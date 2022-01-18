@@ -1,6 +1,6 @@
 {
     files = {
-        "src/main.cpp"
+        "src/Actions.cpp"
     },
     values = {
         "/usr/bin/gcc",
@@ -11,6 +11,6 @@
             "/root/.xmake/packages/p/pegtl/3.2.2/eb9f70b8886845ba88088412887ed882/include"
         }
     },
-    depfiles_gcc = "build/.objs/stretch/linux/x86_64/release/src/main.cpp.o: src/main.cpp  src/Actions.cpp\
+    depfiles_gcc = "build/.objs/stretch/linux/x86_64/release/src/Actions.cpp.o:  src/Actions.cpp\
 "
 }

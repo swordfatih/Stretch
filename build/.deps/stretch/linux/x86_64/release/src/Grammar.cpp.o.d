@@ -1,4 +1,7 @@
 {
+    files = {
+        "src/Grammar.cpp"
+    },
     values = {
         "/usr/bin/gcc",
         {
@@ -9,8 +12,5 @@
         }
     },
     depfiles_gcc = "build/.objs/stretch/linux/x86_64/release/src/Grammar.cpp.o:  src/Grammar.cpp\
-",
-    files = {
-        "src/Grammar.cpp"
-    }
+"
 }
