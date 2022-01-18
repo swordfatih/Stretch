@@ -1,6 +1,4 @@
 {
-    depfiles_gcc = "build/.objs/stretch/linux/x86_64/release/src/Grammaire.cpp.o:  src/Grammaire.cpp\
-",
     values = {
         "/usr/bin/gcc",
         {
@@ -12,5 +10,7 @@
     },
     files = {
         "src/Grammaire.cpp"
-    }
+    },
+    depfiles_gcc = "build/.objs/stretch/linux/x86_64/release/src/Grammaire.cpp.o:  src/Grammaire.cpp\
+"
 }
