@@ -1,22 +1,25 @@
 #include <iostream>
 #include <algorithm>
 
-#include "Grammaire.cpp"
-#include "Actions.cpp"
+#include "../include/Actions.hpp"
+#include <tao/pegtl/contrib/parse_tree_to_dot.hpp>
+
+namespace pe = tao::pegtl;
 
 std::string as_string(const std::string& filename)
 {
-   tao::pegtl::file_input in(filename);
+   pe::file_input in(filename);
 
    std::string out;
-   tao::pegtl::parse<grammar, my_action>(in, out);
+   pe::parse<stretch::grammaire, stretch::action>(in, out);
+
+   // pe::parse_tree::print_dot( std::cout, *root );
 
    return out;
 }
 
-int main() 
+int main(void) 
 {
-   std::cout << "" << " 🏴‍☠️🏴‍☠️🏴‍☠️" << std::endl;
    std::cout << as_string("text") << std::endl;
 
    return 0;
