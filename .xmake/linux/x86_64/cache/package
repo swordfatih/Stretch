@@ -1,0 +1,19 @@
+{
+    pegtl = {
+        __installdir = "/root/.xmake/packages/p/pegtl/3.2.2/eb9f70b8886845ba88088412887ed882",
+        envs = {
+            LD_LIBRARY_PATH = {
+                "/root/.xmake/packages/p/pegtl/3.2.2/eb9f70b8886845ba88088412887ed882/lib",
+                "/root/.xmake/packages/c/cmake/3.22.1/0f13fccf1bec481db8a56b7a3c0eff80/lib"
+            },
+            PATH = {
+                "/root/.xmake/packages/c/cmake/3.22.1/0f13fccf1bec481db8a56b7a3c0eff80/bin"
+            }
+        },
+        sysincludedirs = "/root/.xmake/packages/p/pegtl/3.2.2/eb9f70b8886845ba88088412887ed882/include",
+        __requirestr = "pegtl",
+        version = "3.2.2",
+        __enabled = true,
+        license = "BSL-1.0"
+    }
+}
