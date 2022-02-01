@@ -1,29 +1,33 @@
 #include <iostream>
 #include <algorithm>
 
-#include "../include/Actions.hpp"
-#include <tao/pegtl/contrib/parse_tree_to_dot.hpp>
+#include "../include/Grammaire.hpp"
 
 namespace pe = tao::pegtl;
 
-std::string as_string(const std::string& filename)
+auto get_tree_root(const std::string& filename)
 {
    pe::file_input in(filename);
 
-   std::string out;
-   pe::parse<stretch::grammaire, stretch::action>(in, out);
+   // std::string out;
+   // pe::parse<stretch::grammaire, stretch::action>(in, out);
 
-   // pe::parse_tree::print_dot( std::cout, *root );
+   auto root = pe::parse_tree::parse<stretch::expression, stretch::selector>( in );
+   pe::parse_tree::print_dot( std::cout, *root );
 
-   return out;
+   return root;
 }
 
-int main(void) 
+int main() 
 {
-   std::cout << "Hello" << std::endl;
-   std::cout << "Test" << std::endl;
+   auto root = get_tree_root("/home/stretch/text");
 
-   std::cout << as_string("/home/stretch/text") << std::endl;
+   for(auto& node : root->children) {
+      std::cout << node.get() << std::endl;
+      std::cout << node->has_content() << std::endl;
+      auto s = node->string();
+      printf("%s", s);
+   }
 
    return 0;
 }

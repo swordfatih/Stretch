@@ -1,4 +1,7 @@
 #include <tao/pegtl.hpp>
+#include <tao/pegtl/contrib/parse_tree.hpp>
+#include <tao/pegtl/contrib/parse_tree_to_dot.hpp>
+
 
 namespace pe = tao::pegtl;
 
@@ -49,6 +52,10 @@ struct retourner : pe::string< 'r', 'e', 't', 'o', 'u', 'r', 'n', 'e', 'r' > {};
 struct quitter : pe::string< 'q', 'u', 'i', 't', 't', 'e', 'r'> {};
 struct afficher : pe::string< 'a', 'f', 'f', 'i', 'c', 'h', 'e','r'> {};
 
+/// Commentaires
+struct debut_commentaire : pe::string<'/', '*'> {};
+struct fin_commentaire : pe::string<'*', '/'> {};
+
 /**
  * @brief Opérateurs
  * 
@@ -65,22 +72,37 @@ struct afficher : pe::string< 'a', 'f', 'f', 'i', 'c', 'h', 'e','r'> {};
  * 
  */
 
-struct boucle_nombre : pe::seq<repeter, pe::plus<pe::space>, pe::plus<pe::digit>, pe::plus<pe::space>, fois> {};
+// struct boucle_nombre : pe::seq<repeter, pe::plus<pe::space>, pe::plus<pe::digit>, pe::plus<pe::space>, fois> {};
 
-struct expression;
+// store_content, remove_content, apply
 
-struct operande : pe::sor< pe::plus<pe::digit>, expression > {};
-struct addition : pe::seq< operande, pe::plus<pe::space>, pe::plus<plus, pe::plus<pe::space>, operande> > {};
+struct espaces : pe::plus<pe::space> {};
+struct commentaire : pe::seq<debut_commentaire, pe::until<fin_commentaire>> {};
+struct separateur : pe::star<pe::sor<commentaire, espaces>> {}; 
 
-// struct addition : pe::seq< pe::plus<pe::digit>, pe::plus<pe::space>, plus, pe::plus<pe::space>, pe::plus<pe::digit> > {};
+struct nombre : pe::plus<pe::digit> {};
 
-struct soustraction : pe::seq< pe::plus<pe::digit>, pe::plus<pe::space>, moins, pe::plus<pe::space>, pe::plus<pe::digit> > {};
+struct expression_f : pe::opt< pe::seq< pe::sor<plus, moins>, separateur, nombre, separateur, expression_f> > {};
+struct expression : pe::seq<nombre, separateur, expression_f> {};
 
-struct expression : pe::sor< addition, soustraction > {};
+template< typename Rule >
+using selector = tao::pegtl::parse_tree::selector< Rule,
+    tao::pegtl::parse_tree::store_content::on<
+        expression_f,
+        nombre,
+        plus,
+        moins
+    > >;
 
-struct affectation : pe::seq<pe::plus<pe::alpha>, pe::plus<pe::space>, fleche_gauche, pe::plus<pe::space>, expression >  {};
+// // struct addition : pe::seq< pe::plus<pe::digit>, pe::plus<pe::space>, plus, pe::plus<pe::space>, pe::plus<pe::digit> > {};
 
-struct grammaire : pe::star<pe::seq<affectation, pe::eol>> {};
+// struct soustraction : pe::seq< pe::plus<pe::digit>, pe::plus<pe::space>, moins, pe::plus<pe::space>, pe::plus<pe::digit> > {};
+
+// ([5 + 2] + 4) + 1
+
+// struct affectation : pe::seq<pe::plus<pe::alpha>, pe::plus<pe::space>, fleche_gauche, pe::plus<pe::space>, expression >  {};
+
+// struct grammaire : pe::star<pe::seq<affectation, pe::eol>> {}; 
 
 // struct variable : pe::star<pe::alpha> {};
 // struct plus_minus : pe::opt< pe::one< '+', '-' > > {};  
