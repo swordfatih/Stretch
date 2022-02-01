@@ -20,7 +20,10 @@ std::string as_string(const std::string& filename)
 
 int main(void) 
 {
-   std::cout << as_string("text") << std::endl;
+   std::cout << "Hello" << std::endl;
+   std::cout << "Test" << std::endl;
+
+   std::cout << as_string("/home/stretch/text") << std::endl;
 
    return 0;
 }
