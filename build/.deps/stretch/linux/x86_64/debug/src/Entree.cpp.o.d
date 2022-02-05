@@ -1,6 +1,9 @@
 {
     depfiles_gcc = "build/.objs/stretch/linux/x86_64/debug/src/Entree.cpp.o: src/Entree.cpp\
 ",
+    files = {
+        "src/Entree.cpp"
+    },
     values = {
         "/usr/bin/gcc",
         {
@@ -11,8 +14,5 @@
             "-isystem",
             "/root/.xmake/packages/p/pegtl/3.2.2/eb9f70b8886845ba88088412887ed882/include"
         }
-    },
-    files = {
-        "src/Entree.cpp"
     }
 }

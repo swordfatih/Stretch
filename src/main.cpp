@@ -5,29 +5,38 @@
 
 namespace pe = tao::pegtl;
 
-auto get_tree_root(const std::string& filename)
+// std::string out;
+// pe::parse<stretch::grammaire, stretch::action>(in, out);
+
+template <typename T>
+void print_tree(std::unique_ptr<T>* root)
 {
-   pe::file_input in(filename);
-
-   // std::string out;
-   // pe::parse<stretch::grammaire, stretch::action>(in, out);
-
-   auto root = pe::parse_tree::parse<stretch::expression, stretch::selector>( in );
-   pe::parse_tree::print_dot( std::cout, *root );
-
-   return root;
+    pe::parse_tree::print_dot(std::cout, **root);
 }
 
-int main() 
+template <typename T>
+int evaluer(std::unique_ptr<T>* root, bool first = false) {
+    auto& noeud = **root;
+
+    if(noeud.children.size() == 0)
+        return noeud.string().size() == 0 ? 0 : std::stoi(noeud.string());
+    
+    std::string operateur = first ? "+" : noeud.children[0]->string();
+    int valeur = std::stoi(first ? noeud.children[0]->string() : noeud.children[1]->string()) * (operateur == "-" ? -1 : 1);
+    auto& expression = noeud.children.back();
+
+    return valeur + evaluer(&expression);
+}
+
+int main()
 {
-   auto root = get_tree_root("/home/stretch/text");
+    std::string filename = "/home/stretch/text";
+    pe::file_input in(filename);
 
-   for(auto& node : root->children) {
-      std::cout << node.get() << std::endl;
-      std::cout << node->has_content() << std::endl;
-      auto s = node->string();
-      printf("%s", s);
-   }
+    auto root = pe::parse_tree::parse<stretch::expression, stretch::selector>(in);
 
-   return 0;
+    print_tree(&root);
+    std::cout << evaluer(&root, true) << std::endl;
+
+    return 0;
 }
