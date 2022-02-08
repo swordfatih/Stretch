@@ -1,7 +1,10 @@
 #include <iostream>
 #include <algorithm>
+#include <optional>
 
 #include "../include/Grammaire.hpp"
+
+#include <tao/pegtl/demangle.hpp>
 
 namespace pe = tao::pegtl;
 
@@ -14,18 +17,41 @@ void print_tree(std::unique_ptr<T>* root)
     pe::parse_tree::print_dot(std::cout, **root);
 }
 
+const int operation(const std::string_view& operateur, const std::optional<int> first, const std::optional<int> second) {
+    if(first == std::nullopt)
+        return second.value();
+    else if(second == std::nullopt)
+        return first.value();
+
+    std::cout << operateur << ' ' << first.value() << ' ' << second.value() << std::endl;
+
+    if(operateur == pe::demangle<stretch::plus>()) { 
+        return first.value() + second.value();
+    }
+    else if(operateur == pe::demangle<stretch::moins>()) {
+        return first.value() - second.value();
+    }
+    else if(operateur == pe::demangle<stretch::facteur>()) {
+        return first.value() * second.value();
+    }
+    else if(operateur == pe::demangle<stretch::fraction>()) {
+        return first.value() / second.value();
+    }
+}
+
 template <typename T>
-int evaluer(std::unique_ptr<T>* root, bool first = false) {
+std::optional<int> evaluer(std::unique_ptr<T>* root, bool first = false) {
     auto& noeud = **root;
 
     if(noeud.children.size() == 0)
-        return noeud.string().size() == 0 ? 0 : std::stoi(noeud.string());
-    
-    std::string operateur = first ? "+" : noeud.children[0]->string();
-    int valeur = std::stoi(first ? noeud.children[0]->string() : noeud.children[1]->string()) * (operateur == "-" ? -1 : 1);
+        return noeud.string().size() == 0 ? std::nullopt : std::optional<int>{std::stoi(noeud.string())};
+
+    std::string_view operateur = noeud.children.back()->children.size() != 0 ? noeud.children.back()->children[0]->type : pe::demangle<stretch::plus>();
+
+    int valeur = std::stoi(first ? noeud.children[0]->string() : noeud.children[1]->string());
     auto& expression = noeud.children.back();
 
-    return valeur + evaluer(&expression);
+    return operation(operateur, std::optional<int>{valeur}, evaluer(&expression));
 }
 
 int main()
@@ -36,7 +62,7 @@ int main()
     auto root = pe::parse_tree::parse<stretch::expression, stretch::selector>(in);
 
     print_tree(&root);
-    std::cout << evaluer(&root, true) << std::endl;
+    std::cout << evaluer(&root, true).value() << std::endl;
 
     return 0;
 }

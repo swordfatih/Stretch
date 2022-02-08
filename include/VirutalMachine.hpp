@@ -1,0 +1,3 @@
+struct VirutalMachine {
+    GarbageCollector gc;
+}

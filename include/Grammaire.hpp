@@ -30,13 +30,16 @@ struct egal : pe::string< 'e', 'g', 'a', 'l' > {};
 struct si : pe::string< 's', 'i' > {};
 struct sinon : pe::string< 's', 'i', 'n', 'o', 'n' > {};
 
-/// Operateurs arithmétiques
+/// Operateur d'affectation
 struct fleche_gauche : pe::string< '<', '-' > {};
+
+/// Operateurs arithmétiques
 struct fraction : pe::string< '/' > {};
 struct facteur : pe::string< '*' > {};
 struct moins : pe::string< '-' > {};
 struct modulo : pe::string< '%' > {};
 struct plus : pe::string< '+' > {};
+struct operateur_arithmetique : pe::sor<fraction, facteur, moins, modulo, plus> {};
 
 /// Operateurs logiques
 struct et : pe::string< 'e', 't' > {};
@@ -82,7 +85,7 @@ struct separateur : pe::star<pe::sor<commentaire, espaces>> {};
 
 struct nombre : pe::plus<pe::digit> {};
 
-struct expression_f : pe::opt< pe::seq< pe::sor<plus, moins>, separateur, nombre, separateur, expression_f> > {};
+struct expression_f : pe::opt< pe::seq< operateur_arithmetique, separateur, nombre, separateur, expression_f> > {};
 struct expression : pe::seq<nombre, separateur, expression_f> {};
 
 template< typename Rule >
@@ -91,7 +94,9 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         expression_f,
         nombre,
         plus,
-        moins
+        moins,
+        facteur,
+        fraction
     > >;
 
 // // struct addition : pe::seq< pe::plus<pe::digit>, pe::plus<pe::space>, plus, pe::plus<pe::space>, pe::plus<pe::digit> > {};
