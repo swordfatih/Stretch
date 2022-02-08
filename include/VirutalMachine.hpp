@@ -1,3 +1,0 @@
-struct VirutalMachine {
-    GarbageCollector gc;
-}

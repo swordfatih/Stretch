@@ -2,6 +2,8 @@
 #include <tao/pegtl/contrib/parse_tree.hpp>
 #include <tao/pegtl/contrib/parse_tree_to_dot.hpp>
 
+#include <functional>
+#include <map>
 
 namespace pe = tao::pegtl;
 
@@ -32,6 +34,40 @@ struct sinon : pe::string< 's', 'i', 'n', 'o', 'n' > {};
 
 /// Operateur d'affectation
 struct fleche_gauche : pe::string< '<', '-' > {};
+
+template <typename T>
+static std::map<std::string_view, std::function<T(const T, const T)>> operations = {
+    {
+        "stretch::plus", 
+        [](const T first, const T second) {
+            return first + second;
+        }
+    },
+    {
+        "stretch::moins", 
+        [](const T first, const T second) {
+            return first - second;
+        }
+    },
+    {
+        "stretch::fraction", 
+        [](const T first, const T second) {
+            return first / second;
+        }
+    },
+    {
+        "stretch::facteur", 
+        [](const T first, const T second) {
+            return first * second;
+        }
+    },
+    {
+        "stretch::modulo", 
+        [](const T first, const T second) {
+            return first % second;
+        }
+    }
+};
 
 /// Operateurs arithmétiques
 struct fraction : pe::string< '/' > {};
@@ -96,7 +132,8 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         plus,
         moins,
         facteur,
-        fraction
+        fraction,
+        modulo
     > >;
 
 // // struct addition : pe::seq< pe::plus<pe::digit>, pe::plus<pe::space>, plus, pe::plus<pe::space>, pe::plus<pe::digit> > {};
