@@ -1,9 +1,6 @@
 {
-    depfiles_gcc = "build/.objs/stretch/linux/x86_64/debug/src/main.cpp.o: src/main.cpp  src/../include/Arithmetique.hpp src/../include/../include/Grammaire.hpp\
+    depfiles_gcc = "build/.objs/stretch/linux/x86_64/debug/src/Memoire.cpp.o: src/Memoire.cpp  src/../include/Memoire.hpp src/../include/Variable.hpp\
 ",
-    files = {
-        "src/main.cpp"
-    },
     values = {
         "/usr/bin/gcc",
         {
@@ -14,5 +11,8 @@
             "-isystem",
             "/root/.xmake/packages/p/pegtl/3.2.2/eb9f70b8886845ba88088412887ed882/include"
         }
+    },
+    files = {
+        "src/Memoire.cpp"
     }
 }

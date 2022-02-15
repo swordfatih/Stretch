@@ -2,9 +2,6 @@
 #include <tao/pegtl/contrib/parse_tree.hpp>
 #include <tao/pegtl/contrib/parse_tree_to_dot.hpp>
 
-#include <functional>
-#include <map>
-
 namespace pe = tao::pegtl;
 
 namespace stretch {
@@ -35,40 +32,6 @@ struct sinon : pe::string< 's', 'i', 'n', 'o', 'n' > {};
 /// Operateur d'affectation
 struct fleche_gauche : pe::string< '<', '-' > {};
 
-template <typename T>
-static std::map<std::string_view, std::function<T(const T, const T)>> operations = {
-    {
-        "stretch::plus", 
-        [](const T first, const T second) {
-            return first + second;
-        }
-    },
-    {
-        "stretch::moins", 
-        [](const T first, const T second) {
-            return first - second;
-        }
-    },
-    {
-        "stretch::fraction", 
-        [](const T first, const T second) {
-            return first / second;
-        }
-    },
-    {
-        "stretch::facteur", 
-        [](const T first, const T second) {
-            return first * second;
-        }
-    },
-    {
-        "stretch::modulo", 
-        [](const T first, const T second) {
-            return first % second;
-        }
-    }
-};
-
 /// Operateurs arithmétiques
 struct fraction : pe::string< '/' > {};
 struct facteur : pe::string< '*' > {};
@@ -91,9 +54,11 @@ struct retourner : pe::string< 'r', 'e', 't', 'o', 'u', 'r', 'n', 'e', 'r' > {};
 struct quitter : pe::string< 'q', 'u', 'i', 't', 't', 'e', 'r'> {};
 struct afficher : pe::string< 'a', 'f', 'f', 'i', 'c', 'h', 'e','r'> {};
 
-/// Commentaires
+/// Blocs
 struct debut_commentaire : pe::string<'/', '*'> {};
 struct fin_commentaire : pe::string<'*', '/'> {};
+struct parenthese_ouvrante : pe::one< '(' > {};
+struct parenthese_fermante : pe::one< ')' > {};
 
 /**
  * @brief Opérateurs
@@ -121,19 +86,69 @@ struct separateur : pe::star<pe::sor<commentaire, espaces>> {};
 
 struct nombre : pe::plus<pe::digit> {};
 
-struct expression_f : pe::opt< pe::seq< operateur_arithmetique, separateur, nombre, separateur, expression_f> > {};
-struct expression : pe::seq<nombre, separateur, expression_f> {};
+// struct operation_unaire : pe::list<> {};
+
+struct operation_ou;
+
+struct entre_parentheses : pe::seq< parenthese_ouvrante, operation_ou, parenthese_fermante > {};
+struct valeur : pe::sor< nombre, entre_parentheses > {};
+
+struct operation_produit : pe::list< valeur, pe::sor < facteur, fraction, modulo > > {};
+struct operation_somme : pe::list< operation_produit, pe::sor < plus, moins > > > {};
+struct operation_ordre : pe::list< operation_somme, pe::sor < plus_grand_que, plus_petit_que > > {};
+struct operation_egal : pe::list< operation_ordre, pe::sor < egal > > {};
+struct operation_et : pe::list< operation_egal, pe::sor < et > > {}; 
+struct operation_ou : pe::list< operation_et, pe::sor < ou > > {};
+
+struct grammaire : operation_ou {};
+
+// struct expression_f : pe::opt< pe::seq< operateur_arithmetique, separateur, nombre, separateur, expression_f > > {};
+// struct expression : pe::seq< nombre, separateur, expression_f > {};
+
+// struct expression_f : pe::sor< pe::seq<nombre, separateur, operateur_arithmetique, separateur, expression_f>, nombre > {};
+// struct expression : pe::seq<nombre, separateur, operateur_arithmetique, separateur, expression_f> {}; 
+
+struct rearrange : pe::parse_tree::apply< rearrange > 
+{
+    template< typename Node, typename... States >
+    static void transform( std::unique_ptr< Node >& n, States&&... st )
+    {
+        if( n->children.size() == 1 ) {
+            n = std::move( n->children.back() );
+        }
+        else {
+            n->remove_content();
+            auto& c = n->children;
+            auto r = std::move( c.back() );
+            c.pop_back();
+            auto o = std::move( c.back() );
+            c.pop_back();
+            o->children.emplace_back( std::move( n ) );
+            o->children.emplace_back( std::move( r ) );
+            n = std::move( o );
+
+            transform( n->children.front(), st... );
+        }
+    }
+};
 
 template< typename Rule >
 using selector = tao::pegtl::parse_tree::selector< Rule,
     tao::pegtl::parse_tree::store_content::on<
-        expression_f,
         nombre,
         plus,
         moins,
         facteur,
         fraction,
         modulo
+    >,
+    rearrange::on<
+        operation_ou,
+        operation_et,
+        operation_egal,
+        operation_ordre,
+        operation_somme,
+        operation_produit
     > >;
 
 // // struct addition : pe::seq< pe::plus<pe::digit>, pe::plus<pe::space>, plus, pe::plus<pe::space>, pe::plus<pe::digit> > {};
