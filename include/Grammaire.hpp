@@ -149,7 +149,8 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         et,
         plus_grand_que,
         plus_petit_que,
-        egal
+        egal,
+        variable
     >,
     rearrange::on<
         operation_ou,

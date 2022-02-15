@@ -43,13 +43,9 @@ static std::map<std::string_view, std::function<T(const T, const T)>> operations
     }
 };
 
-const int operation(const std::string_view& operateur, const std::optional<int> first, const std::optional<int> second) {
-    if(first == std::nullopt)
-        return second.value();
-    else if(second == std::nullopt)
-        return first.value();
-
-    return operations<int>[operateur](first.value(), second.value());
+template <typename T>
+const T operation(const std::string_view& operateur, const T first, const T second) {
+    return operations<T>[operateur](first, second);
 }
 
 } // namespace stretch::arithmetique
