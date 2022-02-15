@@ -39,9 +39,8 @@ int main()
     pe::file_input in(filename);
 
     auto root = pe::parse_tree::parse<stretch::operation_ou, stretch::selector>(in);
-    pe::parse_tree::print_dot(std::cout, *root);
 
-    // print_tree(&root);
+    print_tree(&root);
     // std::cout << evaluer(&root, true).value() << std::endl;
 
     return 0;

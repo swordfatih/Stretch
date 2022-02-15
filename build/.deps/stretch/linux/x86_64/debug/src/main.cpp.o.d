@@ -1,9 +1,9 @@
 {
-    depfiles_gcc = "build/.objs/stretch/linux/x86_64/debug/src/main.cpp.o: src/main.cpp  src/../include/Arithmetique.hpp src/../include/../include/Grammaire.hpp\
-",
     files = {
         "src/main.cpp"
     },
+    depfiles_gcc = "build/.objs/stretch/linux/x86_64/debug/src/main.cpp.o: src/main.cpp  src/../include/Arithmetique.hpp src/../include/../include/Grammaire.hpp\
+",
     values = {
         "/usr/bin/gcc",
         {

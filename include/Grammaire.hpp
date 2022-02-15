@@ -88,19 +88,23 @@ struct nombre : pe::plus<pe::digit> {};
 
 // struct operation_unaire : pe::list<> {};
 
-struct operation_ou;
+struct operation;
 
-struct entre_parentheses : pe::seq< parenthese_ouvrante, operation_ou, parenthese_fermante > {};
-struct valeur : pe::sor< nombre, entre_parentheses > {};
+struct variable : pe::identifier {};
+
+struct entre_parentheses : pe::seq< parenthese_ouvrante, operation, parenthese_fermante > {};
+struct valeur : pe::seq< separateur, pe::sor< nombre, entre_parentheses, variable >, separateur > {};
 
 struct operation_produit : pe::list< valeur, pe::sor < facteur, fraction, modulo > > {};
-struct operation_somme : pe::list< operation_produit, pe::sor < plus, moins > > > {};
+struct operation_somme : pe::list< operation_produit, pe::sor < plus, moins > > {};
 struct operation_ordre : pe::list< operation_somme, pe::sor < plus_grand_que, plus_petit_que > > {};
 struct operation_egal : pe::list< operation_ordre, pe::sor < egal > > {};
 struct operation_et : pe::list< operation_egal, pe::sor < et > > {}; 
 struct operation_ou : pe::list< operation_et, pe::sor < ou > > {};
 
-struct grammaire : operation_ou {};
+struct operation : operation_ou {};
+
+struct grammaire : operation {};
 
 // struct expression_f : pe::opt< pe::seq< operateur_arithmetique, separateur, nombre, separateur, expression_f > > {};
 // struct expression : pe::seq< nombre, separateur, expression_f > {};
@@ -140,7 +144,12 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         moins,
         facteur,
         fraction,
-        modulo
+        modulo,
+        ou,
+        et,
+        plus_grand_que,
+        plus_petit_que,
+        egal
     >,
     rearrange::on<
         operation_ou,
