@@ -5,7 +5,7 @@ namespace stretch {
 void Memoire::vider() {
     if(variables.empty())
         variables.clear();
-}
+} 
 
 // void Memoire::supprimer_variable(const std::string& nom) {
 //     variables.erase(nom);
