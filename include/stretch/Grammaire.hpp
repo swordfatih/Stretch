@@ -61,32 +61,18 @@ struct parenthese_ouvrante : pe::one< '(' > {};
 struct parenthese_fermante : pe::one< ')' > {};
 
 /**
- * @brief Opérateurs
+ * @brief Langage
  * 
  */
-
-
-/**
- * @brief Autre
- * 
- */
-
-/**
- * @brief Grammaire
- * 
- */
-
-// struct boucle_nombre : pe::seq<repeter, pe::plus<pe::space>, pe::plus<pe::digit>, pe::plus<pe::space>, fois> {};
-
-// store_content, remove_content, apply
-
 struct espaces : pe::plus<pe::space> {};
 struct commentaire : pe::seq<debut_commentaire, pe::until<fin_commentaire>> {};
 struct separateur : pe::star<pe::sor<commentaire, espaces>> {}; 
 
+/**
+ * @brief Operations
+ * 
+ */
 struct nombre : pe::plus<pe::digit> {};
-
-// struct operation_unaire : pe::list<> {};
 
 struct operation;
 
@@ -104,15 +90,7 @@ struct operation_ou : pe::list< operation_et, pe::sor < ou > > {};
 
 struct operation : operation_ou {};
 
-struct grammaire : operation {};
-
-// struct expression_f : pe::opt< pe::seq< operateur_arithmetique, separateur, nombre, separateur, expression_f > > {};
-// struct expression : pe::seq< nombre, separateur, expression_f > {};
-
-// struct expression_f : pe::sor< pe::seq<nombre, separateur, operateur_arithmetique, separateur, expression_f>, nombre > {};
-// struct expression : pe::seq<nombre, separateur, operateur_arithmetique, separateur, expression_f> {}; 
-
-struct rearrange : pe::parse_tree::apply< rearrange > 
+struct rearrange_operation : pe::parse_tree::apply< rearrange > 
 {
     template< typename Node, typename... States >
     static void transform( std::unique_ptr< Node >& n, States&&... st )
@@ -136,6 +114,21 @@ struct rearrange : pe::parse_tree::apply< rearrange >
     }
 };
 
+/**
+ * @brief Condi
+ * 
+ */
+
+
+
+/**
+ * @brief Grammaire
+ * 
+ */
+struct grammaire : operation {};
+
+// store_content, remove_content, apply
+
 template< typename Rule >
 using selector = tao::pegtl::parse_tree::selector< Rule,
     tao::pegtl::parse_tree::store_content::on<
@@ -152,7 +145,7 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         egal,
         variable
     >,
-    rearrange::on<
+    rearrange_operation::on<
         operation_ou,
         operation_et,
         operation_egal,
@@ -160,75 +153,3 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         operation_somme,
         operation_produit
     > >;
-
-// // struct addition : pe::seq< pe::plus<pe::digit>, pe::plus<pe::space>, plus, pe::plus<pe::space>, pe::plus<pe::digit> > {};
-
-// struct soustraction : pe::seq< pe::plus<pe::digit>, pe::plus<pe::space>, moins, pe::plus<pe::space>, pe::plus<pe::digit> > {};
-
-// ([5 + 2] + 4) + 1
-
-// struct affectation : pe::seq<pe::plus<pe::alpha>, pe::plus<pe::space>, fleche_gauche, pe::plus<pe::space>, expression >  {};
-
-// struct grammaire : pe::star<pe::seq<affectation, pe::eol>> {}; 
-
-// struct variable : pe::star<pe::alpha> {};
-// struct plus_minus : pe::opt< pe::one< '+', '-' > > {};  
-// struct addition : pe::seq< pe::digit, pe::star<space>, pe::plus_minus, pe::star<space>, pe::digit > {};
-
-// struct dot : pe::one< '.' > {};
-
-/*
-struct grammar : star<
-        seq<
-            star<
-                seq<
-                    sor<repeter, egal>, 
-                    space
-                >
-            >, 
-            eolf
-        >
-    > {};
-*/
-
-}
-
-/*
-    struct number
-    : tao::pegtl::plus< tao::pegtl::digit > {};
-
-    struct addition;  // Forward declaration to break the cyclic dependency.
-
-    struct bracket
-    : tao::pegtl::if_must< tao::pegtl::one< '(' >, addition, tao::pegtl::one< ')' > > {};
-
-    struct atomic
-    : tao::pegtl::sor< number, bracket > {};
-
-    struct addition
-    : tao::pegtl::list< atomic, tao::pegtl::one< '+' > > {};
-
-    struct inf : seq< istring< 'i', 'n', 'f' >,
-                        opt< istring< 'i', 'n', 'i', 't', 'y' > > > {};
-
-    struct nan : seq< istring< 'n', 'a', 'n' >,
-                        opt< one< '(' >,
-                            plus< alnum >,
-                            one< ')' > > > {};
-
-    template< typename D >
-    struct number : if_then_else< dot,
-                                    plus< D >,
-                                    seq< plus< D >, opt< dot, star< D > > > > {};
-
-    struct e : one< 'e', 'E' > {};
-    struct p : one< 'p', 'P' > {};
-    struct exponent : seq< plus_minus, plus< digit > > {};
-
-    struct decimal : seq< number< digit >, opt< e, exponent > > {};
-    struct hexadecimal : seq< one< '0' >, one< 'x', 'X' >, number< xdigit >, opt< p, exponent > > {};
-
-    struct grammar : star<seq< plus<dot>, eolf >> {};
-
-    star<plus<dot>, eolf>
-*/
