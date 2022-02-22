@@ -1,9 +1,9 @@
-.vscode/**
-.xmake/**
+.vscode/
+.xmake/
 wget-log
 main.o
 parse_tree.png
 stretch
 stretch-d
-build/**
+build/
 test
