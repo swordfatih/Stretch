@@ -1,0 +1,32 @@
+{
+    pegtl = {
+        __requirestr = "pegtl",
+        sysincludedirs = "/root/.xmake/packages/p/pegtl/3.2.2/eb9f70b8886845ba88088412887ed882/include",
+        __installdir = "/root/.xmake/packages/p/pegtl/3.2.2/eb9f70b8886845ba88088412887ed882",
+        __enabled = true,
+        version = "3.2.2",
+        license = "BSL-1.0",
+        envs = {
+            PATH = {
+                "/root/.xmake/packages/c/cmake/3.22.1/0f13fccf1bec481db8a56b7a3c0eff80/bin"
+            },
+            LD_LIBRARY_PATH = {
+                "/root/.xmake/packages/p/pegtl/3.2.2/eb9f70b8886845ba88088412887ed882/lib",
+                "/root/.xmake/packages/c/cmake/3.22.1/0f13fccf1bec481db8a56b7a3c0eff80/lib"
+            }
+        }
+    },
+    catch2 = {
+        __requirestr = "catch2",
+        sysincludedirs = "/root/.xmake/packages/c/catch2/2.13.7/fc9818b157154703aa80024c54a2b899/include",
+        __installdir = "/root/.xmake/packages/c/catch2/2.13.7/fc9818b157154703aa80024c54a2b899",
+        __enabled = true,
+        version = "2.13.7",
+        license = "BSL-1.0",
+        envs = {
+            LD_LIBRARY_PATH = {
+                "/root/.xmake/packages/c/catch2/2.13.7/fc9818b157154703aa80024c54a2b899/lib"
+            }
+        }
+    }
+}
