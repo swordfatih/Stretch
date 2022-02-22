@@ -1,7 +1,17 @@
+add_requires("pegtl", "catch2")
+
 add_requires("pegtl")
 target("stretch")
 	set_languages("c++17")
 	set_kind("binary")
-	add_files("src/*.cpp")
+	add_includedirs("include/")
+	add_files("src/stretch/*.cpp")
 	add_packages("pegtl")
 	add_rules("mode.debug")
+
+target("test")
+	set_languages("c++17")
+	set_kind("binary")
+	add_includedirs("include/")
+	add_files("src/tests/*.cpp")
+	add_packages("pegtl", "catch2")
