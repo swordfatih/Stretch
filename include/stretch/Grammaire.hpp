@@ -1,7 +1,6 @@
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/parse_tree.hpp>
 
-
 namespace pe = tao::pegtl;
 
 namespace stretch {
