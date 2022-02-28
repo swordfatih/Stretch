@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <tao/pegtl/contrib/parse_tree_to_dot.hpp>
 #include "stretch/Evaluation.hpp"
 
 namespace pe = tao::pegtl;

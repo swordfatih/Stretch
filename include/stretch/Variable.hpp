@@ -14,7 +14,7 @@ public:
     /// chaîne de caractère
     ///
     ////////////////////////////////////////////////////////////
-    // Variable(const std::string& chaine) = 0;
+    Variable(const std::string& chaine);
 
 private:
     virtual void parse(const std::string& chaine) = 0;
