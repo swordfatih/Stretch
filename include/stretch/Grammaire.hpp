@@ -121,26 +121,32 @@ struct rearrange_operation : pe::parse_tree::apply< rearrange_operation >
 /////////////////////////////////////////////////
 /// @brief Conditions
 /////////////////////////////////////////////////
- struct bloc;
- struct condition : pe::seq< si, separateur, operation, separateur, bloc > {};
+struct bloc;
+struct condition : pe::seq< si, separateur, operation, separateur, bloc > {};
+
+/////////////////////////////////////////////////
+/// @brief Assignation
+/////////////////////////////////////////////////
+struct assignation : pe::seq<variable, separateur, fleche_gauche, separateur, operation> {};
 
 /////////////////////////////////////////////////
 /// @brief Blocs d'instructions
 /////////////////////////////////////////////////
- struct debut_bloc : pe::sor< pe::bof, faire, alors > {};
- struct fin_bloc : pe::sor< pe::eof, fin > {};
- struct instruction : pe::sor< operation, condition > {};
- struct bloc : pe::seq< debut_bloc, pe::star< instruction >, pe::until< fin_bloc > > {};
+struct debut_bloc : pe::sor< pe::bof, faire, alors > {};
+struct fin_bloc : pe::sor< pe::eof, fin > {};
+struct instruction : pe::sor< assignation, condition > {};
+struct bloc : pe::seq< debut_bloc, separateur, pe::star< instruction, separateur >, separateur, pe::until< fin_bloc > > {};
 
 /////////////////////////////////////////////////
 /// @brief Grammaire
 /////////////////////////////////////////////////
- struct grammaire : bloc {};
+struct grammaire : bloc {};
 
 // store_content, remove_content, apply
 template< typename Rule >
 using selector = tao::pegtl::parse_tree::selector< Rule,
     tao::pegtl::parse_tree::store_content::on<
+        // operations
         nombre,
         plus,
         moins,
@@ -153,8 +159,10 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         plus_petit_que,
         egal,
         variable,
+
+        // instructions
         bloc,
-        instruction,
+        assignation,
         condition
     >,
     rearrange_operation::on<
@@ -180,11 +188,6 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
 /////////////////////////////////////////////////
 // struct boucle_tant_que : pe::seq<tant_que, expression, bloc_code, fin> {};
 // struct boucle_repeter_x_fois : pe::seq<repeter, expression, fois, bloc_code, fin> {};
-
-/////////////////////////////////////////////////
-/// @brief Assignation
-/////////////////////////////////////////////////
-// struct assignation : pe::seq<pe::list<pe::identifier, virgule>, fleche_gauche, liste_parametres> {};
 
 /////////////////////////////////////////////////
 /// @brief Chaine

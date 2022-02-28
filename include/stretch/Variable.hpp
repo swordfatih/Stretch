@@ -7,14 +7,14 @@ public:
     /// \brief Constructeur qui attribue une valeur par défaut
     ///
     ////////////////////////////////////////////////////////////
-    virtual Entier() = 0;
+    Variable() = default;
 
     ////////////////////////////////////////////////////////////
     /// \brief Constructeur qui créer la variable depuis une
     /// chaîne de caractère
     ///
     ////////////////////////////////////////////////////////////
-    virtual Entier(const std::string& chaine) = 0;
+    // Variable(const std::string& chaine) = 0;
 
 private:
     virtual void parse(const std::string& chaine) = 0;
