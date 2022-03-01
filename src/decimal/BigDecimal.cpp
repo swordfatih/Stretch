@@ -23,7 +23,7 @@ SOFTWARE.
 */
 #define _ASSERT(cond) ((!(cond)) ? _assert(#cond,__FILE__,__LINE__) : _noassert())
 
-#include "BigDecimal.h"
+#include "decimal/BigDecimal.h"
 #include <string.h>
 #include <stdlib.h>
 #include <iostream>
