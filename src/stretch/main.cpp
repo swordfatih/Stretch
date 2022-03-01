@@ -4,9 +4,14 @@
 
 namespace pe = tao::pegtl;
 
-int main()
+int main(int argc, char *argv[])
 {
-    std::string filename = "main.st";
+    if(argc != 2) {
+        std::cerr << "No path given as option" << std::endl;
+        return 0;
+    }
+
+    std::string filename{argv[1]};
     pe::file_input in(filename); 
 
     auto root = pe::parse_tree::parse<stretch::grammaire, stretch::selector>(in);
