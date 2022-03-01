@@ -1,4 +1,4 @@
-name: Test stretch
+name: Stretch
 
 on:
   - push
@@ -14,12 +14,28 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v1
-      - uses: xmake-io/github-action-setup-xmake@master
+      - uses: actions/checkout@v2
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v1
+      - name: Setup xmake
+        uses: xmake-io/github-action-setup-xmake@master
         with:
           xmake-version: ${{ matrix.version }}
-      - name: Run tests
+      - name: Run stretch
         run: |
           xmake --version
           xmake build -y stretch 
-          xmake run stretch ../../../../main.st
+          xmake run stretch ../../../../main.st | dot -Tpng -o tree.png
+      - name: Commit le png
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add tree.png
+          git commit -m "Mise a jour de la visualisation" -a
+      - name: Enregistrer le png dans une branch
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.ACTION_TOKEN }}
+          directory: ${{ github.repository }}
+          force: true
+          branch: ${{ github.ref }}
