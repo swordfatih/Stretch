@@ -65,8 +65,8 @@ struct parenthese_fermante : pe::one< ')' > {};
 /// Ponctuation
 struct virgule : pe::one< ',' > {};
 struct point : pe::one< '.' > {};
-struct guillemets : pe::one< '"' >;
-struct apostrophe : pe::one< '\'' >;
+struct guillemets : pe::one< '"' > {};
+struct apostrophe : pe::one< '\'' > {};
 
 /////////////////////////////////////////////////
 /// @brief Separateurs
@@ -85,14 +85,14 @@ struct reel : pe::seq< entier, point, pe::opt< entier > > {};                   
 struct chaine : pe::seq< guillemets, pe::until< guillemets > > {};              ///< ie. "hello"
 struct booleen : pe::sor < vrai, faux > {};                                     ///< ie. vrai
 
+struct operation;
+struct parentheses : pe::seq< parenthese_ouvrante, operation, parenthese_fermante > {};
+struct valeur : pe::sor< variable, entier, reel, chaine, booleen, parentheses > {};
+
 /////////////////////////////////////////////////
 /// @brief Operations
 /////////////////////////////////////////////////
-struct operation;
-struct parentheses : pe::seq< parenthese_ouvrante, operation, parenthese_fermante > {};
-struct valeur : pe::seq< separateur, pe::sor< variable, entier, reel, chaine, booleen, parentheses >, separateur > {};
-
-struct operation_produit : pe::list< valeur, pe::sor < facteur, fraction, modulo > > {};
+struct operation_produit : pe::list< pe::seq< separateur, valeur, separateur >, pe::sor < facteur, fraction, modulo > > {};
 struct operation_somme : pe::list< operation_produit, pe::sor < plus, moins > > {};
 struct operation_ordre : pe::list< operation_somme, pe::sor < plus_grand_que, plus_petit_que > > {};
 struct operation_egal : pe::list< operation_ordre, pe::sor < egal > > {};
@@ -154,7 +154,7 @@ template< typename Rule >
 using selector = tao::pegtl::parse_tree::selector< Rule,
     tao::pegtl::parse_tree::store_content::on<
         // operations
-        nombre,
+        valeur,
         plus,
         moins,
         facteur,
