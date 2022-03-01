@@ -151,7 +151,7 @@ public:
         return ret;
     }
 
-    std::string toString() {
+    std::string toString() const {
         return value;
     }
 
@@ -160,7 +160,7 @@ public:
             value = BigDecimal::round(value, scale);
     }
 
-    std::string getIntPart() {
+    std::string getIntPart() const {
         std::size_t dot = value.find('.');
         if(dot != std::string::npos) {
             if(dot == 0)
@@ -173,7 +173,7 @@ public:
         }
     }
 
-    std::string getDecPart() {
+    std::string getDecPart() const {
         std::size_t dot = value.find('.');
         if(dot != std::string::npos)
             return value.length()>dot+1?value.substr(dot+1):std::string("0");
