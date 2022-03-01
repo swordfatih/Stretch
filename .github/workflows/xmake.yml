@@ -21,6 +21,5 @@ jobs:
       - name: Run tests
         run: |
           xmake --version
-          xmake create -P test
-          xmake build -P test
-          xmake run -P test
+          xmake build -y stretch 
+          xmake run stretch
