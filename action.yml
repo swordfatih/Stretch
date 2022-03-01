@@ -1,2 +1,0 @@
-- name: setup xmake
-  uses: xmake-io/github-action-setup-xmake@v1.0.12
