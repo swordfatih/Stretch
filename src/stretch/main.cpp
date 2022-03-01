@@ -21,12 +21,12 @@ int main(int argc, char *argv[])
     pe::parse_tree::print_dot(std::cout, *root);
     // stretch::evaluer(root->children[0]);
 
-    std::cout << stretch::Variable("salutt") << std::endl;
-    std::cout << stretch::Variable(45) << std::endl;
-    std::cout << stretch::Variable(75000.8) << std::endl;
-    std::cout << stretch::Variable(stretch::Reel, "45487551215455555555.55555555555555555555555") << std::endl;
-    std::cout << stretch::Variable(root->children[0]->children[1]->children[0]) << std::endl;
-    std::cout << (stretch::Variable::parse("23442.98").get_nature() == stretch::Reel) << std::endl;
+    // std::cout << stretch::Variable("salutt") << std::endl;
+    // std::cout << stretch::Variable(45) << std::endl;
+    // std::cout << stretch::Variable(75000.8) << std::endl;
+    // std::cout << stretch::Variable(stretch::Reel, "45487551215455555555.55555555555555555555555") << std::endl;
+    // std::cout << stretch::Variable(root->children[0]->children[1]->children[0]) << std::endl;
+    // std::cout << (stretch::Variable::parse("23442.98").get_nature() == stretch::Reel) << std::endl;
 
     return 0;
 }

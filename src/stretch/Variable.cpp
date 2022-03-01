@@ -50,7 +50,7 @@ Nature Variable::sto_nature(std::string_view type)
         return Nature::Chaine;
     else if (type == pe::demangle< stretch::booleen >())
         return Nature::Booleen;
-    else if (type == pe::demangle< stretch::reel >())
+    else if (type == pe::demangle< stretch::reel >() || type == pe::demangle< stretch::entier >())
         return Nature::Reel;
 
     return Nature::Nul;
