@@ -1,5 +1,5 @@
 
-struct StretchFonction 
+struct Bloc
 {
     public:
         std::string string() {
