@@ -6,7 +6,7 @@ namespace pe = tao::pegtl;
 
 int main()
 {
-    std::string filename = "/home/stretch/test.txt";
+    std::string filename = "main.st";
     pe::file_input in(filename);
 
     auto root = pe::parse_tree::parse<stretch::grammaire, stretch::selector>(in);
