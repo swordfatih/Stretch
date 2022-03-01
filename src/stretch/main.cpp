@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
     std::cout << stretch::Variable(75000.8) << std::endl;
     std::cout << stretch::Variable(stretch::Reel, "45487551215455555555.55555555555555555555555") << std::endl;
     std::cout << stretch::Variable(root->children[0]->children[1]->children[0]) << std::endl;
+    std::cout << stretch::Variable::parse("23442.98").get_nature() == stretch::Reel << std::endl;
 
     return 0;
 }

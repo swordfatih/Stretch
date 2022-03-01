@@ -2,6 +2,8 @@
 #include <variant>
 #include <string>
 #include <memory>
+#include <algorithm>
+#include <regex>
 #include <iostream>
 
 #include <tao/pegtl/demangle.hpp>
@@ -17,8 +19,7 @@ enum Nature {
     Nul = -1,
     Chaine,
     Booleen,
-    Reel,
-    Entier
+    Reel
 };
 
 using VariantValeur = std::variant< std::string, bool, BigDecimal >;
@@ -48,8 +49,12 @@ public:
     template <typename T>
     Variable(std::unique_ptr<T>& noeud) : Variable(sto_nature(noeud->type), noeud->string()) {}
 
+    Nature get_nature() const;
+    VariantValeur get_valeur() const;
+
     std::string to_string() const;
     friend std::ostream& operator<<(std::ostream& o, const Variable& v) { return o << v.to_string(); }
+
 private:
     Nature m_type; 
     VariantValeur m_valeur; 

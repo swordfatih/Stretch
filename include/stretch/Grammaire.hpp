@@ -161,7 +161,6 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         reel,
         chaine,
         booleen,
-        //valeur,
 
         // operations
         plus,
