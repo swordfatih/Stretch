@@ -1,18 +1,18 @@
 #include <iostream>
-
+#include <tao/pegtl/contrib/parse_tree_to_dot.hpp>
 #include "stretch/Evaluation.hpp"
 
 namespace pe = tao::pegtl;
 
 int main()
 {
-    std::string filename = "/home/stretch/text";
+    std::string filename = "/home/stretch/test.txt";
     pe::file_input in(filename);
 
-    auto root = pe::parse_tree::parse<stretch::operation_ou, stretch::selector>(in);
+    auto root = pe::parse_tree::parse<stretch::grammaire, stretch::selector>(in);
 
-    print_tree(root);
-    std::cout << evaluer(root->children[0]) << std::endl;
+    pe::parse_tree::print_dot(std::cout, *root);
+    // stretch::evaluer(root->children[0]);
 
     return 0;
 }
