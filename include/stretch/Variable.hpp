@@ -20,7 +20,7 @@ namespace stretch {
 /////////////////////////////////////////////////
 /// @brief Les différents types de valeur
 /////////////////////////////////////////////////
-enum Nature {
+enum class Nature {
     Nul = -1,
     Chaine,
     Booleen,
