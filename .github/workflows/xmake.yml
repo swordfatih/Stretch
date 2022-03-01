@@ -1,9 +1,4 @@
 name: Stretch
-description: Langage de programmation
-author: FATIH KILIC, IBRAHIME AHBIB, ELYES BOUNEZOU, SLIM BEN DAALI, GUILLAUME MERCHEZ, SOFIANE TERKI
-branding:
-  icon: code
-  color: yellow
 
 on:
   push:
