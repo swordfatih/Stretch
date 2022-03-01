@@ -27,12 +27,14 @@ jobs:
           xmake build -y stretch 
           xmake run stretch ../../../../main.st | dot -Tpng -o tree.png
       - name: Commit le png
+        continue-on-error: true
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add tree.png
           git commit tree.png -m "Mise a jour de la visualisation"
       - name: Enregistrer le png dans une branch
+        continue-on-error: true
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.ACTION_TOKEN }}
