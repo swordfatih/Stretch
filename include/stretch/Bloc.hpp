@@ -4,11 +4,13 @@
 #include <vector>
 #include <iostream>
 #include "Variable.hpp"
+#include <memory>
 
 /////////////////////////////////////////////////
 /// @brief Classe représentant un bloc d'instruction
 /////////////////////////////////////////////////
-struct Bloc {
+template <typename T>
+class Bloc {
     public:
         /////////////////////////////////////////////////
         /// @brief Constructeur 
@@ -17,7 +19,7 @@ struct Bloc {
         /// @param variables Variables locaux déclarés dans le bloc
         /// @param parametres Parametres du bloc, s'il y en a
         /////////////////////////////////////////////////
-        Bloc(void* root, std::vector<Variable> variables, std::vector<Variable> parametres = {}) : m_root(root), m_parametres(std::move(parametres)), m_variables(std::move(variables)) 
+        Bloc(std::unique_ptr<T>* root, std::vector<Variable> variables = {}, std::vector<Variable> parametres = {}) : m_root(root), m_parametres(std::move(parametres)), m_variables(std::move(variables)) 
         {
             
         }
@@ -26,19 +28,15 @@ struct Bloc {
         {  
             return parametres; 
         }
-        
-        void setParametres(std::vector<Variable> parametres) 
-        { 
-            this->parametres = std::move(parametres); 
-        }
 
         /////////////////////////////////////////////////
         /// @brief ToString
         /////////////////////////////////////////////////
-        const std::ostream &operator<<(std::ostream &os) 
+        friend std::ostream& operator<<(std::ostream& os, const Bloc& b) 
         {
-            return os << "Information sur le bloc à l'adresse " << m_root << std::endl
-                    << "Liste des paramètres " << parametres_string() << std::endl;
+            return os << "Information sur le bloc à l'adresse " << b.m_root << std::endl
+                    << "Liste des paramètres " << b.parametres_string() << std::endl;
+
         }
     
     private:
@@ -48,8 +46,8 @@ struct Bloc {
                 os << param;
             }
         } 
-    
-        void* m_root;                           ///< noeud racine du bloc
+
+        std::unique_ptr<T> *m_root;             ///< noeud racine du bloc
         std::vector<Variable> m_variables;      ///< variables déclarés dans le bloc
         std::vector<Variable> m_parametres;     ///< paramètres du bloc
 };
