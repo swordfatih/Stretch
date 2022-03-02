@@ -21,19 +21,19 @@ Variable evaluer(std::unique_ptr<Noeud>& noeud)
 template <typename Noeud>
 void executer(std::unique_ptr<Noeud>& noeud) 
 {
-    if(noeud->is_root() || noeud->template is_type<stretch::bloc>()) 
+    if(noeud->is_root() || noeud->template is_type<stretch::bloc>())    
     {
         for(auto& c: noeud->children) 
         {
             executer(c);
         }
     }
-    else if(noeud->template is_type<stretch::assignation>()) 
+    else if(noeud->template is_type<stretch::assignation>()) // a <- 5 + 5 + 5
     {
         variables[noeud->children[0]->string()] = evaluer(noeud->children[1]);
         std::cout << "Affectation de " << variables[noeud->children[0]->string()].to_string() << " dans la variable " <<  noeud->children[0]->string() << std::endl;
     } 
-    else if(noeud->template is_type<stretch::condition>()) 
+    else if(noeud->template is_type<stretch::condition>()) // si 5 == 5 alors bloc fin
     {
         Variable resultat = evaluer(noeud->children[0]);
         
@@ -44,12 +44,11 @@ void executer(std::unique_ptr<Noeud>& noeud)
         
         if(std::get<bool>(resultat.get_valeur()) == true) 
         {
-            std::cout << "La condition est vraie, execution du bloc" << std::endl;
             executer(noeud->children[1]);
         } 
-        else 
+        else if(noeud->children.size() == 3) 
         {
-            std::cout << "La condition est fausse" << std::endl;
+            executer(noeud->children[2]);
         }
     }
 }

@@ -83,9 +83,13 @@ struct apostrophe : pe::one< '\'' > {};
 /////////////////////////////////////////////////
 /// @brief Separateurs
 /////////////////////////////////////////////////
+// struct espaces : pe::plus< pe::space > {};
+// struct commentaire : pe::sor< pe::seq< double_commentaire, pe::until< double_commentaire > >, pe::seq<mono_commentaire, pe::until<pe::eol>>> {};
+// struct separateur : pe::star< pe::sor< commentaire, espaces, pe::eol > > {};
+
 struct espaces : pe::plus< pe::space > {};
-struct commentaire : pe::sor< pe::seq< double_commentaire, pe::until< double_commentaire > >, pe::seq<mono_commentaire, pe::until<pe::eol>>> {};
-struct separateur : pe::star< pe::sor< commentaire, espaces, pe::eol > > {}; 
+struct commentaire : pe::seq< double_commentaire, pe::until< double_commentaire > > {};
+struct separateur : pe::star< pe::sor < commentaire, espaces, pe::eol > > {}; 
 
 /////////////////////////////////////////////////
 /// @brief Valeurs
@@ -97,20 +101,25 @@ struct alias : pe::seq< pe::one< '@' >, variable > {};
 
 struct identifieur : pe::sor< alias, variable > {};
 
-struct entier : pe::list< pe::digit, apostrophe > {};
-struct reel : pe::seq< pe::opt< pe::sor< plus, moins > >, entier, pe::opt< point, entier > > {}; ///< ie. 4'500.5 
-struct chaine : pe::seq< guillemets, pe::until< guillemets > > {}; ///< ie. "hello"
-struct booleen : pe::sor < vrai, faux > {}; ///< ie. vrai
+// struct entier : pe::list< pe::digit, apostrophe > {};
+// struct reel : pe::seq< pe::opt< pe::sor< plus, moins > >, entier, pe::opt< point, entier > > {}; ///< ie. 4'500.5 
+// struct chaine : pe::seq< guillemets, pe::until< guillemets > > {}; ///< ie. "hello"
+// struct booleen : pe::sor < vrai, faux > {}; ///< ie. vrai
+
+struct entier : pe::plus< pe::seq< pe::digit, pe::star< apostrophe > > > {};    ///< ie. 4'500 
+struct reel : pe::seq< entier, point, pe::opt< entier > > {};                   ///< ie. 4'500.5 
+struct chaine : pe::seq< guillemets, pe::until< guillemets > > {};              ///< ie. "hello"
+struct booleen : pe::sor < vrai, faux > {};                                     ///< ie. vrai
 
 struct operation;
 struct parentheses : pe::seq< parenthese_ouvrante, operation, parenthese_fermante > {};
-struct valeur : pe::sor< variable,  reel, chaine, booleen, parentheses > {};
+struct valeur : pe::sor< variable, entier, reel, chaine, booleen, parentheses > {};
 
 /////////////////////////////////////////////////
 /// @brief Operateurs
 /////////////////////////////////////////////////
-struct operation_unaire : pe::seq < pe::opt < pe::sor < non, plus, moins > >, pe::sor < separateur, valeur, separateur > > {};
-struct operation_produit : pe::list< operation_unaire, pe::sor < facteur, fraction, modulo > > {};
+// struct operation_unaire : pe::seq < pe::opt < pe::sor < non, plus, moins > >, pe::sor < separateur, valeur, separateur > > {};
+struct operation_produit : pe::list< pe::seq< separateur, valeur, separateur >, pe::sor < facteur, fraction, modulo > > {};
 struct operation_somme : pe::list< operation_produit, pe::sor < plus, moins > > {};
 struct operation_ordre : pe::list< operation_somme, pe::sor < plus_grand_que, plus_petit_que > > {};
 struct operation_egalite : pe::list< operation_ordre, pe::sor < egal, different > > {};
@@ -147,7 +156,8 @@ struct rearrange_operation : pe::parse_tree::apply< rearrange_operation >
 /// @brief Assignation
 /////////////////////////////////////////////////
 struct liste_valeur : pe::list< valeur, virgule > {};
-struct assignation : pe::seq< pe::list< identifieur, virgule >, fleche_gauche, liste_valeur > {};
+// struct assignation : pe::seq< pe::list< identifieur, virgule >, separateur, fleche_gauche, separateur, liste_valeur > {}; // a, b, c <- 2, 5, 10
+struct assignation : pe::seq<variable, separateur, fleche_gauche, separateur, operation> {};
 
 /////////////////////////////////////////////////
 /// @brief Objets et tableaux
@@ -174,7 +184,11 @@ struct acces : pe::seq< identifieur, de, objet > {};
 //                         pe::at < fin > > {};
 
 struct bloc;
-struct condition : pe::seq< si, operation, pe::opt< alors >, bloc, pe::opt< sinon, pe::opt< alors >, bloc >, fin > {};
+struct condition : pe::seq< si, separateur, operation, separateur, bloc, 
+                                pe::opt< pe::seq < sinon, separateur, bloc > >
+                            > {};
+
+//struct condition : pe::seq< si, separateur, operation, separateur, bloc > {};
 
 /////////////////////////////////////////////////
 /// @brief Fonctions
@@ -192,15 +206,18 @@ struct boucle_pour_chaque : pe::seq< pour_chaque, identifieur, dans, operation, 
 /////////////////////////////////////////////////
 /// @brief Blocs d'instructions
 /////////////////////////////////////////////////
-struct debut_bloc : pe::sor< pe::bof, faire, alors > {};
-struct fin_bloc : pe::sor< pe::eof, fin, sinon > {};
+struct debut_bloc : pe::sor< faire, alors > {};
+struct fin_bloc : pe::sor< fin, sinon > {};
+
 struct instruction : pe::sor< assignation, condition > {};
-struct bloc : pe::seq< debut_bloc, separateur, pe::star< instruction, separateur >, separateur > {};
+
+struct bloc : pe::seq< debut_bloc, separateur, pe::until< fin_bloc, pe::star< instruction, separateur > > > {};
+struct fichier : pe::seq< pe::bof, separateur, pe::until< pe::eof, pe::star< instruction, separateur > > > {};
 
 /////////////////////////////////////////////////
 /// @brief Grammaire
 /////////////////////////////////////////////////
-struct grammaire : bloc {};
+struct grammaire : fichier {};
 
 // store_content, remove_content, apply
 template< typename Rule >
@@ -231,7 +248,7 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         condition
     >,
     rearrange_operation::on<
-        operation_unaire,
+        //operation_unaire,
         operation_ou,
         operation_et,
         operation_egalite,

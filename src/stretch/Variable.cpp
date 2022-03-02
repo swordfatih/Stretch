@@ -7,12 +7,12 @@ Variable::Variable(Nature type, VariantValeur valeur) : m_type(std::move(type)),
     // default
 }
 
-Variable::Variable(Nature type, std::string valeur) : Variable::Variable(type, Variable::sto_valeur(type, std::move(valeur))) 
+Variable::Variable(Nature type, std::string valeur) : Variable::Variable(type, VariantValeur(std::string{std::move(valeur)})) 
 {
     // default
 }
 
-Variable::Variable(VariantValeur valeur) : m_valeur(std::move(valeur)), m_type(static_cast<Nature>(valeur.index()))
+Variable::Variable(VariantValeur valeur) : Variable::Variable(static_cast<Nature>(valeur.index()), std::move(valeur))
 {
     // default
 }
@@ -61,13 +61,25 @@ Nature Variable::sto_nature(std::string_view type)
     return Nature::Nul;
 }
 
+std::string Variable::type_tos(Nature type)
+{
+    if(type == Nature::Chaine)
+        return "chaine";
+    else if(type == Nature::Booleen)
+        return "booleen";
+    else if(type == Nature::Reel)
+        return "reel";
+    
+    return "nul";
+}
+
 VariantValeur Variable::sto_valeur(Nature type, std::string valeur) 
 {
     if(type == Nature::Chaine)
         return std::move(valeur);
     else if(type == Nature::Booleen) {
-        std::for_each(valeur.begin(), valeur.end(), [](char& c){ c = std::tolower(c); });
-        return static_cast<bool>(valeur == "vrai");
+        for(auto& c: valeur) c = std::tolower(c);
+        return valeur == "vrai";
     } 
     else if(type == Nature::Reel) 
         return BigDecimal(std::move(valeur));
@@ -78,7 +90,7 @@ VariantValeur Variable::sto_valeur(Nature type, std::string valeur)
 Variable Variable::parse(std::string valeur) 
 {
     std::string lower = valeur;
-    std::for_each(lower.begin(), lower.end(), [](char& c){ c = std::tolower(c); });
+    for(auto& c: lower) c = std::tolower(c);
 
     std::regex number_regex("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)");
     std::smatch match;
