@@ -27,6 +27,17 @@ enum class Nature {
     Reel
 };
 
+static std::string type_tos(Nature type) {
+    if(type == Nature::Chaine)
+        return "chaine";
+    else if(type == Nature::Booleen)
+        return "booleen";
+    else if(type == Nature::Reel)
+        return "reel";
+    
+    return "nul";
+}
+
 /////////////////////////////////////////////////
 /// @brief Les types utilisés en mémoire pour
 /// représenter les différents types de valeurs
@@ -86,6 +97,8 @@ public:
 
     std::string to_string() const;
     friend std::ostream& operator<<(std::ostream& o, const Variable& v) { return o << v.to_string(); }
+
+    bool est(Nature type) const;
 
 private:
     Nature m_type;          ///< Le type de la variable

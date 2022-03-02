@@ -1,6 +1,3 @@
-#ifndef GRAMMAIRE_HPP
-#define GRAMMAIRE_HPP
-
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/parse_tree.hpp>
 
@@ -205,5 +202,3 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
 // struct boucle_repeter_x_fois : pe::seq<repeter, expression, fois, bloc_code, fin> {};
 
 } // namespace stretch
-
-#endif // GRAMMAIRE_HPP

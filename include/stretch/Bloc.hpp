@@ -19,7 +19,7 @@ struct Bloc {
         /////////////////////////////////////////////////
         Bloc(void* root, std::vector<Variable> variables, std::vector<Variable> parametres = {}) : m_root(root), m_parametres(std::move(parametres)), m_variables(std::move(variables)) 
         {
-    
+            
         }
     
         std::vector<Variable>& getParametres()

@@ -2,8 +2,6 @@
 #include <tao/pegtl/contrib/parse_tree_to_dot.hpp>
 #include "stretch/Evaluation.hpp"
 
-#include "stretch/Variable.hpp"
-
 namespace pe = tao::pegtl;
 
 int main(int argc, char *argv[])
@@ -19,7 +17,7 @@ int main(int argc, char *argv[])
     auto root = pe::parse_tree::parse<stretch::grammaire, stretch::selector>(in);
 
     pe::parse_tree::print_dot(std::cout, *root);
-    // stretch::evaluer(root->children[0]);
+    stretch::executer(root);
 
     // std::cout << stretch::Variable("salutt") << std::endl;
     // std::cout << stretch::Variable(45) << std::endl;

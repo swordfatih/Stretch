@@ -44,6 +44,11 @@ std::string Variable::to_string() const
     return "nul";
 }
 
+bool Variable::est(Nature type) const
+{
+    return m_type == type;
+}
+
 Nature Variable::sto_nature(std::string_view type) 
 {
     if (type == pe::demangle< stretch::chaine >())

@@ -1,6 +1,6 @@
 a <- 1 + 1
 
-si 5 egal 2 alors
+si 5 egal 5 alors
     b <- 4 + 2
     c <- 1 + 8
 fin
