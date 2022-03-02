@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 #include "Variable.hpp"
-#include<memory>
+#include <memory>
 
 /////////////////////////////////////////////////
 /// @brief Classe représentant un bloc d'instruction
