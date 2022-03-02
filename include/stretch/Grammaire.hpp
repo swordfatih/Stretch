@@ -94,22 +94,15 @@ struct separateur : pe::star< pe::sor < commentaire, espaces, pe::eol > > {};
 /////////////////////////////////////////////////
 /// @brief Valeurs
 /////////////////////////////////////////////////
-// struct expression {}; //TODO à faire
-
 struct variable : pe::identifier {};
 struct alias : pe::seq< pe::one< '@' >, variable > {};
 
 struct identifieur : pe::sor< alias, variable > {};
 
-// struct entier : pe::list< pe::digit, apostrophe > {};
-// struct reel : pe::seq< pe::opt< pe::sor< plus, moins > >, entier, pe::opt< point, entier > > {}; ///< ie. 4'500.5 
-// struct chaine : pe::seq< guillemets, pe::until< guillemets > > {}; ///< ie. "hello"
-// struct booleen : pe::sor < vrai, faux > {}; ///< ie. vrai
-
-struct entier : pe::plus< pe::seq< pe::digit, pe::star< apostrophe > > > {};    ///< ie. 4'500 
-struct reel : pe::seq< entier, point, pe::opt< entier > > {};                   ///< ie. 4'500.5 
-struct chaine : pe::seq< guillemets, pe::until< guillemets > > {};              ///< ie. "hello"
-struct booleen : pe::sor < vrai, faux > {};                                     ///< ie. vrai
+struct entier : pe::list< pe::digit, apostrophe > {};
+struct reel : pe::seq< pe::opt< pe::sor< plus, moins > >, entier, pe::opt< point, entier > > {}; ///< ie. 4'500.5 
+struct chaine : pe::seq< guillemets, pe::until< guillemets > > {}; ///< ie. "hello"
+struct booleen : pe::sor < vrai, faux > {}; ///< ie. vrai
 
 struct operation;
 struct parentheses : pe::seq< parenthese_ouvrante, operation, parenthese_fermante > {};
@@ -118,8 +111,8 @@ struct valeur : pe::sor< variable, entier, reel, chaine, booleen, parentheses > 
 /////////////////////////////////////////////////
 /// @brief Operateurs
 /////////////////////////////////////////////////
-// struct operation_unaire : pe::seq < pe::opt < pe::sor < non, plus, moins > >, pe::sor < separateur, valeur, separateur > > {};
-struct operation_produit : pe::list< pe::seq< separateur, valeur, separateur >, pe::sor < facteur, fraction, modulo > > {};
+struct operation_unaire : pe::seq < pe::opt < pe::sor < non, plus, moins > >, pe::seq < separateur, valeur, separateur > > {};
+struct operation_produit : pe::list< operation_unaire, pe::sor < facteur, fraction, modulo > > {};
 struct operation_somme : pe::list< operation_produit, pe::sor < plus, moins > > {};
 struct operation_ordre : pe::list< operation_somme, pe::sor < plus_grand_que, plus_petit_que > > {};
 struct operation_egalite : pe::list< operation_ordre, pe::sor < egal, different > > {};
@@ -155,16 +148,15 @@ struct rearrange_operation : pe::parse_tree::apply< rearrange_operation >
 /////////////////////////////////////////////////
 /// @brief Assignation
 /////////////////////////////////////////////////
-struct liste_valeur : pe::list< valeur, virgule > {};
-struct assignation : pe::seq< pe::list< identifieur, virgule >, separateur, fleche_gauche, separateur, liste_valeur > {}; // a, b, c <- 2, 5, 10
-// struct assignation : pe::seq<variable, separateur, fleche_gauche, separateur, operation> {};
+struct liste_operation : pe::list< operation, virgule > {};
+struct assignation : pe::seq< pe::list< identifieur, virgule >, separateur, fleche_gauche, separateur, liste_operation > {}; // a, b, c <- 2, 5, 10
 
 /////////////////////////////////////////////////
 /// @brief Objets et tableaux
 /////////////////////////////////////////////////
 struct affectation : pe::seq< variable, fleche_gauche, operation > {};
 
-struct tableau : pe::seq< crochet_ouvrant, liste_valeur, crochet_fermant > {};
+struct tableau : pe::seq< crochet_ouvrant, liste_operation, crochet_fermant > {};
 struct objet : pe::seq< crochet_ouvrant, pe::list< pe::sor< affectation, objet >, virgule >, crochet_fermant > {};
 
 struct indexation : pe::seq< tableau, hashtag, operation > {};
@@ -184,8 +176,8 @@ struct acces : pe::seq< identifieur, de, objet > {};
 //                         pe::at < fin > > {};
 
 struct bloc;
-struct condition : pe::seq< si, separateur, operation, separateur, bloc, 
-                                pe::opt< pe::seq < sinon, separateur, bloc > >
+struct condition : pe::seq< si, separateur, operation, separateur, bloc 
+                                //, pe::opt< pe::seq < sinon, separateur, bloc > >
                             > {};
 
 //struct condition : pe::seq< si, separateur, operation, separateur, bloc > {};
@@ -193,8 +185,8 @@ struct condition : pe::seq< si, separateur, operation, separateur, bloc,
 /////////////////////////////////////////////////
 /// @brief Fonctions
 /////////////////////////////////////////////////
-struct definition_fonction : pe::seq< fonction, identifieur, pe::opt< fleche_gauche, liste_valeur >, pe::one< ':' >, bloc > {};
-struct appel_fonction : pe::seq< identifieur, parenthese_ouvrante, pe::opt< liste_valeur >, parenthese_fermante > {};
+struct definition_fonction : pe::seq< fonction, identifieur, pe::opt< fleche_gauche, liste_operation >, pe::one< ':' >, bloc > {};
+struct appel_fonction : pe::seq< identifieur, parenthese_ouvrante, pe::opt< liste_operation >, parenthese_fermante > {};
 
 /////////////////////////////////////////////////
 /// @brief Boucles
