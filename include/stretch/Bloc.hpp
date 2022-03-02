@@ -47,8 +47,7 @@ class Bloc {
             }
         } 
 
-        std::unique_ptr<T> *m_root;                           ///< noeud racine du bloc
-
+        std::unique_ptr<T> *m_root;             ///< noeud racine du bloc
         std::vector<Variable> m_variables;      ///< variables déclarés dans le bloc
         std::vector<Variable> m_parametres;     ///< paramètres du bloc
 };
