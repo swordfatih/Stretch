@@ -156,8 +156,8 @@ struct rearrange_operation : pe::parse_tree::apply< rearrange_operation >
 /// @brief Assignation
 /////////////////////////////////////////////////
 struct liste_valeur : pe::list< valeur, virgule > {};
-// struct assignation : pe::seq< pe::list< identifieur, virgule >, separateur, fleche_gauche, separateur, liste_valeur > {}; // a, b, c <- 2, 5, 10
-struct assignation : pe::seq<variable, separateur, fleche_gauche, separateur, operation> {};
+struct assignation : pe::seq< pe::list< identifieur, virgule >, separateur, fleche_gauche, separateur, liste_valeur > {}; // a, b, c <- 2, 5, 10
+// struct assignation : pe::seq<variable, separateur, fleche_gauche, separateur, operation> {};
 
 /////////////////////////////////////////////////
 /// @brief Objets et tableaux
