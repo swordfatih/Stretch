@@ -6,6 +6,7 @@ target("stretch")
 	set_kind("binary")
 	add_includedirs("include/")
 	add_files("src/stretch/*.cpp")
+	add_files("src/decimal/*.cpp")
 	add_packages("pegtl")
 	add_rules("mode.debug")
 
