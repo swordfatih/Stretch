@@ -1,3 +1,6 @@
+#ifndef GRAMMAIRE_HPP
+#define GRAMMAIRE_HPP
+
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/parse_tree.hpp>
 
@@ -206,8 +209,13 @@ struct grammaire : bloc {};
 template< typename Rule >
 using selector = tao::pegtl::parse_tree::selector< Rule,
     tao::pegtl::parse_tree::store_content::on<
+        // valeurs 
+        entier,
+        reel,
+        chaine,
+        booleen,
+
         // operations
-        valeur,
         plus,
         moins,
         facteur,
@@ -236,3 +244,5 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
     > >;
 
 } // namespace stretch
+
+#endif // GRAMMAIRE_HPP
