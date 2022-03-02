@@ -5,4 +5,7 @@
 /stretch
 /stretch-d
 /build/
+.idea/
+cmake-build-debug/
+CMakeLists.txt
 *.swp
