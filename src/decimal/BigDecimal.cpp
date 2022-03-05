@@ -700,9 +700,9 @@ std::string BigDecimal::add (const std::string &lhs, const std::string &rhs, int
     return add (lhs, ZERO, scale);
   }
 
-//  if (scale == INT_MIN) {
-//    scale = _scale;
-//  }
+ if (scale == INT_MIN) {
+   scale = _scale;
+ }
  if (scale < 0) {
    std::cerr <<"Scale ("<<to_string(scale).c_str()<<") Cant Be Negative!!!"<< std::endl;
    scale = 0;

@@ -4,7 +4,6 @@
 #include <variant>
 #include <string>
 #include <memory>
-#include <algorithm>
 #include <regex>
 #include <iostream>
 
@@ -54,9 +53,18 @@ public:
     static Nature sto_nature(std::string_view type);
 
     /////////////////////////////////////////////////
+    /// @brief Convertir le type en string
+    ///
+    /// @param type Le type à convertir
+    /// @return La chaîne correspondante
+    /////////////////////////////////////////////////
+    static std::string type_tos(Nature type);
+
+    /////////////////////////////////////////////////
     /// @brief Convertir un string en valeur
     ///
-    /// @param type La chaîne à convertir
+    /// @param type Le type de la valeur
+    /// @param valeur La chaîne à affecter
     /// @return La valeur correspondante
     /////////////////////////////////////////////////
     static VariantValeur sto_valeur(Nature type, std::string valeur);
@@ -79,13 +87,15 @@ public:
 
     // Constructeur à partir d'un noeud
     template <typename T>
-    Variable(std::unique_ptr<T>& noeud) : Variable(sto_nature(noeud->type), noeud->string()) {}
+    Variable(std::unique_ptr<T>& noeud) : Variable(sto_nature(noeud->type), sto_valeur(sto_nature(noeud->type), noeud->string())) {}
 
     Nature get_nature() const;
     VariantValeur get_valeur() const;
 
     std::string to_string() const;
     friend std::ostream& operator<<(std::ostream& o, const Variable& v) { return o << v.to_string(); }
+
+    bool est(Nature type) const;
 
 private:
     Nature m_type;          ///< Le type de la variable

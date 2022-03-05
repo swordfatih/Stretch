@@ -1,6 +1,3 @@
-#ifndef GRAMMAIRE_HPP
-#define GRAMMAIRE_HPP
-
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/parse_tree.hpp>
 
@@ -86,15 +83,17 @@ struct apostrophe : pe::one< '\'' > {};
 /////////////////////////////////////////////////
 /// @brief Separateurs
 /////////////////////////////////////////////////
+// struct espaces : pe::plus< pe::space > {};
+// struct commentaire : pe::sor< pe::seq< double_commentaire, pe::until< double_commentaire > >, pe::seq<mono_commentaire, pe::until<pe::eol>>> {};
+// struct separateur : pe::star< pe::sor< commentaire, espaces, pe::eol > > {};
+
 struct espaces : pe::plus< pe::space > {};
-struct commentaire : pe::sor< pe::seq< double_commentaire, pe::until< double_commentaire > >, pe::seq<mono_commentaire, pe::until<pe::eol>>> {};
-struct separateur : pe::star< pe::sor< commentaire, espaces, pe::eol > > {}; 
+struct commentaire : pe::seq< double_commentaire, pe::until< double_commentaire > > {};
+struct separateur : pe::star< pe::sor < commentaire, espaces, pe::eol > > {}; 
 
 /////////////////////////////////////////////////
 /// @brief Valeurs
 /////////////////////////////////////////////////
-// struct expression {}; //TODO à faire
-
 struct variable : pe::identifier {};
 struct alias : pe::seq< pe::one< '@' >, variable > {};
 
@@ -107,12 +106,12 @@ struct booleen : pe::sor < vrai, faux > {}; ///< ie. vrai
 
 struct operation;
 struct parentheses : pe::seq< parenthese_ouvrante, operation, parenthese_fermante > {};
-struct valeur : pe::sor< variable,  reel, chaine, booleen, parentheses > {};
+struct valeur : pe::sor< variable, entier, reel, chaine, booleen, parentheses > {};
 
 /////////////////////////////////////////////////
 /// @brief Operateurs
 /////////////////////////////////////////////////
-struct operation_unaire : pe::seq < pe::opt < pe::sor < non, plus, moins > >, pe::sor < separateur, valeur, separateur > > {};
+struct operation_unaire : pe::seq < pe::opt < pe::sor < non, plus, moins > >, pe::seq < separateur, valeur, separateur > > {};
 struct operation_produit : pe::list< operation_unaire, pe::sor < facteur, fraction, modulo > > {};
 struct operation_somme : pe::list< operation_produit, pe::sor < plus, moins > > {};
 struct operation_ordre : pe::list< operation_somme, pe::sor < plus_grand_que, plus_petit_que > > {};
@@ -149,15 +148,15 @@ struct rearrange_operation : pe::parse_tree::apply< rearrange_operation >
 /////////////////////////////////////////////////
 /// @brief Assignation
 /////////////////////////////////////////////////
-struct liste_valeur : pe::list< valeur, virgule > {};
-struct assignation : pe::seq< pe::list< identifieur, virgule >, fleche_gauche, liste_valeur > {};
+struct liste_operation : pe::list< operation, virgule > {};
+struct assignation : pe::seq< pe::list< identifieur, virgule >, separateur, fleche_gauche, separateur, liste_operation > {}; // a, b, c <- 2, 5, 10
 
 /////////////////////////////////////////////////
 /// @brief Objets et tableaux
 /////////////////////////////////////////////////
 struct affectation : pe::seq< variable, fleche_gauche, operation > {};
 
-struct tableau : pe::seq< crochet_ouvrant, liste_valeur, crochet_fermant > {};
+struct tableau : pe::seq< crochet_ouvrant, liste_operation, crochet_fermant > {};
 struct objet : pe::seq< crochet_ouvrant, pe::list< pe::sor< affectation, objet >, virgule >, crochet_fermant > {};
 
 struct indexation : pe::seq< tableau, hashtag, operation > {};
@@ -177,13 +176,17 @@ struct acces : pe::seq< identifieur, de, objet > {};
 //                         pe::at < fin > > {};
 
 struct bloc;
-struct condition : pe::seq< si, operation, pe::opt< alors >, bloc, pe::opt< sinon, pe::opt< alors >, bloc >, fin > {};
+struct condition : pe::seq< si, separateur, operation, separateur, bloc 
+                                //, pe::opt< pe::seq < sinon, separateur, bloc > >
+                            > {};
+
+//struct condition : pe::seq< si, separateur, operation, separateur, bloc > {};
 
 /////////////////////////////////////////////////
 /// @brief Fonctions
 /////////////////////////////////////////////////
-struct definition_fonction : pe::seq< fonction, identifieur, pe::opt< fleche_gauche, liste_valeur >, pe::one< ':' >, bloc > {};
-struct appel_fonction : pe::seq< identifieur, parenthese_ouvrante, pe::opt< liste_valeur >, parenthese_fermante > {};
+struct definition_fonction : pe::seq< fonction, identifieur, pe::opt< fleche_gauche, liste_operation >, pe::one< ':' >, bloc > {};
+struct appel_fonction : pe::seq< identifieur, parenthese_ouvrante, pe::opt< liste_operation >, parenthese_fermante > {};
 
 /////////////////////////////////////////////////
 /// @brief Boucles
@@ -195,15 +198,18 @@ struct boucle_pour_chaque : pe::seq< pour_chaque, identifieur, dans, operation, 
 /////////////////////////////////////////////////
 /// @brief Blocs d'instructions
 /////////////////////////////////////////////////
-struct debut_bloc : pe::sor< pe::bof, faire, alors > {};
-struct fin_bloc : pe::sor< pe::eof, fin, sinon > {};
+struct debut_bloc : pe::sor< faire, alors > {};
+struct fin_bloc : pe::sor< fin, sinon > {};
+
 struct instruction : pe::sor< assignation, condition > {};
-struct bloc : pe::seq< debut_bloc, separateur, pe::star< instruction, separateur >, separateur > {};
+
+struct bloc : pe::seq< debut_bloc, separateur, pe::until< fin_bloc, pe::star< instruction, separateur > > > {};
+struct fichier : pe::seq< pe::bof, separateur, pe::until< pe::eof, pe::star< instruction, separateur > > > {};
 
 /////////////////////////////////////////////////
 /// @brief Grammaire
 /////////////////////////////////////////////////
-struct grammaire : bloc {};
+struct grammaire : fichier {};
 
 // store_content, remove_content, apply
 template< typename Rule >
@@ -234,7 +240,7 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         condition
     >,
     rearrange_operation::on<
-        operation_unaire,
+        //operation_unaire,
         operation_ou,
         operation_et,
         operation_egalite,
@@ -245,4 +251,3 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
 
 } // namespace stretch
 
-#endif // GRAMMAIRE_HPP
