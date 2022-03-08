@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <map>
+#include <regex>
 
 #include "stretch/Variable.hpp"
 
@@ -86,18 +87,22 @@ static std::map<
             {
                 std::make_pair(Nature::Chaine, Nature::Chaine),
                 [](const Variable f, const Variable s) {
-                    Variable t = Variable::parse(std::get<std::string>(s.get_valeur()));
+                    Variable t_f = Variable::parse(std::get<std::string>(f.get_valeur()));
+                    Variable t_s = Variable::parse(std::get<std::string>(s.get_valeur()));
 
-                    if(t.est(Nature::Reel)) {
-                        int n = std::get<BigDecimal>(t.get_valeur()).toInt();
+                    if(t_s.est(Nature::Reel)) {
+                        int n = std::get<BigDecimal>(t_s.get_valeur()).toInt();
 
                         std::string str = std::get<std::string>(f.get_valeur());
                         str.erase(str.begin() + str.size() - n, str.end());
                         
                         return Variable(str);
+                    } else if(t_s.est(Nature::Reel) && t_f.est(Nature::Reel)) {
+                        throw std::runtime_error("Vous ne pouvez pas soustraire deux chaines contenant des réel.");
+                    } else if(t_s.est(Nature::Chaine) && t_f.est(Nature::Chaine)) {
+                        std::regex r = std::regex(std::get<std::string>(t_s.get_valeur()));
+                        return Variable(std::regex_replace(std::get<std::string>(t_f.get_valeur()), r, ""));
                     }
-                        
-                    throw std::runtime_error("Vous ne pouvez pas soustraire deux chaines.");
                 }
             }
         }

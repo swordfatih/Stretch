@@ -1,6 +1,9 @@
 a <- "" + 5 + 5
 b <- 0 + "5" + "5"
 
+c <- "salut" - "lu"
+d <- "salut" - 3
+
 ||
 saluuut
 qsdqsd
