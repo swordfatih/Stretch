@@ -31,7 +31,7 @@ void executer(std::unique_ptr<Noeud>& noeud)
     else if(noeud->template is_type<stretch::assignation>()) // a <- 5 + 5 + 5
     {
         variables[noeud->children[0]->string()] = evaluer(noeud->children[1]);
-        // std::cout << "Affectation de " << variables[noeud->children[0]->string()].to_string() << " dans la variable " <<  noeud->children[0]->string() << std::endl;
+        std::cout << "Affectation de " << variables[noeud->children[0]->string()].to_string() << " dans la variable " <<  noeud->children[0]->string() << std::endl;
     } 
     else if(noeud->template is_type<stretch::condition>()) // si 5 == 5 alors bloc fin
     {

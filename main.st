@@ -1,12 +1,14 @@
-a <- 1 + 1
+a <- "" + 5 + 5
+b <- 0 + "5" + "5"
 
-|| saluuut
+||
+saluuut
 qsdqsd
 
-qsdsqdqd||
+qsdsqdqd
 
 si 5 egal 7 alors
     c <- 5
-fin
+fin||
 
 b <- 5 + 7

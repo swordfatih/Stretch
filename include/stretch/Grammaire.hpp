@@ -83,9 +83,7 @@ struct apostrophe : pe::one< '\'' > {};
 /////////////////////////////////////////////////
 /// @brief Separateurs
 /////////////////////////////////////////////////
-// struct espaces : pe::plus< pe::space > {};
 // struct commentaire : pe::sor< pe::seq< double_commentaire, pe::until< double_commentaire > >, pe::seq<mono_commentaire, pe::until<pe::eol>>> {};
-// struct separateur : pe::star< pe::sor< commentaire, espaces, pe::eol > > {};
 
 struct espaces : pe::plus< pe::space > {};
 struct commentaire : pe::seq< double_commentaire, pe::until< double_commentaire > > {};
@@ -99,14 +97,16 @@ struct alias : pe::seq< pe::one< '@' >, variable > {};
 
 struct identifieur : pe::sor< alias, variable > {};
 
-struct entier : pe::list< pe::digit, apostrophe > {};
+struct entier : pe::list< pe::plus< pe::digit >, apostrophe > {};
 struct reel : pe::seq< pe::opt< pe::sor< plus, moins > >, entier, pe::opt< point, entier > > {}; ///< ie. 4'500.5 
-struct chaine : pe::seq< guillemets, pe::until< guillemets > > {}; ///< ie. "hello"
 struct booleen : pe::sor < vrai, faux > {}; ///< ie. vrai
+
+struct chaine : pe::star< pe::not_at< guillemets >, pe::alnum > {};
+struct texte : pe::seq< guillemets, chaine, guillemets > {}; ///< ie. "hello"
 
 struct operation;
 struct parentheses : pe::seq< parenthese_ouvrante, operation, parenthese_fermante > {};
-struct valeur : pe::sor< variable, entier, reel, chaine, booleen, parentheses > {};
+struct valeur : pe::sor< variable, entier, reel, texte, booleen, parentheses > {};
 
 /////////////////////////////////////////////////
 /// @brief Operateurs
@@ -218,8 +218,8 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         // valeurs 
         entier,
         reel,
-        chaine,
         booleen,
+        chaine,
 
         // operations
         plus,

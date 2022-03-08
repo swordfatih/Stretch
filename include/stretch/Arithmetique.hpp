@@ -10,35 +10,140 @@ namespace pe = tao::pegtl;
 namespace stretch::arithmetique {
 
 /////////////////////////////////////////////////
-template <typename... N>
-static void types_non_supportes(std::string operation, Variable first, Variable second, N... types) 
-{
-    for (const auto& type : {types...})
-    {
-        if(first.est(type) || second.est(type))
-            throw std::runtime_error("Impossible d'effectuer l'operation " + operation + " entre un " 
-                + Variable::type_tos(first.get_nature()) + " et un " + Variable::type_tos(second.get_nature()));        
-    }
-}
+static std::map<    
+                    std::string_view, 
+                    std::map<   
+                                std::pair< Nature, Nature >,
+                                std::function< Variable(const Variable, const Variable) > 
+                            >
+                > 
+    operations = {
 
-/////////////////////////////////////////////////
-static void types_differents(std::string operation, Variable first, Variable second) 
-{
-    if(first.get_nature() != second.get_nature()) 
+    /////////////////////////////////////////////////
+    // Addition
+    /////////////////////////////////////////////////
     {
-        throw std::runtime_error("Impossible d'effectuer l'operation " + operation + " entre un " 
-            + Variable::type_tos(first.get_nature()) + " et un " + Variable::type_tos(second.get_nature()));
-    }   
-}
+        pe::demangle<stretch::plus>(), 
+        {
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Reel, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    return Variable(std::get<BigDecimal>(f.get_valeur()) + std::get<BigDecimal>(s.get_valeur()));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Chaine, Nature::Chaine),
+                [](const Variable f, const Variable s) {
+                    return Variable(std::get<std::string>(f.get_valeur()) + std::get<std::string>(s.get_valeur()));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Chaine, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    return Variable(std::get<std::string>(f.get_valeur()) + std::get<BigDecimal>(s.get_valeur()).toString());
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Reel, Nature::Chaine),
+                [](const Variable f, const Variable s) {
+                    Variable t = Variable::parse(std::get<std::string>(s.get_valeur()));
 
-/////////////////////////////////////////////////
-static std::map<std::string_view, std::function<Variable(const Variable, const Variable)>> operations = {
+                    if(t.est(Nature::Reel))
+                        return Variable(std::get<BigDecimal>(f.get_valeur()) + std::get<BigDecimal>(t.get_valeur()));
+                    
+                    return Variable(std::get<BigDecimal>(f.get_valeur()).toString() + std::get<std::string>(s.get_valeur()));
+                }
+            }
+        }
+    },
+
+    /////////////////////////////////////////////////
+    // Soustraction
+    /////////////////////////////////////////////////
+    {
+        pe::demangle<stretch::moins>(), 
+        {
+            {
+                std::make_pair(Nature::Reel, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    return Variable(std::get<BigDecimal>(f.get_valeur()) - std::get<BigDecimal>(s.get_valeur()));
+                }
+            },
+            {
+                std::make_pair(Nature::Chaine, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    std::string str = std::get<std::string>(f.get_valeur());
+                    BigDecimal n = std::get<BigDecimal>(s.get_valeur());
+                    str.erase(str.begin() + str.size() - n.toInt(), str.end());
+
+                    return Variable(str);
+                }
+            },
+            {
+                std::make_pair(Nature::Chaine, Nature::Chaine),
+                [](const Variable f, const Variable s) {
+                    Variable t = Variable::parse(std::get<std::string>(s.get_valeur()));
+
+                    if(t.est(Nature::Reel)) {
+                        int n = std::get<BigDecimal>(t.get_valeur()).toInt();
+
+                        std::string str = std::get<std::string>(f.get_valeur());
+                        str.erase(str.begin() + str.size() - n, str.end());
+                        
+                        return Variable(str);
+                    }
+                        
+                    throw std::runtime_error("Vous ne pouvez pas soustraire deux chaines.");
+                }
+            }
+        }
+    },
     {
         /////////////////////////////////////////////////
+        pe::demangle<stretch::facteur>(), 
+        {
+            {
+                std::make_pair(Nature::Reel, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    return Variable(std::get<BigDecimal>(f.get_valeur()) * std::get<BigDecimal>(s.get_valeur()));
+                }
+            },
+            {
+                std::make_pair(Nature::Chaine, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    std::string value = std::get<std::string>(f.get_valeur());
+                    BigDecimal n = std::get<BigDecimal>(s.get_valeur());
+
+                    std::string repeat;
+                    for(BigDecimal i = 0; i < n; i += 1)
+                        repeat += value;
+
+                    return Variable(repeat);
+                }
+            },
+            {
+                std::make_pair(Nature::Reel, Nature::Chaine),
+                [](const Variable f, const Variable s) {
+                    std::string value = std::get<std::string>(s.get_valeur());
+                    BigDecimal n = std::get<BigDecimal>(f.get_valeur());
+
+                    std::string repeat;
+                    for(BigDecimal i = 0; i < n; i += 1)
+                        repeat += value;
+
+                    return Variable(repeat);
+                }
+            }
+        }
+    } 
+        
+       /* 
         pe::demangle<stretch::plus>(), 
         [](const Variable first, const Variable second) {
-            types_non_supportes("addition", first, second, Nature::Booleen, Nature::Nul);
-                
             // "5" + 5 = "55"
             // 5 + "5" = 10
 
@@ -52,12 +157,7 @@ static std::map<std::string_view, std::function<Variable(const Variable, const V
                 return Variable(std::get<std::string>(first.get_valeur()) + std::get<BigDecimal>(second.get_valeur()).toString());
             } 
             else if(first.est(Nature::Reel) && second.est(Nature::Chaine)) {
-                Variable second_var = Variable::parse(std::get<std::string>(second.get_valeur()));
-
-                if(second_var.get_nature() == Nature::Reel)
-                    return Variable(std::get<BigDecimal>(first.get_valeur()) + std::get<BigDecimal>(second_var.get_valeur()));
-                else
-                    return Variable(std::get<BigDecimal>(first.get_valeur()).toString() + std::get<std::string>(second.get_valeur()));
+                
             } 
         
             return Variable();
@@ -177,11 +277,21 @@ static std::map<std::string_view, std::function<Variable(const Variable, const V
 
             return first;// == second;
         }
-    }
+    }*/
 };
 
 const Variable operation(const std::string_view& operateur, const Variable first, const Variable second) {
-    return operations[operateur](first, second);
+    if(operations.find(operateur) == operations.end()) {
+        std::cout << "L'opération " << operateur << " n'existe pas" << std::endl;
+        return Variable();
+    }
+
+    if(operations[operateur].find(std::make_pair(first.get_nature(), second.get_nature())) == operations[operateur].end()) {
+        std::cout << "L'opération " << operateur << " n'est pas valide pour ces types" << std::endl;
+        return Variable();
+    }
+
+    return operations[operateur][std::make_pair(first.get_nature(), second.get_nature())](first, second);
 }
 
 } // namespace stretch::arithmetique
