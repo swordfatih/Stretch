@@ -106,7 +106,7 @@ struct texte : pe::seq< guillemets, chaine, guillemets > {}; ///< ie. "hello"
 
 struct operation;
 struct parentheses : pe::seq< parenthese_ouvrante, operation, parenthese_fermante > {};
-struct valeur : pe::sor< variable, entier, reel, texte, booleen, parentheses > {};
+struct valeur : pe::sor< parentheses, booleen, variable, reel, texte > {};
 
 /////////////////////////////////////////////////
 /// @brief Operateurs
@@ -120,7 +120,7 @@ struct operation_et : pe::list< operation_egalite, pe::sor < et > > {};
 struct operation_ou : pe::list< operation_et, pe::sor < ou > > {};
 
 struct operation : operation_ou {};
- 
+
 struct rearrange_operation : pe::parse_tree::apply< rearrange_operation > 
 {
     template< typename Node, typename... States >
@@ -164,51 +164,43 @@ struct acces : pe::seq< identifieur, de, objet > {};
 
 /////////////////////////////////////////////////
 /// @brief Conditions
-/////////////////////////////////////////////////
-// struct condition : pe::seq< si, operation, pe::opt< alors >, bloc, 
-//                         // pe::star< sinon, si, operation, pe::opt< alors >, bloc >,
-//                         // pe::opt< sinon, bloc >,
-//                         fin > {};
-
-// struct fin_condition : pe::sor < fin, sinon > {};
-// struct condition : pe::seq< si, operation, pe::opt< alors >, bloc, 
-//                         pe::opt< sinon, bloc, pe::at< fin > >,
-//                         pe::at < fin > > {};
-
+///////////////////////////////////////////////// 
 struct bloc;
-struct condition : pe::seq< si, separateur, operation, separateur, bloc 
-                                //, pe::opt< pe::seq < sinon, separateur, bloc > >
-                            > {};
 
-//struct condition : pe::seq< si, separateur, operation, separateur, bloc > {};
-
-/////////////////////////////////////////////////
-/// @brief Fonctions
-/////////////////////////////////////////////////
-struct definition_fonction : pe::seq< fonction, identifieur, pe::opt< fleche_gauche, liste_operation >, pe::one< ':' >, bloc > {};
-struct appel_fonction : pe::seq< identifieur, parenthese_ouvrante, pe::opt< liste_operation >, parenthese_fermante > {};
+struct condition : pe::seq< si, operation, pe::opt< alors >, bloc, 
+                        pe::star< sinon, pe::opt< si >, operation, pe::opt< alors >, bloc >,
+                        pe::opt< sinon, bloc >,
+                        fin > {};
 
 /////////////////////////////////////////////////
 /// @brief Boucles
 /////////////////////////////////////////////////
-struct boucle_tant_que : pe::seq< tant_que, operation, faire, bloc > {};
-struct boucle_repeter : pe::seq< repeter, operation, fois, pe::opt< dans, identifieur >, bloc > {};
-struct boucle_pour_chaque : pe::seq< pour_chaque, identifieur, dans, operation, faire, bloc > {};
+struct ranger : pe::opt< pe::seq < dans, identifieur > > {}; // ranger la valeur actuelle dans une variable
+
+struct boucle_tant_que : pe::seq< tant_que, operation, pe::opt< faire >, bloc, fin > {};
+struct boucle_repeter : pe::seq< repeter, operation, fois, ranger, bloc, fin > {};
+
+struct tableau;
+struct boucle_pour_chaque : pe::seq< pour_chaque, identifieur, dans, tableau, faire, bloc, fin > {};
+
+/////////////////////////////////////////////////
+/// @brief Fonctions
+/////////////////////////////////////////////////
+struct liste_variables : pe::list< variable, virgule > {};
+struct parametres : pe::opt< fleche_gauche, liste_variables > {};
+struct definition_fonction : pe::seq< fonction, variable, parametres, pe::one< ':' >, bloc > {};
+struct appel_fonction : pe::seq< identifieur, parenthese_ouvrante, pe::opt< liste_operation >, parenthese_fermante > {};
 
 /////////////////////////////////////////////////
 /// @brief Blocs d'instructions
 /////////////////////////////////////////////////
-struct debut_bloc : pe::sor< faire, alors > {};
-struct fin_bloc : pe::sor< fin, sinon > {};
-
 struct instruction : pe::sor< assignation, condition > {};
-
-struct bloc : pe::seq< debut_bloc, separateur, pe::until< fin_bloc, pe::star< instruction, separateur > > > {};
-struct fichier : pe::seq< pe::bof, separateur, pe::until< pe::eof, pe::star< instruction, separateur > > > {};
+struct bloc : pe::star< instruction, separateur > {};
 
 /////////////////////////////////////////////////
 /// @brief Grammaire
 /////////////////////////////////////////////////
+struct fichier : pe::seq< pe::bof, separateur, pe::until< pe::eof, bloc > > {};
 struct grammaire : fichier {};
 
 // store_content, remove_content, apply
@@ -216,7 +208,6 @@ template< typename Rule >
 using selector = tao::pegtl::parse_tree::selector< Rule,
     tao::pegtl::parse_tree::store_content::on<
         // valeurs 
-        entier,
         reel,
         booleen,
         chaine,
@@ -234,10 +225,19 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         egal,
         variable,
 
+        // boucles
+        ranger,        
+
+        // fonctions
+        parametres,
+
         // instructions
         bloc,
         assignation,
-        condition
+        condition,
+        boucle_repeter,
+        boucle_tant_que,
+        definition_fonction
     >,
     rearrange_operation::on<
         //operation_unaire,
