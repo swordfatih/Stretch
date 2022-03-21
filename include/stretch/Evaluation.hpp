@@ -8,14 +8,16 @@ namespace stretch {
  
 /////////////////////////////////////////////////
 static std::map<std::string_view, Variable> variables;
-static std::map<std::string_view, Bloc> definitions_fonctions;
+
+template <typename T>
+static std::map<std::string_view, Bloc<T>> definitions_fonctions;
 
 /////////////////////////////////////////////////
 template <typename Noeud>
 void assigner(std::unique_ptr<Noeud>& variable, Variable valeur) 
 {
     variables[variable->string()] = valeur;
-    std::cout << "Affectation de " << variables[variable->string()].to_string() << " dans la variable " <<  variable->string() << std::endl;
+    // std::cout << "Affectation de " << variables[variable->string()].to_string() << " dans la variable " <<  variable->string() << std::endl;
 }
  
 /////////////////////////////////////////////////
@@ -23,11 +25,11 @@ template <typename Noeud>
 Variable evaluer(std::unique_ptr<Noeud>& noeud) 
 {
     if(noeud->children.empty()) 
-    {
-        std::cout << noeud->type << std::endl;
         return Variable(noeud);
-    }
-        
+
+    // if(noeud->children.size() == 1)
+    //     return stretch::arithmetique::operation(noeud->type, evaluer(noeud->children[0]), Variable());
+
     return stretch::arithmetique::operation(noeud->type, evaluer(noeud->children[0]), evaluer(noeud->children[1]));
 }
  
@@ -107,9 +109,20 @@ void executer(std::unique_ptr<Noeud>& noeud)
     {
         /*
             auto nom_fonction = noeud->children.front();
+            std::vector<std::string> parametres;
 
-            //puis on récupère toutes les variables (tous les fils de parametre) jusqu'à atteindre le fond 
-            while(noeud->children[0]->children.front() != nullptr)
+
+            //puis on récupère tous les noms de parametre (tous les fils de stretch::parametres) jusqu'à atteindre le fond 
+            if(noeud->children[1]->template is_type<stretch::parametres>() ) 
+            {
+                for(int i = 0; i < noeud->children.size(); ++i)
+                {
+                    parametres.put(noeud->children[i]->string());
+                }
+            }
+
+            definitions_fonctions[nom_fonction->string()] = Bloc(&noeud, parametres});
+
         */
         ;
     }

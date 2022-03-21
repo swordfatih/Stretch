@@ -466,8 +466,6 @@ const Variable operation(const std::string_view& operateur, const Variable first
         return Variable();
     }
 
-    std::cout << "operateur " << operateur << " " << Variable::type_tos(first.get_nature()) << " " << Variable::type_tos(second.get_nature()) << std::endl;
-
     return operations[operateur][std::make_pair(first.get_nature(), second.get_nature())](first, second);
 }
 

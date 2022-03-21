@@ -213,16 +213,18 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         chaine,
 
         // operations
+        non,
         plus,
         moins,
         facteur,
         fraction,
         modulo,
-        ou,
-        et,
         plus_grand_que,
         plus_petit_que,
         egal,
+        different,
+        ou,
+        et,
         variable,
 
         // boucles
@@ -240,13 +242,14 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         definition_fonction
     >,
     rearrange_operation::on<
-        //operation_unaire,
+        operation,
         operation_ou,
         operation_et,
         operation_egalite,
         operation_ordre,
         operation_somme,
         operation_produit
+        // operation_unaire
     > >;
 
 } // namespace stretch
