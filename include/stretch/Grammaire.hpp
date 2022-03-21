@@ -248,7 +248,7 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         operation_egalite,
         operation_ordre,
         operation_somme,
-        operation_produit
+        operation_produit 
         // operation_unaire
     > >;
 
