@@ -208,7 +208,8 @@ struct boucle_pour_chaque : pe::seq< pour_chaque, identifieur, dans, tableau, fa
 struct liste_variables : pe::list< variable, virgule > {};
 struct parametres : pe::opt< fleche_gauche, liste_variables > {};
 struct definition_fonction : pe::seq< fonction, variable, parametres, pe::one< ':' >, bloc > {};
-struct appel_fonction : pe::seq< identifieur, parenthese_ouvrante, pe::opt< liste_operation >, parenthese_fermante > {};
+struct variables_fonction : pe::opt< liste_operation > {};
+struct appel_fonction : pe::seq< variable, parenthese_ouvrante, variables_fonction, parenthese_fermante > {};
 
 /////////////////////////////////////////////////
 /// @brief Blocs d'instructions

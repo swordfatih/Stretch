@@ -5,7 +5,10 @@
 #include <stdexcept>
  
 namespace stretch {
- 
+
+template <typename Noeud>
+void executer(std::unique_ptr<Noeud>& noeud);
+
 /////////////////////////////////////////////////
 static std::map<std::string, Variable> variables;
 
@@ -19,7 +22,42 @@ void assigner(std::unique_ptr<Noeud>& variable, const Variable& valeur)
     variables.insert(std::make_pair(std::string{variable->string()}, valeur));
     std::cerr << "[DEBUG] Affectation de " << variables[variable->string()].to_string() << " (" << Variable::type_tos(variables[variable->string()].get_nature()) << ") dans la variable " <<  variable->string() << std::endl;
 }
- 
+
+template<typename T>
+void ajout_map(std::string nom_fonction, Bloc<T> bloc)
+{
+    definitions_fonctions<T>.insert(std::make_pair(nom_fonction, bloc));
+}
+
+template<typename T>
+void verification_fonction(std::unique_ptr<T>& noeud, std::string nom_fonction)
+{
+    auto bloc = definitions_fonctions<T>.find(nom_fonction); //retourne un std::pair
+    if(bloc == definitions_fonctions<T>.end())
+    {
+        throw std::runtime_error("Votre fonction n'est pas définie !");
+    }
+
+    //si il met des paramètres à l'appel alors qu'il n'y en a pas dans la définition
+    auto& liste_parametres = noeud->children[1];
+    if(liste_parametres->template is_type<stretch::variables_fonction>())
+    {
+        std::vector<std::string> parametres_entrees;
+
+        //itération sur tous les parametres envoyés dans l'arbre
+        for(auto& param : liste_parametres->children)
+        {
+            parametres_entrees.push_back(param->string());
+        }
+
+        if(parametres_entrees.size() != bloc->second.get_parametres().size())
+        {
+            throw std::runtime_error("L'appel à la fonction n'a pas le même nombre de paramètres que sa définition.");
+        }
+    }
+        
+    executer(*(bloc->second.get_root())); //bloc est un itérateur, on le déférence
+}
 /////////////////////////////////////////////////
 template <typename Noeud>
 Variable evaluer(std::unique_ptr<Noeud>& noeud) 
@@ -75,7 +113,7 @@ void executer(std::unique_ptr<Noeud>& noeud)
         executer(noeud->children.back());
     } 
     /////////////////////////////////////////////////
-    /*else if(noeud->template is_type<stretch::boucle_repeter>())
+    else if(noeud->template is_type<stretch::boucle_repeter>())
     {
         Variable compteur = evaluer(noeud->children.front());
 
@@ -112,21 +150,25 @@ void executer(std::unique_ptr<Noeud>& noeud)
     }
     else if(noeud->template is_type<stretch::definition_fonction>())
     {
-        auto nom_fonction = noeud->children.front();
         std::vector<std::string> parametres;
 
 
-        //puis on récupère tous les noms de parametre (tous les fils de stretch::parametres) jusqu'à atteindre le fond 
-        if(noeud->children[1]->template is_type<stretch::parametres>() ) 
+        //puis on récupère tous les noms de parametres (tous les fils de stretch::parametres) jusqu'à atteindre le fond 
+        if(noeud->children[1]->template is_type<stretch::parametres>()) 
         {
-            for(int i = 0; i < noeud->children.size(); ++i)
+            for(int i = 0; i < noeud->children[1]->children.size(); ++i)
             {
-                parametres.put(noeud->children[i]->string());
+                parametres.push_back(noeud->children[1]->children[i]->string());
             }
         }
 
-        definitions_fonctions[nom_fonction->string()] = Bloc(&noeud, parametres});
-    }*/
+        //noeud->children.front() = nom de la fonction
+        ajout_map(noeud->children.front()->string(), Bloc(&(noeud->children.back()), parametres));
+    }
+    else if(noeud->template is_type<stretch::appel_fonction>())
+    {   
+        verification_fonction(noeud, noeud->children.front()->string());
+    }
 }
 
 } // namespace stretch

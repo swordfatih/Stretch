@@ -26,9 +26,14 @@ class Bloc {
             
         }
     
-        std::vector<std::string>& getParametres()
+        std::vector<std::string>& get_parametres()
         {  
             return m_parametres; 
+        }
+
+        std::unique_ptr<T>* get_root()
+        {
+            return m_root;
         }
 
         /////////////////////////////////////////////////
