@@ -5,6 +5,8 @@
 #include <iostream>
 #include <memory>
 
+namespace stretch {
+
 /////////////////////////////////////////////////
 class Variable;
 
@@ -21,11 +23,16 @@ class Bloc {
         /// @param variables Variables locaux déclarés dans le bloc
         /// @param parametres Parametres du bloc, s'il y en a
         /////////////////////////////////////////////////
-        Bloc(std::unique_ptr<T>* root, std::vector<std::string> parametres = {}, std::vector<std::string> variables = {}) : m_root(root), m_parametres(std::move(parametres)), m_variables(std::move(variables)) 
+        Bloc(std::unique_ptr<T>* root, std::vector<std::string> parametres = {}, std::map<std::string, Variable> variables = {}) : m_root(root), m_parametres(std::move(parametres)), m_variables(std::move(variables)) 
         {
             
         }
     
+        auto& get_variables()
+        {  
+            return m_variables; 
+        }
+
         std::vector<std::string>& get_parametres()
         {  
             return m_parametres; 
@@ -54,7 +61,11 @@ class Bloc {
             }
         } 
 
-        std::unique_ptr<T> *m_root;             ///< noeud racine du bloc
-        std::vector<std::string> m_variables;   ///< variables déclarés dans le bloc
-        std::vector<std::string> m_parametres;  ///< paramètres du bloc
+        std::unique_ptr<T> *m_root;                     ///< noeud racine du bloc
+        
+        std::map<std::string, Variable> m_variables;    ///< variables déclarés dans le bloc
+
+        std::vector<std::string> m_parametres;          ///< paramètres du bloc
 };
+
+} // stretch

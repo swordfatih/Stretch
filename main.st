@@ -28,4 +28,4 @@ fonction factorielle <- i:
     retourner i * factorielle(i - 1) 
 fin
 
-c <- factorielle(3) || 3628800 ||
+c <- factorielle(10) || 3628800 ||
