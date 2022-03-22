@@ -126,9 +126,11 @@ struct rearrange_operation : pe::parse_tree::apply< rearrange_operation >
     template< typename Node, typename... States >
     static void transform( std::unique_ptr< Node >& noeud, States&&... st )
     {
+        // pour les opérations non utilisés
         if( noeud->children.size() == 1 ) {
             noeud = std::move( noeud->children.back() );
         } 
+        // pour les opérations unaires
         else if( noeud->template is_type< operation_unaire >() && noeud->children.size() == 2 ) {
             noeud->remove_content();
             auto& fils = noeud->children;
@@ -142,6 +144,7 @@ struct rearrange_operation : pe::parse_tree::apply< rearrange_operation >
             noeud = std::move( operateur );
             noeud->children.emplace_back( std::move( valeur ) );
         }
+        // pour les opérations binaires
         else {
             noeud->remove_content();
             auto& fils = noeud->children;
