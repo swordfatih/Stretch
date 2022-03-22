@@ -3,8 +3,10 @@
 /////////////////////////////////////////////////
 #include <vector>
 #include <iostream>
-#include "Variable.hpp"
 #include <memory>
+
+/////////////////////////////////////////////////
+class Variable;
 
 /////////////////////////////////////////////////
 /// @brief Classe représentant un bloc d'instruction
@@ -19,14 +21,14 @@ class Bloc {
         /// @param variables Variables locaux déclarés dans le bloc
         /// @param parametres Parametres du bloc, s'il y en a
         /////////////////////////////////////////////////
-        Bloc(std::unique_ptr<T>* root, std::vector<Variable> variables = {}, std::vector<Variable> parametres = {}) : m_root(root), m_parametres(std::move(parametres)), m_variables(std::move(variables)) 
+        Bloc(std::unique_ptr<T>* root, std::vector<std::string> parametres = {}, std::vector<std::string> variables = {}) : m_root(root), m_parametres(std::move(parametres)), m_variables(std::move(variables)) 
         {
             
         }
     
-        std::vector<Variable>& getParametres()
+        std::vector<std::string>& getParametres()
         {  
-            return parametres; 
+            return m_parametres; 
         }
 
         /////////////////////////////////////////////////
@@ -42,12 +44,12 @@ class Bloc {
     private:
         std::string parametres_string(std::ostream &os) 
         {
-            for(const Variable& param : parametres) {
+            for(const std::string& param : m_parametres) {
                 os << param;
             }
         } 
 
         std::unique_ptr<T> *m_root;             ///< noeud racine du bloc
-        std::vector<Variable> m_variables;      ///< variables déclarés dans le bloc
-        std::vector<Variable> m_parametres;     ///< paramètres du bloc
+        std::vector<std::string> m_variables;   ///< variables déclarés dans le bloc
+        std::vector<std::string> m_parametres;  ///< paramètres du bloc
 };
