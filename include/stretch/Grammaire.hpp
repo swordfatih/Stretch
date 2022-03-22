@@ -57,6 +57,7 @@ struct hashtag : pe::one< '#' > {};
 struct de : pe::istring< 'd', 'e' > {};
 
 /// Fonctions
+struct debut_fonction : pe::one< ':' > {};
 struct fonction : pe::istring< 'f', 'o', 'n', 'c', 't', 'i', 'o', 'n' > {};
 struct retourner : pe::istring< 'r', 'e', 't', 'o', 'u', 'r', 'n', 'e', 'r' > {};
 struct quitter : pe::istring< 'q', 'u', 'i', 't', 't', 'e', 'r' > {};
@@ -101,25 +102,28 @@ struct entier : pe::list< pe::plus< pe::digit >, apostrophe > {};
 struct reel : pe::seq< entier, pe::opt< point, entier > > {}; ///< ie. 4'500.5 
 struct booleen : pe::sor < vrai, faux > {}; ///< ie. vrai
 
-struct chaine : pe::star< pe::not_at< guillemets >, pe::alnum > {};
+struct chaine : pe::star< pe::not_at< guillemets >, pe::sor< pe::alnum, pe::space > > {};
 struct texte : pe::seq< guillemets, chaine, guillemets > {}; ///< ie. "hello"
 
 struct operation;
 struct parentheses : pe::seq< parenthese_ouvrante, operation, parenthese_fermante > {};
-struct valeur : pe::sor< parentheses, booleen, variable, reel, texte > {};
+struct valeur : pe::sor< parentheses, booleen, identifieur, reel, texte > {};
 
 /////////////////////////////////////////////////
 /// @brief Operateurs
 /////////////////////////////////////////////////
-struct operation_unaire : pe::seq < pe::opt < pe::seq < separateur, pe::sor< non, plus, moins > > >, separateur, valeur, separateur > {};
-struct operation_produit : pe::list< operation_unaire, pe::sor < facteur, fraction, modulo > > {};
-struct operation_somme : pe::list< operation_produit, pe::sor < plus, moins > > {};
-struct operation_ordre : pe::list< operation_somme, pe::sor < plus_grand_que, plus_petit_que > > {};
-struct operation_egalite : pe::list< operation_ordre, pe::sor < egal, different > > {};
-struct operation_et : pe::list< operation_egalite, pe::sor < et > > {}; 
-struct operation_ou : pe::list< operation_et, pe::sor < ou > > {};
+struct appel_fonction;
+struct operation_fonction : pe::seq< separateur, valeur, separateur, pe::opt < appel_fonction > > {};
+struct operation_unaire : pe::seq< pe::opt< pe::seq< separateur, pe::sor< non, plus, moins > > >, operation_fonction > {};
+struct operation_produit : pe::list< operation_unaire, pe::sor< facteur, fraction, modulo > > {};
+struct operation_somme : pe::list< operation_produit, pe::sor< plus, moins > > {};
+struct operation_ordre : pe::list< operation_somme, pe::sor< plus_grand_que, plus_petit_que > > {};
+struct operation_egalite : pe::list< operation_ordre, pe::sor< egal, different > > {};
+struct operation_et : pe::list< operation_egalite, pe::sor< et > > {}; 
+struct operation_ou : pe::list< operation_et, pe::sor< ou > > {};
 
 struct operation : operation_ou {};
+struct operations : pe::list< operation, virgule > {};
 
 struct rearrange_operation : pe::parse_tree::apply< rearrange_operation > 
 {
@@ -144,6 +148,20 @@ struct rearrange_operation : pe::parse_tree::apply< rearrange_operation >
             noeud = std::move( operateur );
             noeud->children.emplace_back( std::move( valeur ) );
         }
+        // pour les appels de fonctions
+        else if( noeud->template is_type< operation_fonction >() ) {
+            noeud->remove_content();
+            auto& fils = noeud->children;
+
+            auto parametres = std::move( fils.back() );
+            fils.pop_back();
+
+            auto identifieur = std::move( fils.back() );
+            fils.pop_back();  
+
+            noeud = std::move( parametres );
+            noeud->children.insert( noeud->children.begin(), std::move( identifieur ) );
+        }
         // pour les opérations binaires
         else {
             noeud->remove_content();
@@ -167,15 +185,14 @@ struct rearrange_operation : pe::parse_tree::apply< rearrange_operation >
 /////////////////////////////////////////////////
 /// @brief Assignation
 /////////////////////////////////////////////////
-struct liste_operation : pe::list< operation, virgule > {};
-struct assignation : pe::seq< pe::list< identifieur, virgule >, separateur, fleche_gauche, separateur, liste_operation > {}; // a, b, c <- 2, 5, 10
+struct assignation : pe::seq< pe::list< identifieur, virgule >, separateur, fleche_gauche, separateur, operations > {}; // a, b, c <- 2, 5, 10
 
 /////////////////////////////////////////////////
 /// @brief Objets et tableaux
 /////////////////////////////////////////////////
 struct affectation : pe::seq< variable, fleche_gauche, operation > {};
 
-struct tableau : pe::seq< crochet_ouvrant, liste_operation, crochet_fermant > {};
+struct tableau : pe::seq< crochet_ouvrant, operations, crochet_fermant > {};
 struct objet : pe::seq< crochet_ouvrant, pe::list< pe::sor< affectation, objet >, virgule >, crochet_fermant > {};
 
 struct indexation : pe::seq< tableau, hashtag, operation > {};
@@ -194,27 +211,31 @@ struct condition : pe::seq< si, operation, pe::opt< pe::seq < alors, separateur 
 /////////////////////////////////////////////////
 /// @brief Boucles
 /////////////////////////////////////////////////
-struct ranger : pe::opt< pe::seq < dans, identifieur > > {}; // ranger la valeur actuelle dans une variable
-
-struct boucle_tant_que : pe::seq< tant_que, operation, pe::opt< faire >, bloc, fin > {};
-struct boucle_repeter : pe::seq< repeter, operation, fois, ranger, bloc, fin > {};
-
 struct tableau;
 struct boucle_pour_chaque : pe::seq< pour_chaque, identifieur, dans, tableau, faire, bloc, fin > {};
+
+struct ranger : pe::opt< pe::seq< dans, separateur, identifieur, separateur > > {}; // ranger la valeur actuelle dans une variable
+struct boucle_repeter : pe::seq< repeter, operation, fois, separateur, ranger, bloc, fin > {};
+
+struct boucle_tant_que : pe::seq< tant_que, operation, pe::opt< pe::seq < faire, separateur > >, bloc, fin > {};
+
+struct boucle : pe::sor< boucle_repeter, boucle_pour_chaque, boucle_tant_que > {};
 
 /////////////////////////////////////////////////
 /// @brief Fonctions
 /////////////////////////////////////////////////
-struct liste_variables : pe::list< variable, virgule > {};
-struct parametres : pe::opt< fleche_gauche, liste_variables > {};
-struct definition_fonction : pe::seq< fonction, variable, parametres, pe::one< ':' >, bloc > {};
-struct variables_fonction : pe::opt< liste_operation > {};
-struct appel_fonction : pe::seq< variable, parenthese_ouvrante, variables_fonction, parenthese_fermante > {};
+struct retourner_valeurs : pe::seq< retourner, separateur, operations > {};
+
+struct parametres : pe::opt< pe::seq< fleche_gauche, separateur, pe::list< pe::seq < separateur, variable, separateur >, virgule > > > {};
+struct definition_fonction : pe::seq< fonction, separateur, variable, separateur, parametres, separateur, debut_fonction, separateur, bloc, fin > {};
+
+struct valeur_parametres : pe::opt< operations > {};
+struct appel_fonction : pe::seq< parenthese_ouvrante, separateur, valeur_parametres, separateur, parenthese_fermante > {};
 
 /////////////////////////////////////////////////
 /// @brief Blocs d'instructions
 /////////////////////////////////////////////////
-struct instruction : pe::sor< assignation, condition > {};
+struct instruction : pe::sor< assignation, condition, boucle, definition_fonction, retourner_valeurs, quitter > {};
 struct bloc : pe::star< instruction, separateur > {};
 
 /////////////////////////////////////////////////
@@ -231,35 +252,43 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         reel,
         booleen,
         chaine,
+        variable,
+        alias,
 
-        // operations
+        // operation unaire
         non,
         plus,
         moins,
+        
+        // operations binaires
         facteur,
         fraction,
         modulo,
+    
+        // operations logiques
         plus_grand_que,
         plus_petit_que,
         egal,
         different,
         ou,
         et,
-        variable,
 
-        // boucles
-        ranger,        
+        // boucles       
+        boucle_tant_que,
+        boucle_repeter,
 
         // fonctions
+        definition_fonction,
         parametres,
+        appel_fonction,
+        valeur_parametres,
 
         // instructions
-        bloc,
         assignation,
-        condition,
-        boucle_repeter,
-        boucle_tant_que,
-        definition_fonction
+        condition, 
+        bloc,
+        retourner_valeurs,
+        quitter
     >,
     rearrange_operation::on<
         operation,
@@ -269,7 +298,8 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         operation_ordre,
         operation_somme,
         operation_produit,
-        operation_unaire
+        operation_unaire,
+        operation_fonction
     > >;
 
 } // namespace stretch

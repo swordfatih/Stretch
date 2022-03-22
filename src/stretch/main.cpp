@@ -17,7 +17,16 @@ int main(int argc, char *argv[])
     auto root = pe::parse_tree::parse<stretch::grammaire, stretch::selector>(in);
 
     pe::parse_tree::print_dot(std::cout, *root);
-    stretch::executer(root);
+
+    try
+    {
+        stretch::executer(root);
+    }
+    catch(const StretchException& e) 
+    {            
+        std::cerr << e.what() << std::endl;                 
+        return 0;
+    }
 
     // std::cout << stretch::Variable("salutt") << std::endl;
     // std::cout << stretch::Variable(45) << std::endl;
