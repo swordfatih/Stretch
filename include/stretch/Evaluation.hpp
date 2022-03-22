@@ -7,28 +7,35 @@
 namespace stretch {
  
 /////////////////////////////////////////////////
-static std::map<std::string_view, Variable> variables;
+static std::map<std::string, Variable> variables;
 
 template <typename T>
-static std::map<std::string_view, Bloc<T>> definitions_fonctions;
+static std::map<std::string, Bloc<T>> definitions_fonctions;
 
 /////////////////////////////////////////////////
 template <typename Noeud>
-void assigner(std::unique_ptr<Noeud>& variable, Variable valeur) 
+void assigner(std::unique_ptr<Noeud>& variable, const Variable& valeur) 
 {
-    variables[variable->string()] = valeur;
-    // std::cout << "Affectation de " << variables[variable->string()].to_string() << " dans la variable " <<  variable->string() << std::endl;
+    variables.insert(std::make_pair(std::string{variable->string()}, valeur));
+    std::cerr << "[DEBUG] Affectation de " << variables[variable->string()].to_string() << " (" << Variable::type_tos(variables[variable->string()].get_nature()) << ") dans la variable " <<  variable->string() << std::endl;
 }
  
 /////////////////////////////////////////////////
 template <typename Noeud>
 Variable evaluer(std::unique_ptr<Noeud>& noeud) 
 {
+    if(noeud->template is_type< stretch::variable > ()) {
+        if(variables.count(noeud->string()) == 0)
+            return Variable();
+            
+        return variables.at(noeud->string());
+    }   
+
     if(noeud->children.empty()) 
         return Variable(noeud);
 
-    // if(noeud->children.size() == 1)
-    //     return stretch::arithmetique::operation(noeud->type, evaluer(noeud->children[0]), Variable());
+    if(noeud->children.size() == 1)
+        return stretch::arithmetique::operation(noeud->type, evaluer(noeud->children[0]), Variable());
 
     return stretch::arithmetique::operation(noeud->type, evaluer(noeud->children[0]), evaluer(noeud->children[1]));
 }
@@ -53,24 +60,22 @@ void executer(std::unique_ptr<Noeud>& noeud)
     /////////////////////////////////////////////////
     else if(noeud->template is_type<stretch::condition>()) // si 5 == 5 alors bloc fin
     {
-        Variable resultat = evaluer(noeud->children.front());
+        for(auto i = 0; i < noeud->children.size() - 1; i += 2) {
+            Variable resultat = evaluer(noeud->children[i]);
         
-        if(resultat.get_nature() != Nature::Booleen) 
-        {
-            throw std::runtime_error("La condition ne retourne pas un booléen.");
+            if(resultat.get_nature() != Nature::Booleen) 
+                throw std::runtime_error("La condition ne retourne pas un booléen.");
+
+            if(std::get<bool>(resultat.get_valeur()) == true) {
+                executer(noeud->children[i + 1]);
+                return;
+            }
         }
         
-        if(std::get<bool>(resultat.get_valeur()) == true) 
-        {
-            executer(noeud->children[1]);
-        } 
-        else if(noeud->children.size() == 3) 
-        {
-            executer(noeud->children[2]);
-        } 
+        executer(noeud->children.back());
     } 
     /////////////////////////////////////////////////
-    else if(noeud->template is_type<stretch::boucle_repeter>())
+    /*else if(noeud->template is_type<stretch::boucle_repeter>())
     {
         Variable compteur = evaluer(noeud->children.front());
 
@@ -107,25 +112,21 @@ void executer(std::unique_ptr<Noeud>& noeud)
     }
     else if(noeud->template is_type<stretch::definition_fonction>())
     {
-        /*
-            auto nom_fonction = noeud->children.front();
-            std::vector<std::string> parametres;
+        auto nom_fonction = noeud->children.front();
+        std::vector<std::string> parametres;
 
 
-            //puis on récupère tous les noms de parametre (tous les fils de stretch::parametres) jusqu'à atteindre le fond 
-            if(noeud->children[1]->template is_type<stretch::parametres>() ) 
+        //puis on récupère tous les noms de parametre (tous les fils de stretch::parametres) jusqu'à atteindre le fond 
+        if(noeud->children[1]->template is_type<stretch::parametres>() ) 
+        {
+            for(int i = 0; i < noeud->children.size(); ++i)
             {
-                for(int i = 0; i < noeud->children.size(); ++i)
-                {
-                    parametres.put(noeud->children[i]->string());
-                }
+                parametres.put(noeud->children[i]->string());
             }
+        }
 
-            definitions_fonctions[nom_fonction->string()] = Bloc(&noeud, parametres});
-
-        */
-        ;
-    }
+        definitions_fonctions[nom_fonction->string()] = Bloc(&noeud, parametres});
+    }*/
 }
 
 } // namespace stretch

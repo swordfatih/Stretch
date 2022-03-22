@@ -731,9 +731,9 @@ std::string BigDecimal::subtract (const std::string &lhs, const std::string &rhs
     return subtract (lhs, ZERO, scale);
   }
 
-//  if (scale == INT_MIN) {
-//    scale = _scale;
-//  }
+ if (scale == INT_MIN) {
+   scale = _scale;
+ }
  if (scale < 0) {
    std::cerr <<"Scale ("<<to_string(scale).c_str()<<") Cant Be Negative!!!"<< std::endl;
    scale = 0;
@@ -764,9 +764,9 @@ std::string BigDecimal::multiply (const std::string &lhs, const std::string &rhs
     return multiply (lhs, ZERO, scale);
   }
 
-//  if (scale == INT_MIN) {
-//    scale = _scale;
-//  }
+  if (scale == INT_MIN) {
+    scale = _scale;
+  }
  if (scale < 0) {
    std::cerr <<"Scale ("<<to_string(scale).c_str()<<") Cant Be Negative!!!"<< std::endl;
    scale = 0;

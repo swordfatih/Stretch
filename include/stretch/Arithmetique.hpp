@@ -59,6 +59,13 @@ static std::map<
                     
                     return Variable(std::get<BigDecimal>(f.get_valeur()).toString() + std::get<std::string>(s.get_valeur()));
                 }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Reel, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return f;
+                }
             }
         }
     },
@@ -101,12 +108,17 @@ static std::map<
                         str.erase(str.begin() + str.size() - n, str.end());
                         
                         return Variable(str);
-                    } else if(t_s.est(Nature::Reel) && t_f.est(Nature::Reel)) {
-                        throw std::runtime_error("Vous ne pouvez pas soustraire deux chaines contenant des réel.");
-                    } else if(t_s.est(Nature::Chaine) && t_f.est(Nature::Chaine)) {
-                        std::regex r = std::regex(std::get<std::string>(t_s.get_valeur()));
-                        return Variable(std::regex_replace(std::get<std::string>(t_f.get_valeur()), r, ""));
-                    }
+                    } 
+
+                    std::regex r = std::regex(std::get<std::string>(f.get_valeur()));
+                    return Variable(std::regex_replace(std::get<std::string>(s.get_valeur()), r, ""));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Reel, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(std::get<BigDecimal>(f.get_valeur()) * -1);
                 }
             }
         }
@@ -452,6 +464,22 @@ static std::map<
                 }
             }
         }
+    },
+
+    /////////////////////////////////////////////////
+    // Non
+    /////////////////////////////////////////////////
+    {
+        pe::demangle<stretch::non>(), 
+        {
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Booleen, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(!(std::get<bool>(f.get_valeur())));
+                }
+            }
+        }
     }
 };
 
@@ -462,7 +490,7 @@ const Variable operation(const std::string_view& operateur, const Variable first
     } 
 
     if(operations[operateur].find(std::make_pair(first.get_nature(), second.get_nature())) == operations[operateur].end()) {
-        std::cout << "L'opération " << operateur << " n'est pas valide pour ces types" << std::endl;
+        std::cout << "L'opération " << operateur << " n'est pas supporté pour les types " << Variable::type_tos(first.get_nature()) << " et " << Variable::type_tos(second.get_nature()) << std::endl;
         return Variable();
     }
 

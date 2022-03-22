@@ -37,11 +37,11 @@ struct alors : pe::istring< 'a', 'l', 'o', 'r', 's' > {};
 struct fleche_gauche : pe::string< '<', '-' > {};
 
 /// Operateurs arithmétiques
+struct plus : pe::one< '+' > {};
+struct moins : pe::one< '-' > {};
 struct fraction : pe::one< '/' > {};
 struct facteur : pe::one< '*' > {};
-struct moins : pe::one< '-' > {};
 struct modulo : pe::one< '%' > {};
-struct plus : pe::one< '+' > {};
 
 /// Operateurs logiques
 struct et : pe::istring< 'e', 't' > {};
@@ -79,7 +79,7 @@ struct virgule : pe::one< ',' > {};
 struct point : pe::one< '.' > {};
 struct guillemets : pe::one< '"' > {};
 struct apostrophe : pe::one< '\'' > {};
-
+ 
 /////////////////////////////////////////////////
 /// @brief Separateurs
 /////////////////////////////////////////////////
@@ -98,7 +98,7 @@ struct alias : pe::seq< pe::one< '@' >, variable > {};
 struct identifieur : pe::sor< alias, variable > {};
 
 struct entier : pe::list< pe::plus< pe::digit >, apostrophe > {};
-struct reel : pe::seq< pe::opt< pe::sor< plus, moins > >, entier, pe::opt< point, entier > > {}; ///< ie. 4'500.5 
+struct reel : pe::seq< entier, pe::opt< point, entier > > {}; ///< ie. 4'500.5 
 struct booleen : pe::sor < vrai, faux > {}; ///< ie. vrai
 
 struct chaine : pe::star< pe::not_at< guillemets >, pe::alnum > {};
@@ -111,7 +111,7 @@ struct valeur : pe::sor< parentheses, booleen, variable, reel, texte > {};
 /////////////////////////////////////////////////
 /// @brief Operateurs
 /////////////////////////////////////////////////
-struct operation_unaire : pe::seq < pe::opt < pe::sor < non, plus, moins > >, pe::seq < separateur, valeur, separateur > > {};
+struct operation_unaire : pe::seq < pe::opt < pe::seq < separateur, pe::sor< non, plus, moins > > >, separateur, valeur, separateur > {};
 struct operation_produit : pe::list< operation_unaire, pe::sor < facteur, fraction, modulo > > {};
 struct operation_somme : pe::list< operation_produit, pe::sor < plus, moins > > {};
 struct operation_ordre : pe::list< operation_somme, pe::sor < plus_grand_que, plus_petit_que > > {};
@@ -124,23 +124,39 @@ struct operation : operation_ou {};
 struct rearrange_operation : pe::parse_tree::apply< rearrange_operation > 
 {
     template< typename Node, typename... States >
-    static void transform( std::unique_ptr< Node >& n, States&&... st )
+    static void transform( std::unique_ptr< Node >& noeud, States&&... st )
     {
-        if( n->children.size() == 1 ) {
-            n = std::move( n->children.back() );
+        if( noeud->children.size() == 1 ) {
+            noeud = std::move( noeud->children.back() );
+        } 
+        else if( noeud->template is_type< operation_unaire >() && noeud->children.size() == 2 ) {
+            noeud->remove_content();
+            auto& fils = noeud->children;
+
+            auto valeur = std::move( fils.back() );
+            fils.pop_back();
+
+            auto operateur = std::move( fils.back() );
+            fils.pop_back();
+
+            noeud = std::move( operateur );
+            noeud->children.emplace_back( std::move( valeur ) );
         }
         else {
-            n->remove_content();
-            auto& c = n->children;
-            auto r = std::move( c.back() );
-            c.pop_back();
-            auto o = std::move( c.back() );
-            c.pop_back();
-            o->children.emplace_back( std::move( n ) );
-            o->children.emplace_back( std::move( r ) );
-            n = std::move( o );
+            noeud->remove_content();
+            auto& fils = noeud->children;
 
-            transform( n->children.front(), st... );
+            auto droite = std::move( fils.back() );
+            fils.pop_back();
+
+            auto operateur = std::move( fils.back() );
+            fils.pop_back();
+
+            operateur->children.emplace_back( std::move( noeud ) );
+            operateur->children.emplace_back( std::move( droite ) );
+
+            noeud = std::move( operateur );
+            transform( noeud->children.front(), st... );
         }
     }
 };
@@ -167,9 +183,9 @@ struct acces : pe::seq< identifieur, de, objet > {};
 ///////////////////////////////////////////////// 
 struct bloc;
 
-struct condition : pe::seq< si, operation, pe::opt< alors >, bloc, 
-                        pe::star< sinon, pe::opt< si >, operation, pe::opt< alors >, bloc >,
-                        pe::opt< sinon, bloc >,
+struct condition : pe::seq< si, operation, pe::opt< pe::seq < alors, separateur > >, bloc, 
+                        pe::star< sinon, separateur, si, operation, pe::opt< pe::seq < alors, separateur > >, bloc >,
+                        pe::opt< pe::seq < sinon, separateur, bloc > >,
                         fin > {};
 
 /////////////////////////////////////////////////
@@ -248,8 +264,8 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         operation_egalite,
         operation_ordre,
         operation_somme,
-        operation_produit 
-        // operation_unaire
+        operation_produit,
+        operation_unaire
     > >;
 
 } // namespace stretch
