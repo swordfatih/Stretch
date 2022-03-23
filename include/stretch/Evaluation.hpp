@@ -13,12 +13,9 @@ using Retour = std::vector<Variable>;
 // Memoire
 /////////////////////////////////////////////////
 template <typename T>
-static std::unique_ptr<Bloc<T>> bloc_principal;
-
-static std::map<std::string, Variable>* variables_courantes;
-
-template <typename T>
 static std::map<std::string, Bloc<T>> definitions;
+
+static std::map<std::string, Variable> variables;
 
 /////////////////////////////////////////////////
 // Prototypes
@@ -34,8 +31,6 @@ void assigner(const std::string& nom, Variable valeur);
 template <typename Noeud>
 void assigner(std::unique_ptr<Noeud>& variable, Variable valeur);
 
-Variable lire(const std::string& nom);
-
 template<typename T>
 void ajout_fonction(std::string nom_fonction, Bloc<T> bloc);
 
@@ -46,12 +41,6 @@ Retour invoquer_fonction(std::string nom_fonction, std::unique_ptr<T>& noeud);
 template <typename Noeud>
 Retour executer(std::unique_ptr<Noeud>& noeud) 
 {
-    /////////////////////////////////////////////////
-    if(noeud->is_root()) {
-        bloc_principal<Noeud> = std::unique_ptr<Bloc<Noeud>>(new Bloc<Noeud>(&(noeud)));
-        variables_courantes = &(bloc_principal<Noeud>->get_variables());
-    }
-
     /////////////////////////////////////////////////
     if(noeud->is_root() || noeud->template is_type<stretch::bloc>())    
     {
@@ -96,7 +85,7 @@ Retour executer(std::unique_ptr<Noeud>& noeud)
         BigDecimal n = std::get<BigDecimal>(compteur.get_valeur());
         n.round(1);
  
-        for(BigDecimal i = 0; i < n; i += 1) 
+        for(BigDecimal i = 1; i < n + 1; i += 1) 
         {
             auto& ranger = noeud->children[1];
 
@@ -179,7 +168,10 @@ Variable evaluer(std::unique_ptr<Noeud>& noeud)
 
     // variable
     if(noeud->template is_type< stretch::variable >()) {
-        return lire(noeud->string());
+        if(variables.count(noeud->string()) == 0)
+            return Variable();
+
+        return variables.at(noeud->string());
     }   
 
     // valeur
@@ -197,23 +189,15 @@ Variable evaluer(std::unique_ptr<Noeud>& noeud)
 /////////////////////////////////////////////////
 void assigner(const std::string& nom, Variable valeur) 
 {
-    (*variables_courantes)[nom] = std::move(valeur);
-    std::cerr << "[DEBUG] Affectation de " << (*variables_courantes)[nom].to_string() << " (" << Variable::type_tos((*variables_courantes)[nom].get_nature()) << ") dans la variable " << nom << std::endl;
+    variables[nom] = valeur;
+    std::cerr << "[DEBUG] Affectation de " << variables[nom].to_string() << " (" << Variable::type_tos(variables[nom].get_nature()) << ") dans la variable " << nom << std::endl;
 }
 
 /////////////////////////////////////////////////
 template <typename Noeud>
 void assigner(std::unique_ptr<Noeud>& variable, Variable valeur) 
 {
-    assigner(variable->string(), valeur);
-}
-
-/////////////////////////////////////////////////
-Variable lire(const std::string& nom) {
-    if(variables_courantes->count(nom) == 0)
-        return Variable();
-
-    return variables_courantes->at(nom);
+    assigner(static_cast<std::string>(variable->string()), valeur);
 }
 
 /////////////////////////////////////////////////
@@ -221,9 +205,6 @@ template<typename T>
 void ajout_fonction(std::string nom_fonction, Bloc<T> bloc)
 {
     definitions<T>.insert(std::make_pair(nom_fonction, std::move(bloc)));
-
-    variables_courantes = &(definitions<T>.at(nom_fonction).get_variables());
-
     std::cerr << "[DEBUG] Création de la fonction " << nom_fonction << " (" << bloc.get_root() << ")" << std::endl;
 }
 
@@ -231,6 +212,7 @@ void ajout_fonction(std::string nom_fonction, Bloc<T> bloc)
 template<typename T>
 Retour invoquer_fonction(std::string nom_fonction, std::unique_ptr<T>& noeud)
 {
+    //est-ce que la clé existe ?
     if(definitions<T>.count(nom_fonction) == 0)
     {
         throw std::runtime_error("La fonction " + nom_fonction + " n'est pas définie");

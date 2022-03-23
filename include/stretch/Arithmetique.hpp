@@ -4,6 +4,7 @@
 #include <map>
 #include <regex>
 #include <cstring>
+#include <cmath>
 
 #include "stretch/Variable.hpp"
 
@@ -190,7 +191,7 @@ static std::map<
                     if(t.est(Nature::Reel))
                         return Variable(std::get<BigDecimal>(f.get_valeur()) / std::get<BigDecimal>(t.get_valeur()));
                     
-                    throw std::runtime_error("Vous ne pouvez pas diviser un réel par une chaine qui ne contient pas de réel");
+                    throw std::runtime_error("Vous ne pouvez pas diviser un réel par une chaîne qui ne contient pas de réel");
                 }
             }
         }
@@ -218,7 +219,7 @@ static std::map<
                     if(t.est(Nature::Reel))
                         return Variable(std::get<BigDecimal>(f.get_valeur()) % std::get<BigDecimal>(t.get_valeur()));
                     
-                    throw std::runtime_error("Vous ne pouvez pas diviser un réel par une chaine qui ne contient pas de réel");
+                    throw std::runtime_error("Vous ne pouvez pas diviser un réel par une chaîne qui ne contient pas de réel");
                 }
             }
         }
@@ -480,17 +481,61 @@ static std::map<
                 }
             }
         }
+    },
+
+    /////////////////////////////////////////////////
+    // Indice
+    /////////////////////////////////////////////////
+    {
+        pe::demangle<stretch::indice>(), 
+        {
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Chaine, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    auto indice = std::get<BigDecimal>(s.get_valeur());
+                    auto chaine = std::get<std::string>(f.get_valeur());
+
+                    if(indice > 0 && indice.toInt() <= chaine.size()) 
+                        return Variable(std::string{chaine[indice.toInt() - 1]});
+
+                    throw std::runtime_error("L'indice donné dépasse les bornes de la chaîne");
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Reel, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    auto indice = std::get<BigDecimal>(s.get_valeur());
+                    auto reel = std::get<BigDecimal>(f.get_valeur());
+
+                    if(indice < 0) {
+                        int entier = std::abs((indice + 1).toInt());
+
+                        if(entier >= reel.getDecPart().size())
+                            throw std::runtime_error("L'indice " + std::to_string(entier) + " donné dépasse les bornes de la partie décimale de taille " + std::to_string(reel.getDecPart().size()));
+
+                        return Variable(BigDecimal(reel.getDecPart()[entier] - '0')); 
+                    }
+                        
+                    if(indice > 0 && indice.toInt() >= reel.getIntPart().size())
+                        throw std::runtime_error("L'indice " + indice.toString() + " donné dépasse les bornes de la partie réelle de taille " + std::to_string(reel.getIntPart().size()));
+
+                    return Variable(BigDecimal(reel.getIntPart()[reel.getIntPart().size() - indice.toInt()] - '0')); 
+                }
+            }
+        }
     }
 };
 
 const Variable operation(const std::string_view& operateur, const Variable first, const Variable second) {
     if(operations.find(operateur) == operations.end()) {
-        std::cout << "L'opération " << operateur << " n'existe pas" << std::endl;
+        throw std::runtime_error("L'opération " + static_cast<std::string>(operateur) + " n'existe pas");
         return Variable();
     } 
 
     if(operations[operateur].find(std::make_pair(first.get_nature(), second.get_nature())) == operations[operateur].end()) {
-        std::cout << "L'opération " << operateur << " n'est pas supporté pour les types " << Variable::type_tos(first.get_nature()) << " et " << Variable::type_tos(second.get_nature()) << std::endl;
+        throw std::runtime_error("L'opération " + static_cast<std::string>(operateur) + " n'est pas supporté pour les types " + Variable::type_tos(first.get_nature()) + " et " + Variable::type_tos(second.get_nature()));
         return Variable();
     }
 

@@ -1,4 +1,5 @@
 #include "stretch/Variable.hpp"
+#include <sstream>
 
 namespace stretch {
 
@@ -40,6 +41,22 @@ std::string Variable::to_string() const
         return std::get<bool>(m_valeur) == true ? "vrai" : "faux";
     else if(m_type == Nature::Reel) 
         return std::get<BigDecimal>(m_valeur).toString();
+    else if(m_type == Nature::Tableau) {
+        auto& tableau = std::get<Tableau>(m_valeur);
+        
+        std::stringstream chaine { "[" };
+        
+        for(int i = 0; i < tableau.size(); ++i) {
+            if(i != 0)
+                chaine << ", ";
+
+            chaine << tableau[i].to_string() << " ,";
+        }
+
+        chaine << "]";
+
+        return chaine.str();
+    }
     
     return "nul";
 }
@@ -57,6 +74,8 @@ Nature Variable::sto_nature(std::string_view type)
         return Nature::Booleen;
     else if (type == pe::demangle< stretch::reel >() || type == pe::demangle< stretch::entier >())
         return Nature::Reel;
+    else if (type == pe::demangle< stretch::tableau >())
+        return Nature::Tableau;
 
     return Nature::Nul;
 }
@@ -69,6 +88,8 @@ std::string Variable::type_tos(Nature type)
         return "booleen";
     else if(type == Nature::Reel)
         return "reel";
+    else if(type == Nature::Tableau)
+        return "tableau";
     
     return "nul";
 }
@@ -83,6 +104,22 @@ VariantValeur Variable::sto_valeur(Nature type, std::string valeur)
     } 
     else if(type == Nature::Reel) 
         return BigDecimal(std::move(valeur));
+    else if(type == Nature::Tableau)
+    {
+        valeur.erase(valeur.begin());
+        valeur.erase(valeur.end());
+
+        std::istringstream sstream(valeur);
+        std::vector<std::string> elements;
+        std::string element;
+        
+        Tableau tableau;
+        
+        while(std::getline(sstream, element, ','))
+            tableau.push_back(parse(element));
+
+        return tableau;
+    }
     
     return {};
 }
@@ -99,6 +136,9 @@ Variable Variable::parse(std::string valeur)
         return Variable(Nature::Booleen, lower);
     else if(std::regex_match(valeur, match, number_regex)) 
         return Variable(BigDecimal(std::move(valeur)));
+    /*else if(std::regex_match(..)) {
+
+    }*/
 
     return Variable(std::move(valeur));
 }

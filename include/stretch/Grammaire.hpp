@@ -33,7 +33,7 @@ struct si : pe::istring< 's', 'i' > {};
 struct sinon : pe::istring< 's', 'i', 'n', 'o', 'n' > {};
 struct alors : pe::istring< 'a', 'l', 'o', 'r', 's' > {};
 
-/// Operateur d'affectation
+/// Operateur d'assignation
 struct fleche_gauche : pe::string< '<', '-' > {};
 
 /// Operateurs arithmétiques
@@ -51,7 +51,7 @@ struct vrai : pe::istring< 'v', 'r', 'a', 'i' > {};
 struct faux : pe::istring< 'f', 'a', 'u', 'x' > {};
 
 /// Operateur d'indexation
-struct hashtag : pe::one< '#' > {};
+struct indice : pe::one< '#' > {};
 
 /// Operateur d'accès
 struct de : pe::istring< 'd', 'e' > {};
@@ -105,7 +105,15 @@ struct booleen : pe::sor < vrai, faux > {}; ///< ie. vrai
 struct chaine : pe::star< pe::not_at< guillemets >, pe::sor< pe::alnum, pe::space > > {};
 struct texte : pe::seq< guillemets, chaine, guillemets > {}; ///< ie. "hello"
 
+// struct affectation : pe::seq< variable, fleche_gauche, operation > {};
+// struct objet : pe::seq< crochet_ouvrant, pe::list< pe::sor< affectation, objet >, virgule >, crochet_fermant > {};
+// struct acces : pe::seq< identifieur, de, objet > {};
+
 struct operation;
+struct operations;
+
+struct tableau : pe::seq< crochet_ouvrant, operations, crochet_fermant > {};
+
 struct parentheses : pe::seq< parenthese_ouvrante, operation, parenthese_fermante > {};
 struct valeur : pe::sor< parentheses, booleen, identifieur, reel, texte > {};
 
@@ -115,7 +123,8 @@ struct valeur : pe::sor< parentheses, booleen, identifieur, reel, texte > {};
 struct appel_fonction;
 struct operation_fonction : pe::seq< separateur, valeur, separateur, pe::opt < appel_fonction > > {};
 struct operation_unaire : pe::seq< pe::opt< pe::seq< separateur, pe::sor< non, plus, moins > > >, operation_fonction > {};
-struct operation_produit : pe::list< operation_unaire, pe::sor< facteur, fraction, modulo > > {};
+struct operation_indice : pe::list< operation_unaire, pe::sor< indice > > {};
+struct operation_produit : pe::list< operation_indice, pe::sor< facteur, fraction, modulo > > {};
 struct operation_somme : pe::list< operation_produit, pe::sor< plus, moins > > {};
 struct operation_ordre : pe::list< operation_somme, pe::sor< plus_grand_que, plus_petit_que > > {};
 struct operation_egalite : pe::list< operation_ordre, pe::sor< egal, different > > {};
@@ -188,17 +197,6 @@ struct rearrange_operation : pe::parse_tree::apply< rearrange_operation >
 struct assignation : pe::seq< pe::list< identifieur, virgule >, separateur, fleche_gauche, separateur, operations > {}; // a, b, c <- 2, 5, 10
 
 /////////////////////////////////////////////////
-/// @brief Objets et tableaux
-/////////////////////////////////////////////////
-struct affectation : pe::seq< variable, fleche_gauche, operation > {};
-
-struct tableau : pe::seq< crochet_ouvrant, operations, crochet_fermant > {};
-struct objet : pe::seq< crochet_ouvrant, pe::list< pe::sor< affectation, objet >, virgule >, crochet_fermant > {};
-
-struct indexation : pe::seq< tableau, hashtag, operation > {};
-struct acces : pe::seq< identifieur, de, objet > {};
-
-/////////////////////////////////////////////////
 /// @brief Conditions
 ///////////////////////////////////////////////// 
 struct bloc;
@@ -254,6 +252,7 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         chaine,
         variable,
         alias,
+        tableau,
 
         // operation unaire
         non,
@@ -261,6 +260,7 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         moins,
         
         // operations binaires
+        indice,
         facteur,
         fraction,
         modulo,

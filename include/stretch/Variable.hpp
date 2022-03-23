@@ -23,14 +23,19 @@ enum class Nature {
     Nul = -1,
     Chaine,
     Booleen,
-    Reel
+    Reel,
+    Tableau
 };
+
+/////////////////////////////////////////////////
+class Variable;
 
 /////////////////////////////////////////////////
 /// @brief Les types utilisés en mémoire pour
 /// représenter les différents types de valeurs
 /////////////////////////////////////////////////
-using VariantValeur = std::variant< std::string, bool, BigDecimal >;
+using Tableau = std::vector< Variable >;
+using VariantValeur = std::variant< std::string, bool, BigDecimal, Tableau >;
 
 /////////////////////////////////////////////////
 /// @brief Classe représentant une variable

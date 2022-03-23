@@ -29,3 +29,8 @@ fonction factorielle <- i:
 fin
 
 c <- factorielle(10) || 3628800 ||
+
+z <- "abcdefghijklmnopqrstuvwxyz"
+repeter 26 fois dans h
+    c <- z#h
+fin
