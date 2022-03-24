@@ -67,6 +67,21 @@ static std::map<
                 [](const Variable f, const Variable s) {
                     return f;
                 }
+            },
+            /////////////////////////////////////////////////
+            {
+                /*std::make_pair(Nature::Tableau, Nature::Tableau),
+                [](const Variable f, const Variable s) {
+                    
+                }*/
+
+                std::make_pair(Nature::Tableau, Nature::Tableau),
+                [](const Variable f, const Variable s) {
+                    auto t = std::get<Tableau>(f.get_valeur());
+                    auto q = std::get<Tableau>(s.get_valeur());
+                    t.insert(t.end(), q.begin(), q.end());
+                    return Variable(t);
+                }
             }
         }
     },
@@ -121,7 +136,22 @@ static std::map<
                 [](const Variable f, const Variable s) {
                     return Variable(std::get<BigDecimal>(f.get_valeur()) * -1);
                 }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Tableau, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    auto t_f = std::get<Tableau>(f.get_valeur());
+                    auto t_s = std::get<BigDecimal>(s.get_valeur());
+                    
+                    if(t_s.toInt() > t_f.size()) {
+                        throw std::runtime_error("Ce que vous souhaitez retirer du tableau dépasse sa taille");
+                    }
+
+                    return Variable(std::vector(t_f.begin(), t_f.end() - t_s.toInt()));
+                }
             }
+
         }
     },
 
@@ -522,6 +552,19 @@ static std::map<
                         throw std::runtime_error("L'indice " + indice.toString() + " donné dépasse les bornes de la partie réelle de taille " + std::to_string(reel.getIntPart().size()));
 
                     return Variable(BigDecimal(reel.getIntPart()[reel.getIntPart().size() - indice.toInt()] - '0')); 
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Tableau, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    auto indice = std::get<BigDecimal>(s.get_valeur());
+                    auto tableau = std::get<Tableau>(f.get_valeur());
+
+                    if(indice > 0 && indice.toInt() <= tableau.size()) 
+                        return Variable(tableau[indice.toInt() - 1]);
+
+                    throw std::runtime_error("L'indice donné dépasse les bornes du tableau");
                 }
             }
         }

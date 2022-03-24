@@ -115,7 +115,7 @@ struct operations;
 struct tableau : pe::seq< crochet_ouvrant, operations, crochet_fermant > {};
 
 struct parentheses : pe::seq< parenthese_ouvrante, operation, parenthese_fermante > {};
-struct valeur : pe::sor< parentheses, booleen, identifieur, reel, texte > {};
+struct valeur : pe::sor< parentheses, booleen, identifieur, tableau, reel, texte > {};
 
 /////////////////////////////////////////////////
 /// @brief Operateurs
@@ -209,7 +209,6 @@ struct condition : pe::seq< si, operation, pe::opt< pe::seq < alors, separateur 
 /////////////////////////////////////////////////
 /// @brief Boucles
 /////////////////////////////////////////////////
-struct tableau;
 struct boucle_pour_chaque : pe::seq< pour_chaque, identifieur, dans, tableau, faire, bloc, fin > {};
 
 struct ranger : pe::opt< pe::seq< dans, separateur, identifieur, separateur > > {}; // ranger la valeur actuelle dans une variable

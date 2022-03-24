@@ -34,3 +34,6 @@ z <- "abcdefghijklmnopqrstuvwxyz"
 repeter 26 fois dans h
     c <- z#h
 fin
+
+
+a <- [1,25.56,"salut",[5,3,2]]#4

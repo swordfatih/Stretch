@@ -92,7 +92,18 @@ public:
 
     // Constructeur à partir d'un noeud
     template <typename T>
-    Variable(std::unique_ptr<T>& noeud) : Variable(sto_nature(noeud->type), sto_valeur(sto_nature(noeud->type), noeud->string())) {}
+    Variable(std::unique_ptr<T>& noeud) : m_type(sto_nature(noeud->type)) {
+        if(m_type != Nature::Tableau) {
+            m_valeur = sto_valeur(m_type, noeud->string());
+        }
+        else {
+            Tableau tableau;
+            for(auto& fils : noeud->children) {
+                tableau.push_back(Variable(fils));
+            }
+            m_valeur = tableau;
+        }
+    }
 
     Nature get_nature() const;
     VariantValeur get_valeur() const;
@@ -103,8 +114,11 @@ public:
     bool est(Nature type) const;
 
 private:
+    static std::vector<std::string> split_tableau(const std::string& s, const std::regex& tableau_regex); 
+
     Nature m_type;          ///< Le type de la variable
     VariantValeur m_valeur; ///< La valeur de la variable
+
 };
 
 } // namespace stretch

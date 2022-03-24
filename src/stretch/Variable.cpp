@@ -44,13 +44,14 @@ std::string Variable::to_string() const
     else if(m_type == Nature::Tableau) {
         auto& tableau = std::get<Tableau>(m_valeur);
         
-        std::stringstream chaine { "[" };
+        std::stringstream chaine;
+        chaine << "[";
         
         for(int i = 0; i < tableau.size(); ++i) {
             if(i != 0)
                 chaine << ", ";
-
-            chaine << tableau[i].to_string() << " ,";
+            
+            chaine << tableau[i].to_string();
         }
 
         chaine << "]";
@@ -104,7 +105,7 @@ VariantValeur Variable::sto_valeur(Nature type, std::string valeur)
     } 
     else if(type == Nature::Reel) 
         return BigDecimal(std::move(valeur));
-    else if(type == Nature::Tableau)
+    /*else if(type == Nature::Tableau)
     {
         valeur.erase(valeur.begin());
         valeur.erase(valeur.end());
@@ -115,11 +116,11 @@ VariantValeur Variable::sto_valeur(Nature type, std::string valeur)
         
         Tableau tableau;
         
-        while(std::getline(sstream, element, ','))
+        while(std::getline(sstream, element, ',')) //[1, 2, 3, [5,"salut"]]
             tableau.push_back(parse(element));
 
         return tableau;
-    }
+    } A gérer plus tard : parsing en ayant un tableau comme une chaine de caractères*/
     
     return {};
 }
@@ -130,17 +131,38 @@ Variable Variable::parse(std::string valeur)
     for(auto& c: lower) c = std::tolower(c);
 
     std::regex number_regex("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)");
+    std::regex tableau_regex("^\\[.*(,.*)*\\]$");
     std::smatch match;
 
     if(lower == "vrai" || lower == "faux")
         return Variable(Nature::Booleen, lower);
     else if(std::regex_match(valeur, match, number_regex)) 
         return Variable(BigDecimal(std::move(valeur)));
-    /*else if(std::regex_match(..)) {
-
-    }*/
+    else if(std::regex_match(valeur, match, tableau_regex)) {
+        std::vector<Variable> variables;
+        for(auto& v : split_tableau(valeur, tableau_regex))
+        {
+            variables.push_back(parse(v));
+        }
+        return Variable(variables);
+    }
 
     return Variable(std::move(valeur));
+}
+
+std::vector<std::string> Variable::split_tableau(const std::string& s, const std::regex& tableau_regex) 
+{
+    std::vector<std::string> elems;
+
+    std::sregex_token_iterator iter(s.begin(), s.end(), tableau_regex, -1);
+    std::sregex_token_iterator end;
+
+    while (iter != end)  {
+        elems.push_back(*iter);
+        ++iter;
+    }
+
+    return elems;
 }
 
 } // namespace stretch

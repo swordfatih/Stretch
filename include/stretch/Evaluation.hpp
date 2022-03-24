@@ -175,7 +175,7 @@ Variable evaluer(std::unique_ptr<Noeud>& noeud)
     }   
 
     // valeur
-    if(noeud->children.empty()) 
+    if(noeud->children.empty() || noeud->template is_type< stretch::tableau >()) 
         return Variable(noeud);
 
     // operation unaire
