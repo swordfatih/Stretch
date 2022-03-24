@@ -1,0 +1,30 @@
+{
+    "name": "stretch",
+    "displayName": "Stretch Highlighting",
+    "description": "Syntax highlighting for Stretch",
+    "icon": "images/icon.png",
+    "version": "0.0.1",
+    "publisher": "stretch",
+    "author": {
+        "name": "swordfatih"
+    },
+    "engines": {
+        "vscode": "^1.65.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "st",
+            "aliases": ["Stretch", "st"],
+            "extensions": [".st"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "st",
+            "scopeName": "source.st",
+            "path": "./syntaxes/st.tmLanguage.json"
+        }]
+    }
+}
