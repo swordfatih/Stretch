@@ -1,4 +1,4 @@
-/.vscode/
+.vscode/
 /.xmake/
 /wget-log
 /main.o
@@ -9,3 +9,4 @@
 cmake-build-debug/
 CMakeLists.txt
 *.swp
+.vscodeignore
