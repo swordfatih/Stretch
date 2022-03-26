@@ -116,6 +116,25 @@ Retour executer(std::unique_ptr<Noeud>& noeud)
         }
     }
     /////////////////////////////////////////////////
+    else if(noeud->template is_type<stretch::boucle_pour_chaque>())
+    {
+        auto& element = noeud->children.front();
+        Variable tableau = evaluer(noeud->children[1]);
+
+        if(tableau.get_nature() != Nature::Tableau) 
+            throw std::runtime_error("Un tableau est requis pour la boucle pour chaque.");
+
+        if(!(element->template is_type<stretch::variable>()))
+            throw std::runtime_error(element->string() + " n'est pas un nom de variable valide.");
+
+        Tableau tab = std::get<Tableau>(tableau.get_valeur());
+        for(auto& v: tab) 
+        {
+            assigner(element, v);
+            executer(noeud->children.back());
+        }
+    }
+    /////////////////////////////////////////////////
     else if(noeud->template is_type<stretch::definition_fonction>())
     {
         std::vector<std::string> parametres;
@@ -131,7 +150,7 @@ Retour executer(std::unique_ptr<Noeud>& noeud)
         ajout_fonction(noeud->children.front()->string(), Bloc(&(noeud->children.back()), parametres));
     }
     /////////////////////////////////////////////////
-    else if(noeud->template is_type<stretch::retourner_valeurs>()) 
+    else if(noeud->template is_type<stretch::retour>()) 
     {
         Retour valeurs;
         

@@ -26,7 +26,7 @@ static std::map<
     // Addition
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::plus>(), 
+        pe::demangle<stretch::operateur::plus>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -90,7 +90,7 @@ static std::map<
     // Soustraction
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::moins>(), 
+        pe::demangle<stretch::operateur::moins>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -159,7 +159,7 @@ static std::map<
     // Multiplication
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::facteur>(), 
+        pe::demangle<stretch::operateur::facteur>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -203,7 +203,7 @@ static std::map<
     // Division
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::fraction>(), 
+        pe::demangle<stretch::operateur::fraction>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -231,7 +231,7 @@ static std::map<
     // Reste
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::modulo>(), 
+        pe::demangle<stretch::operateur::modulo>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -259,7 +259,7 @@ static std::map<
     // Egalité
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::egal>(), 
+        pe::demangle<stretch::egalite>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -341,7 +341,7 @@ static std::map<
     // Différence
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::different>(), 
+        pe::demangle<stretch::difference>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -423,7 +423,7 @@ static std::map<
     // Ou
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::ou>(), 
+        pe::demangle<stretch::operateur::ou>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -439,7 +439,7 @@ static std::map<
     // Et
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::et>(), 
+        pe::demangle<stretch::operateur::et>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -452,10 +452,10 @@ static std::map<
     }, 
 
     /////////////////////////////////////////////////
-    // Plus petit que
+    // Inferieur
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::plus_petit_que>(), 
+        pe::demangle<stretch::inferieur>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -475,10 +475,10 @@ static std::map<
     }, 
 
     /////////////////////////////////////////////////
-    // Plus grand que
+    // Supérieur
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::plus_grand_que>(), 
+        pe::demangle<stretch::superieur>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -501,7 +501,7 @@ static std::map<
     // Non
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::non>(), 
+        pe::demangle<stretch::operateur::non>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -517,7 +517,7 @@ static std::map<
     // Indice
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::indice>(), 
+        pe::demangle<stretch::operateur::indice>(), 
         {
             /////////////////////////////////////////////////
             {
