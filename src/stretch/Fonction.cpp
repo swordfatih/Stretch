@@ -31,13 +31,18 @@ void Fonction::enregistrer(const std::string& nom, Fonction fonction)
 }
 
 /////////////////////////////////////////////////
+Fonction& Fonction::recuperer(const std::string& nom) 
+{
+    if(definitions.count(nom) == 0)
+        throw std::runtime_error("La fonction " + nom + " n'est pas enregistrée");
+
+    return definitions.at(nom);
+}
+
+/////////////////////////////////////////////////
 Tableau Fonction::invoquer(std::string nom, Tableau& valeurs)
 {
-    // est-ce que la fonction existe ?
-    if(definitions.count(nom) == 0)
-        throw std::runtime_error("La fonction " + nom + " n'est pas définie");
-
-    auto& fonction = definitions.at(nom);
+    Fonction& fonction = Fonction::recuperer(nom);
 
     // si il met des paramètres à l'appel alors qu'il n'y en a pas dans la définition
     // nombre de valeurs = tous les fils sauf le nom de la fonction

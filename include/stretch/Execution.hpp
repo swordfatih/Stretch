@@ -17,10 +17,10 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Fonction& fonction)
     {
         for(auto& c: noeud->children) 
         {
-            auto&& valeurs_retour = executer(c, fonction);
+            auto&& resultat = executer(c, fonction);
             
-            if(!valeurs_retour.empty())
-                return valeurs_retour;
+            if(!resultat.empty())
+                return std::move(resultat);
         }
     }
     /////////////////////////////////////////////////
@@ -154,7 +154,7 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Fonction& fonction)
         for(auto& valeur: noeud->children)
             valeurs.push_back(evaluer(valeur, fonction));
 
-        return valeurs;
+        return std::move(valeurs);
     }
     /////////////////////////////////////////////////
     else if(noeud->template is_type< mot::quitter >()) 

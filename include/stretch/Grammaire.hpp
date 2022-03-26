@@ -58,7 +58,7 @@ struct ou : pe::sor < mot::ou > {};
 struct et : pe::sor < mot::et > {};
 
 struct appel;
-struct operation_appel : pe::seq< separateur, valeur, separateur, pe::opt < appel > > {};
+struct operation_appel : pe::seq< separateur, valeur, separateur, pe::opt < appel, separateur > > {};
 struct operation_unaire : pe::seq< pe::opt< separateur, pe::sor< negation, addition, soustraction > >, operation_appel > {};
 struct operation_indice : pe::list< operation_unaire, indexation > {};
 struct operation_produit : pe::list< operation_indice, pe::sor< multiplication, division, reste > > {};

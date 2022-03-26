@@ -34,8 +34,8 @@ public:
     /////////////////////////////////////////////////
     void assigner(const std::string& nom, Variable valeur) 
     {
-        variables[nom] = valeur;
-        std::cerr << "[DEBUG] Affectation de " << variables[nom].to_string() << " (" << Variable::type_tos(variables[nom].get_nature()) << ") dans la variable " << nom << std::endl;   
+        m_variables[nom] = valeur;
+        std::cerr << "[DEBUG] Affectation de " << m_variables[nom].to_string() << " (" << Variable::type_tos(m_variables[nom].get_nature()) << ") dans la variable " << nom << std::endl;   
     }
 
     /////////////////////////////////////////////////
@@ -47,13 +47,13 @@ public:
     /////////////////////////////////////////////////
     Variable lire(const std::string& nom) 
     {
-        return variables.count(nom) == 0 ? Variable() : variables.at(nom);
+        return m_variables.count(nom) == 0 ? Variable() : m_variables.at(nom);
     }
 
 private:
     /////////////////////////////////////////////////
     std::unique_ptr<Noeud>& m_root;
-    std::map<std::string, Variable> variables;
+    std::map<std::string, Variable> m_variables;
 };
 
 } // namespace stretch

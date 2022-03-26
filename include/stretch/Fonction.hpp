@@ -30,6 +30,9 @@ public:
     static void enregistrer(const std::string& nom, Fonction fonction);
 
     /////////////////////////////////////////////////
+    static Fonction& recuperer(const std::string& nom);
+
+    /////////////////////////////////////////////////
     static Tableau invoquer(std::string nom, Tableau& valeurs);
 
     /////////////////////////////////////////////////

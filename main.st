@@ -23,16 +23,6 @@ si faux
     e <- "ca marche"
 fin
 
-fonction factorielle <- i
-    si i plus petit que 2
-        sortir avec 1
-    fin
-    
-    sortir avec i * factorielle(i - 1)
-fin
-
-c <- factorielle(10)
-
 z <- "abcdefghijklmnopqrstuvwxyz"
 repeter 26 fois dans h
     c <- z#h
@@ -43,3 +33,13 @@ a <- [1,25.56,"salut",[5,3,2]]#4 + ["cc"]
 pour chaque i dans a faire 
     
 fin
+
+fonction factorielle <- i
+    si i plus petit que 2
+        sortir avec 1
+    fin
+    
+    sortir avec factorielle(i - 1) * i
+fin
+
+c <- factorielle(10)
