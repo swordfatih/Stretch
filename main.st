@@ -14,6 +14,9 @@ fin
 
 repeter 5 fois dans i
     e <- "ca repete"
+    si i egal 1
+        arreter
+    fin
 fin
 
 si faux

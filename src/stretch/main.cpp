@@ -1,6 +1,6 @@
 #include <iostream>
 #include <tao/pegtl/contrib/parse_tree_to_dot.hpp>
-#include "stretch/Evaluation.hpp"
+#include "stretch/Execution.hpp"
 
 namespace pe = tao::pegtl;
 
@@ -22,18 +22,11 @@ int main(int argc, char *argv[])
     {
         stretch::executer(root);
     }
-    catch(const StretchException& e) 
+    catch(const stretch::exception::QuitterException& e) 
     {            
         std::cerr << e.what() << std::endl;                 
         return 0;
     }
-
-    // std::cout << stretch::Variable("salutt") << std::endl;
-    // std::cout << stretch::Variable(45) << std::endl;
-    // std::cout << stretch::Variable(75000.8) << std::endl;
-    // std::cout << stretch::Variable(stretch::Nature::Reel, "45487551215455555555.55555555555555555555555") << std::endl;
-    // std::cout << stretch::Variable(root->children[0]->children[1]->children[0]) << std::endl;
-    // std::cout << (stretch::Variable::parse("23442.98").get_nature() == stretch::Nature::Reel) << std::endl;
-
+    
     return 0;
 }

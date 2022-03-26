@@ -140,10 +140,10 @@ Variable Variable::parse(std::string valeur)
         return Variable(BigDecimal(std::move(valeur)));
     else if(std::regex_match(valeur, match, tableau_regex)) {
         std::vector<Variable> variables;
+
         for(auto& v : split_tableau(valeur, tableau_regex))
-        {
             variables.push_back(parse(v));
-        }
+
         return Variable(variables);
     }
 

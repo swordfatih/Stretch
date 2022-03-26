@@ -1,16 +1,11 @@
-#include <tao/pegtl/demangle.hpp>
-
+/////////////////////////////////////////////////
+// Headers
+/////////////////////////////////////////////////
 #include <functional>
 #include <map>
 #include <regex>
 #include <cstring>
 #include <cmath>
-
-#include "stretch/Variable.hpp"
-
-namespace pe = tao::pegtl;
-
-namespace stretch::arithmetique {
 
 /////////////////////////////////////////////////
 static std::map<    
@@ -70,16 +65,12 @@ static std::map<
             },
             /////////////////////////////////////////////////
             {
-                /*std::make_pair(Nature::Tableau, Nature::Tableau),
-                [](const Variable f, const Variable s) {
-                    
-                }*/
-
                 std::make_pair(Nature::Tableau, Nature::Tableau),
                 [](const Variable f, const Variable s) {
                     auto t = std::get<Tableau>(f.get_valeur());
                     auto q = std::get<Tableau>(s.get_valeur());
                     t.insert(t.end(), q.begin(), q.end());
+                    
                     return Variable(t);
                 }
             }
@@ -259,7 +250,7 @@ static std::map<
     // Egalité
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::egalite>(), 
+        pe::demangle<stretch::operateur::egalite>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -341,7 +332,7 @@ static std::map<
     // Différence
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::difference>(), 
+        pe::demangle<stretch::operateur::difference>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -455,7 +446,7 @@ static std::map<
     // Inferieur
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::inferieur>(), 
+        pe::demangle<stretch::operateur::inferieur>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -478,7 +469,7 @@ static std::map<
     // Supérieur
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::superieur>(), 
+        pe::demangle<stretch::operateur::superieur>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -571,6 +562,7 @@ static std::map<
     }
 };
 
+/////////////////////////////////////////////////
 const Variable operation(const std::string_view& operateur, const Variable first, const Variable second) {
     if(operations.find(operateur) == operations.end()) {
         throw std::runtime_error("L'opération " + static_cast<std::string>(operateur) + " n'existe pas");
@@ -584,5 +576,3 @@ const Variable operation(const std::string_view& operateur, const Variable first
 
     return operations[operateur][std::make_pair(first.get_nature(), second.get_nature())](first, second);
 }
-
-} // namespace stretch::arithmetique
