@@ -1,11 +1,12 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#pragma once 
+
 #include <variant>
 #include <string>
 #include <memory>
 #include <regex>
-#include <iostream>
 
 #include <tao/pegtl/demangle.hpp>
 

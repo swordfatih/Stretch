@@ -1,9 +1,15 @@
-#include <iostream>
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/parse_tree_to_dot.hpp>
+
 #include "stretch/Execution.hpp"
 
+/////////////////////////////////////////////////
 namespace pe = tao::pegtl;
 
+/////////////////////////////////////////////////
 int main(int argc, char *argv[])
 {
     if(argc != 2) {
@@ -20,7 +26,10 @@ int main(int argc, char *argv[])
 
     try
     {
-        stretch::executer(root);
+        auto main = stretch::Fonction(root);
+        stretch::Fonction::enregistrer("main", main);
+
+        stretch::executer(root, main);
     }
     catch(const stretch::exception::QuitterException& e) 
     {            

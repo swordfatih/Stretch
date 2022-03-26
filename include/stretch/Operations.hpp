@@ -8,6 +8,10 @@
 #include <cmath>
 
 /////////////////////////////////////////////////
+namespace stretch
+{
+
+/////////////////////////////////////////////////
 static std::map<    
                     std::string_view, 
                     std::map<   
@@ -21,7 +25,7 @@ static std::map<
     // Addition
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::operateur::plus>(), 
+        pe::demangle<stretch::addition>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -81,7 +85,7 @@ static std::map<
     // Soustraction
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::operateur::moins>(), 
+        pe::demangle<stretch::soustraction>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -144,13 +148,13 @@ static std::map<
             }
 
         }
-    },
+    }, 
 
     /////////////////////////////////////////////////
     // Multiplication
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::operateur::facteur>(), 
+        pe::demangle<stretch::multiplication>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -194,7 +198,7 @@ static std::map<
     // Division
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::operateur::fraction>(), 
+        pe::demangle<stretch::division>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -222,7 +226,7 @@ static std::map<
     // Reste
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::operateur::modulo>(), 
+        pe::demangle<stretch::reste>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -250,7 +254,7 @@ static std::map<
     // Egalité
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::operateur::egalite>(), 
+        pe::demangle<stretch::egalite>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -332,7 +336,7 @@ static std::map<
     // Différence
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::operateur::difference>(), 
+        pe::demangle<stretch::inegalite>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -414,7 +418,7 @@ static std::map<
     // Ou
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::operateur::ou>(), 
+        pe::demangle<stretch::ou>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -430,7 +434,7 @@ static std::map<
     // Et
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::operateur::et>(), 
+        pe::demangle<stretch::et>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -446,7 +450,7 @@ static std::map<
     // Inferieur
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::operateur::inferieur>(), 
+        pe::demangle<stretch::inferieur>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -469,7 +473,7 @@ static std::map<
     // Supérieur
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::operateur::superieur>(), 
+        pe::demangle<stretch::superieur>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -492,7 +496,7 @@ static std::map<
     // Non
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::operateur::non>(), 
+        pe::demangle<stretch::negation>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -506,9 +510,10 @@ static std::map<
 
     /////////////////////////////////////////////////
     // Indice
+
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::operateur::indice>(), 
+        pe::demangle<stretch::indexation>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -563,7 +568,8 @@ static std::map<
 };
 
 /////////////////////////////////////////////////
-const Variable operation(const std::string_view& operateur, const Variable first, const Variable second) {
+const Variable operer(const std::string_view& operateur, const Variable first, const Variable second) 
+{
     if(operations.find(operateur) == operations.end()) {
         throw std::runtime_error("L'opération " + static_cast<std::string>(operateur) + " n'existe pas");
         return Variable();
@@ -576,3 +582,5 @@ const Variable operation(const std::string_view& operateur, const Variable first
 
     return operations[operateur][std::make_pair(first.get_nature(), second.get_nature())](first, second);
 }
+
+} // namespace stretch

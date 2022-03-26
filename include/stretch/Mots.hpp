@@ -1,7 +1,9 @@
 /////////////////////////////////////////////////
-/// @brief Headers
+/// Headers
 /////////////////////////////////////////////////
+#include <tao/pegtl/ascii.hpp>
 #include <tao/pegtl/rules.hpp>
+#include <tao/pegtl/utf8.hpp>
 
 /////////////////////////////////////////////////
 namespace pe = tao::pegtl;
@@ -10,13 +12,13 @@ namespace pe = tao::pegtl;
 namespace stretch::mot {
 
 /////////////////////////////////////////////////
-/// @brief Mots clés
+/// Mots clés
 /////////////////////////////////////////////////
 namespace symbole {
     struct plus : pe::one< '+' > {};
     struct moins : pe::one< '-' > {};
     struct division : pe::one< '/' > {};
-    struct multiplication : pe::one< '*' > {};
+    struct fois : pe::one< '*' > {};
     struct modulo : pe::one< '%' > {};
 } // namespace symbole
 
@@ -28,6 +30,7 @@ struct fin : pe::istring< 'f', 'i', 'n' > {};
 struct tant : pe::istring< 't', 'a', 'n', 't' > {};
 struct que : pe::istring< 'q', 'u', 'e' > {}; 
 struct repeter : pe::istring< 'r', 'e', 'p', 'e', 't', 'e', 'r' > {};
+struct fois : pe::istring< 'f', 'o', 'i', 's' > {};
 struct dans : pe::istring< 'd', 'a', 'n', 's' > {};
 struct pour : pe::istring< 'p', 'o', 'u', 'r' > {};
 struct chaque : pe::istring< 'c', 'h', 'a', 'q', 'u', 'e' > {};
@@ -39,7 +42,7 @@ struct sinon : pe::istring< 's', 'i', 'n', 'o', 'n' > {};
 struct alors : pe::istring< 'a', 'l', 'o', 'r', 's' > {};
 
 /// Assignation
-struct fleche_gauche : pe::string< '<', '-' > {};
+struct fleche : pe::string< '<', '-' > {};
 
 /// Fonctions
 struct fonction : pe::istring< 'f', 'o', 'n', 'c', 't', 'i', 'o', 'n' > {};
@@ -66,6 +69,9 @@ struct virgule : pe::one< ',' > {};
 struct point : pe::one< '.' > {};
 struct guillemets : pe::one< '"' > {};
 struct apostrophe : pe::one< '\'' > {};
+
+/// Operateurs arithmétiques
+struct reste : pe::istring< 'r', 'e', 's', 't', 'e' > {};
 
 /// Operateurs logiques
 struct et : pe::istring< 'e', 't' > {};

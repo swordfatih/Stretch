@@ -1,17 +1,22 @@
 /////////////////////////////////////////////////
 // Headers
 /////////////////////////////////////////////////
-#pragma once
 #include <exception>
 
+/////////////////////////////////////////////////
 namespace stretch::exception {
 
 /////////////////////////////////////////////////
 class StretchException : public std::exception
 {
 public:
-    explicit StretchException(std::string message) : m_message(message) {}
+    /////////////////////////////////////////////////
+    explicit StretchException(std::string message) : m_message(message) 
+    {
 
+    }
+
+    /////////////////////////////////////////////////
     char const* what() const noexcept override 
     { 
         return m_message.c_str(); 
@@ -22,13 +27,19 @@ protected:
 };
 
 /////////////////////////////////////////////////
-class QuitterException : public StretchException {
-
-}
+class QuitterException : public StretchException 
+{
+public:
+    /////////////////////////////////////////////////
+    explicit QuitterException(std::string message) : StretchException(message) {}
+};
 
 /////////////////////////////////////////////////
-class BoucleException : public StretchException {
-    
-}
+class BoucleException : public StretchException 
+{
+public:
+    /////////////////////////////////////////////////
+    explicit BoucleException(std::string message) : StretchException(message) {}
+};
 
 } // namespace stretch
