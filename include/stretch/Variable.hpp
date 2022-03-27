@@ -11,7 +11,7 @@
 #include <tao/pegtl/demangle.hpp>
 
 #include "decimal/BigDecimal.h"
-#include "stretch/Grammaire.hpp"
+#include "stretch/Arbre.hpp"
 
 /////////////////////////////////////////////////
 using Noeud = tao::pegtl::parse_tree::node;

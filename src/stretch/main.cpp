@@ -3,6 +3,7 @@
 /////////////////////////////////////////////////
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/parse_tree_to_dot.hpp>
+#include <tao/pegtl/contrib/analyze.hpp>
 
 #include "stretch/Execution.hpp"
 
@@ -19,10 +20,14 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    /* if(pe::analyze<stretch::grammaire>(1) != 0) {
+        return 1;
+    } */ 
+
     std::string filename{argv[1]};
     pe::file_input in(filename); 
 
-    auto root = pe::parse_tree::parse<stretch::grammaire, stretch::selector>(in);
+    auto root = pe::parse_tree::parse< stretch::grammaire, stretch::selector >(in);
 
     pe::parse_tree::print_dot(std::cout, *root);
 

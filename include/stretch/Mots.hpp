@@ -54,6 +54,7 @@ struct quitter : pe::istring< 'q', 'u', 'i', 't', 't', 'e', 'r' > {};
 /// Valeurs
 struct vrai : pe::istring< 'v', 'r', 'a', 'i' > {};
 struct faux : pe::istring< 'f', 'a', 'u', 'x' > {};
+struct unicode : pe::utf8::range< 0x20, 0x10FFFF > {};
 
 /// Tableau
 struct crochet_ouvrant : pe::one< '[' > {};
@@ -68,7 +69,7 @@ struct virgule : pe::one< ',' > {};
 struct point : pe::one< '.' > {};
 struct guillemets : pe::one< '"' > {};
 struct apostrophe : pe::one< '\'' > {};
-struct echapper : pe::one< '\\' > {};
+struct echappement : pe::one< '\\' > {};
 
 /// Operateurs de forme
 struct taille : pe::istring< 't', 'a', 'i', 'l', 'l', 'e' > {};
