@@ -293,7 +293,7 @@ static std::map<
                     if(t.est(Nature::Booleen))
                         return Variable(std::get<bool>(t.get_valeur()) == std::get<bool>(s.get_valeur()));
                     
-                    return Variable(static_cast<bool>(false));
+                    return Variable(VariantValeur(false));
                 }
             },
             /////////////////////////////////////////////////
@@ -305,7 +305,7 @@ static std::map<
                     if(t.est(Nature::Booleen))
                         return Variable(std::get<bool>(f.get_valeur()) == std::get<bool>(t.get_valeur()));
                     
-                    return Variable(static_cast<bool>(false));
+                    return Variable(VariantValeur(false));
                 }
             },
             /////////////////////////////////////////////////
@@ -319,14 +319,14 @@ static std::map<
             {
                 std::make_pair(Nature::Chaine, Nature::Nul),
                 [](const Variable f, const Variable s) {                
-                    return Variable(static_cast<bool>(false));
+                    return Variable(VariantValeur(false));
                 }
             },
             /////////////////////////////////////////////////
             {
                 std::make_pair(Nature::Nul, Nature::Chaine),
                 [](const Variable f, const Variable s) {                
-                    return Variable(static_cast<bool>(false));
+                    return Variable(VariantValeur(false));
                 } 
             }
         } 
