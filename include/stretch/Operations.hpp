@@ -319,14 +319,14 @@ static std::map<
             {
                 std::make_pair(Nature::Chaine, Nature::Nul),
                 [](const Variable f, const Variable s) {                
-                    return Variable(static_cast(false));
+                    return Variable(static_cast<bool>(false));
                 }
             },
             /////////////////////////////////////////////////
             {
                 std::make_pair(Nature::Nul, Nature::Chaine),
                 [](const Variable f, const Variable s) {                
-                    return Variable(static_cast(false));
+                    return Variable(static_cast<bool>(false));
                 } 
             }
         } 
