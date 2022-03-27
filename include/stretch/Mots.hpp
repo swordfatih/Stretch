@@ -72,7 +72,7 @@ struct apostrophe : pe::one< '\'' > {};
 
 /// Echappement
 struct echappeur : pe::one< '\\' > {};
-struct echapper : pe::one< '"' > {};
+struct echapper : pe::one< '"', 'n' > {};
 
 /// Operateurs de forme
 struct taille : pe::istring< 't', 'a', 'i', 'l', 'l', 'e' > {};
@@ -94,7 +94,7 @@ struct de : pe::istring< 'd', 'e' > {};
 
 // Operateurs de comparaison
 struct plus : pe::istring< 'p', 'l', 'u', 's' > {}; 
-struct petit: pe::istring< 'p', 'e', 't', 'i', 't' > {};
+struct petit : pe::istring< 'p', 'e', 't', 'i', 't' > {};
 struct grand : pe::istring< 'g', 'r', 'a', 'n', 'd' > {}; 
 struct egal : pe::istring< 'e', 'g', 'a', 'l' > {};
 struct est : pe::istring< 'e', 's', 't' > {};

@@ -6,6 +6,7 @@
 #include <tao/pegtl/contrib/analyze.hpp>
 
 #include "stretch/Execution.hpp"
+#include "stretch/Standard.hpp"
 
 #include <iostream>
 
@@ -29,6 +30,7 @@ int main(int argc, char *argv[])
 
     try
     {
+        stretch::standard::charger();
         stretch::Fonction::enregistrer("main", stretch::Fonction(root));
         stretch::Scope scope;
         stretch::executer(root, scope);

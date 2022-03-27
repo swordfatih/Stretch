@@ -26,7 +26,7 @@ Variable evaluer(std::unique_ptr<Noeud>& noeud, Scope& scope)
 
         Tableau&& retour = Fonction::invoquer(scope, noeud->children.front()->string(), valeurs);
         
-        return retour.empty() ? Variable() : (retour.size() == 1 ? retour[0] : Variable(retour));
+        return retour.empty() ? Variable() : (retour.size() == 1 ? retour[0] : Variable(std::move(retour)));
     }
 
     // variable

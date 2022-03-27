@@ -1,0 +1,22 @@
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "stretch/Fonction.hpp"
+
+#include "stretch/standard/Aleatoire.hpp"
+
+/////////////////////////////////////////////////
+namespace stretch::standard {
+
+/////////////////////////////////////////////////
+static std::unique_ptr< Noeud > null_node = nullptr;
+
+/////////////////////////////////////////////////
+void charger() 
+{
+    Fonction::enregistrer("aleatoire", Fonction(null_node, {"from", "to", "real"}, fonction::aleatoire));
+}
+
+} // namespace stretch::standard
+
+

@@ -85,10 +85,10 @@ struct assignation : pe::seq< pe::list< identifieur, mot::virgule >, separateur,
 /// Conditions
 ///////////////////////////////////////////////// 
 struct bloc;
-struct condition : pe::seq< mot::si, operation, pe::opt< mot::alors, separateur >, bloc, 
-                        pe::star< mot::sinon, separateur, mot::si, operation, pe::opt< mot::alors, separateur >, bloc >,
-                        pe::opt< mot::sinon, separateur, bloc >,
-                        mot::fin > {};
+struct condition : pe::seq< mot::si, operation, mot::alors, separateur, bloc, 
+                    pe::star< mot::sinon, separateur, mot::si, operation, separateur, bloc >,
+                    pe::opt< mot::sinon, separateur, bloc >,
+                    mot::fin > {};
 
 /////////////////////////////////////////////////
 /// Boucles
@@ -118,7 +118,7 @@ struct entree : pe::seq< mot::lire, separateur, mot::dans, separateur, identifie
 /////////////////////////////////////////////////
 /// Blocs d'instructions
 /////////////////////////////////////////////////
-struct instruction : pe::sor< retour, mot::quitter, entree, sortie, mot::arreter, mot::continuer, definition, condition, boucle, assignation > {};
+struct instruction : pe::sor< mot::arreter, retour, mot::quitter, entree, sortie, mot::continuer, definition, condition, boucle, assignation > {};
 struct bloc : pe::star< instruction, separateur > {};
 
 /////////////////////////////////////////////////

@@ -1,6 +1,10 @@
+#pragma once
+
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include <functional>
+
 #include "stretch/Scope.hpp"
 
 namespace stretch {
@@ -17,11 +21,11 @@ public:
     /////////////////////////////////////////////////
     /// @brief Constructeur 
     ///
-    /// @param root Noeud de départ du bloc
-    /// @param variables Variables locaux déclarés dans le bloc
-    /// @param parametres Parametres du bloc, s'il y en a
+    /// @param root Noeud racine de la fonction
+    /// @param parametres Parametres de la fonction, s'il y en a
+    /// @param interne Fonction interne, s'il y en a une
     /////////////////////////////////////////////////
-    Fonction(std::unique_ptr<Noeud>& root, std::vector<std::string> parametres = {});
+    Fonction(std::unique_ptr<Noeud>& root, std::vector<std::string> parametres = {}, const std::function<Tableau(const Tableau&)>& interne = {});
 
     /////////////////////////////////////////////////
     std::unique_ptr<Noeud>& get_root();
@@ -33,7 +37,7 @@ public:
     static Fonction& recuperer(const std::string& nom);
 
     /////////////////////////////////////////////////
-    static Tableau invoquer(Scope& parent, std::string nom, Tableau& valeurs);
+    static Tableau invoquer(Scope& parent, const std::string& nom, const Tableau& valeurs);
 
     /////////////////////////////////////////////////
     /// @brief Affichage
@@ -50,8 +54,9 @@ public:
 
 private:
     /////////////////////////////////////////////////
-    std::vector<std::string> m_parametres;  ///< paramètres de la fonction
-    std::unique_ptr<Noeud>& m_root;         ///< noeud racine de la fonction
+    std::vector<std::string> m_parametres;              ///< paramètres de la fonction
+    std::unique_ptr<Noeud>& m_root;                     ///< noeud racine de la fonction
+    std::function<Tableau(const Tableau&)> m_interne;   ///< fonction interne
 };
 
 } // stretch

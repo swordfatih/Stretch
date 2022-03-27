@@ -37,6 +37,7 @@ Variable::Variable(std::unique_ptr<Noeud>& noeud) : m_type(sto_nature(noeud->typ
     {
         std::string&& valeur = noeud->string();
         remplacer(valeur, "\\\"", "\"");
+        remplacer(valeur, "\\n", "\n");
         
         m_valeur = sto_valeur(m_type, valeur);
     }

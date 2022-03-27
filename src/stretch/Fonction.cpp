@@ -10,7 +10,7 @@ namespace stretch {
 Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope);
 
 /////////////////////////////////////////////////
-Fonction::Fonction(std::unique_ptr<Noeud>& root, std::vector<std::string> parametres) : m_root(root), m_parametres(std::move(parametres)) 
+Fonction::Fonction(std::unique_ptr<Noeud>& root, std::vector<std::string> parametres, const std::function<Tableau(const Tableau&)>& interne) : m_root(root), m_parametres(std::move(parametres)), m_interne(interne) 
 {
     
 }
@@ -42,7 +42,7 @@ Fonction& Fonction::recuperer(const std::string& nom)
 }
 
 /////////////////////////////////////////////////
-Tableau Fonction::invoquer(Scope& parent, std::string nom, Tableau& valeurs)
+Tableau Fonction::invoquer(Scope& parent, const std::string& nom, const Tableau& valeurs)
 {
     Fonction& fonction = Fonction::recuperer(nom);
     Scope scope(&parent);
@@ -51,6 +51,11 @@ Tableau Fonction::invoquer(Scope& parent, std::string nom, Tableau& valeurs)
     // nombre de valeurs = tous les fils sauf le nom de la fonction
     if(valeurs.size() != fonction.m_parametres.size() || valeurs.empty() && !fonction.m_parametres.empty()) 
         throw std::runtime_error("L'appel à la fonction n'a pas le même nombre de paramètres que sa définition");
+
+    // si la fonction a une fonction interne
+    // c'est une fonction standard
+    if(fonction.m_interne) 
+        return fonction.m_interne(valeurs);
 
     // itération sur tous les parametres envoyés dans l'arbre
     for(size_t i = 0; i < valeurs.size(); ++i)

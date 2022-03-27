@@ -59,7 +59,7 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope)
             if(i != 0)
                 std::cout << " ";
 
-            std::cout << evaluer(noeud->children[i], scope).to_string();
+            std::cout << evaluer(noeud->children[i], scope).to_string() << std::flush;
         }
     }
     /////////////////////////////////////////////////
