@@ -1,38 +1,64 @@
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "stretch/Variable.hpp"
-#include <sstream>
 
+/////////////////////////////////////////////////
 namespace stretch {
 
+/////////////////////////////////////////////////
 Variable::Variable(Nature type, VariantValeur valeur) : m_type(std::move(type)), m_valeur(std::move(valeur))
 {
     // default
 }
 
+/////////////////////////////////////////////////
 Variable::Variable(Nature type, std::string valeur) : Variable::Variable(type, VariantValeur(std::string{std::move(valeur)})) 
 {
     // default
 }
 
+/////////////////////////////////////////////////
 Variable::Variable(VariantValeur valeur) : Variable::Variable(static_cast<Nature>(valeur.index()), std::move(valeur))
 {
     // default
 }
 
+/////////////////////////////////////////////////
 Variable::Variable(std::string valeur) : Variable(VariantValeur(std::string{std::move(valeur)}))
 {
     // default
 }
 
+/////////////////////////////////////////////////
+Variable::Variable(std::unique_ptr<Noeud>& noeud) : m_type(sto_nature(noeud->type)) 
+{
+    if(m_type != Nature::Tableau) {
+        m_valeur = sto_valeur(m_type, noeud->string());
+    }
+    else {
+        Tableau tableau;
+
+        for(auto& fils : noeud->children)
+            tableau.push_back(Variable(fils));
+
+        m_valeur = std::move(tableau);
+    }
+}
+
+/////////////////////////////////////////////////
 Nature Variable::get_nature() const 
 {
     return m_type;
 }
 
+/////////////////////////////////////////////////
 VariantValeur Variable::get_valeur() const 
 {
     return m_valeur;
 }
 
+/////////////////////////////////////////////////
 std::string Variable::to_string() const 
 {
     if(m_type == Nature::Chaine)
@@ -62,11 +88,13 @@ std::string Variable::to_string() const
     return "nul";
 }
 
+/////////////////////////////////////////////////
 bool Variable::est(Nature type) const
 {
     return m_type == type;
 }
 
+/////////////////////////////////////////////////
 Nature Variable::sto_nature(std::string_view type) 
 {
     if (type == pe::demangle< stretch::chaine >())
@@ -81,6 +109,7 @@ Nature Variable::sto_nature(std::string_view type)
     return Nature::Nul;
 }
 
+/////////////////////////////////////////////////
 std::string Variable::type_tos(Nature type)
 {
     if(type == Nature::Chaine)
@@ -95,6 +124,7 @@ std::string Variable::type_tos(Nature type)
     return "nul";
 }
 
+/////////////////////////////////////////////////
 VariantValeur Variable::sto_valeur(Nature type, std::string valeur) 
 {
     if(type == Nature::Chaine)
@@ -125,6 +155,7 @@ VariantValeur Variable::sto_valeur(Nature type, std::string valeur)
     return {};
 }
 
+/////////////////////////////////////////////////
 Variable Variable::parse(std::string valeur) 
 {
     std::string lower = valeur;
@@ -150,6 +181,7 @@ Variable Variable::parse(std::string valeur)
     return Variable(std::move(valeur));
 }
 
+/////////////////////////////////////////////////
 std::vector<std::string> Variable::split_tableau(const std::string& s, const std::regex& tableau_regex) 
 {
     std::vector<std::string> elems;

@@ -13,8 +13,10 @@
 #include "decimal/BigDecimal.h"
 #include "stretch/Grammaire.hpp"
 
-namespace pe = tao::pegtl;
+/////////////////////////////////////////////////
+using Noeud = tao::pegtl::parse_tree::node;
 
+/////////////////////////////////////////////////
 namespace stretch {
 
 /////////////////////////////////////////////////
@@ -92,19 +94,7 @@ public:
     Variable(std::string valeur);
 
     // Constructeur à partir d'un noeud
-    template <typename T>
-    Variable(std::unique_ptr<T>& noeud) : m_type(sto_nature(noeud->type)) {
-        if(m_type != Nature::Tableau) {
-            m_valeur = sto_valeur(m_type, noeud->string());
-        }
-        else {
-            Tableau tableau;
-            for(auto& fils : noeud->children) {
-                tableau.push_back(Variable(fils));
-            }
-            m_valeur = tableau;
-        }
-    }
+    Variable(std::unique_ptr<Noeud>& noeud);
 
     Nature get_nature() const;
     VariantValeur get_valeur() const;
@@ -115,6 +105,7 @@ public:
     bool est(Nature type) const;
 
 private:
+    /////////////////////////////////////////////////   
     static std::vector<std::string> split_tableau(const std::string& s, const std::regex& tableau_regex); 
 
     Nature m_type;          ///< Le type de la variable
