@@ -44,6 +44,8 @@ struct valeur : pe::sor< priorite, booleen, identifieur, tableau, reel, texte > 
 /// Operations
 /////////////////////////////////////////////////
 struct negation : pe::sor< mot::non > {};
+struct taille : pe::seq< mot::taille, separateur, mot::de > {};
+struct nature : pe::seq< mot::nature, separateur, mot::de > {};
 struct addition : pe::sor< mot::symbole::plus > {};
 struct soustraction : pe::sor< mot::symbole::moins > {};
 struct division : pe::sor< mot::symbole::division > {};
@@ -59,7 +61,7 @@ struct et : pe::sor < mot::et > {};
 
 struct appel;
 struct operation_appel : pe::seq< separateur, valeur, separateur, pe::opt < appel, separateur > > {};
-struct operation_unaire : pe::seq< pe::opt< separateur, pe::sor< negation, addition, soustraction > >, operation_appel > {};
+struct operation_unaire : pe::seq< pe::opt< separateur, pe::sor< negation, addition, soustraction, taille, nature > >, operation_appel > {};
 struct operation_indice : pe::list< operation_unaire, indexation > {};
 struct operation_produit : pe::list< operation_indice, pe::sor< multiplication, division, reste > > {};
 struct operation_somme : pe::list< operation_produit, pe::sor< addition, soustraction > > {};
@@ -188,6 +190,8 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
 
         // operation unaire
         negation,
+        taille,
+        nature,
         
         // operations binaires
         indexation,

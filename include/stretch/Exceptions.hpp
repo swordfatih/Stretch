@@ -42,4 +42,12 @@ public:
     explicit BoucleException(std::string message) : StretchException(message) {}
 };
 
+/////////////////////////////////////////////////
+class VariableInconnue : public StretchException 
+{
+public:
+    /////////////////////////////////////////////////
+    explicit VariableInconnue(std::string message) : StretchException(message) {}
+};
+
 } // namespace stretch

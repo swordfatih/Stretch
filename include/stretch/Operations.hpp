@@ -510,7 +510,6 @@ static std::map<
 
     /////////////////////////////////////////////////
     // Indice
-
     /////////////////////////////////////////////////
     {
         pe::demangle<stretch::indexation>(), 
@@ -561,6 +560,86 @@ static std::map<
                         return Variable(tableau[indice.toInt() - 1]);
 
                     throw std::runtime_error("L'indice donné dépasse les bornes du tableau");
+                }
+            }
+        }
+    },
+
+    /////////////////////////////////////////////////
+    // Taille
+    /////////////////////////////////////////////////
+    {
+        pe::demangle<stretch::taille>(), 
+        {
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Tableau, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(std::get<Tableau>(f.get_valeur()).size());
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Chaine, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(f.to_string().size());
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Reel, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(f.to_string().size());
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Booleen, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(f.to_string().size());
+                }
+            }
+        }
+    },
+    /////////////////////////////////////////////////
+    // Nature
+    /////////////////////////////////////////////////
+    {
+        pe::demangle<stretch::nature>(), 
+        {
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Tableau, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(Variable::type_tos(f.get_nature()));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Chaine, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(Variable::type_tos(f.get_nature()));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Reel, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(Variable::type_tos(f.get_nature()));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Booleen, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(Variable::type_tos(f.get_nature()));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Nul, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(Variable::type_tos(f.get_nature()));
                 }
             }
         }

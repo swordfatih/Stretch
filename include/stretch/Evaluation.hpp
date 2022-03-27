@@ -13,7 +13,7 @@ namespace stretch {
 
 /////////////////////////////////////////////////
 template <typename Noeud>
-Variable evaluer(std::unique_ptr<Noeud>& noeud, Fonction& fonction) 
+Variable evaluer(std::unique_ptr<Noeud>& noeud, Scope& scope) 
 {
     // appel de fonction
     if(noeud->template is_type< appel >()) {
@@ -22,16 +22,16 @@ Variable evaluer(std::unique_ptr<Noeud>& noeud, Fonction& fonction)
 
         Tableau valeurs;
         for(size_t i = 1; i < noeud->children.size(); ++i)
-            valeurs.push_back(evaluer(noeud->children[i], fonction));
+            valeurs.push_back(evaluer(noeud->children[i], scope));
 
-        Tableau&& retour = Fonction::invoquer(noeud->children.front()->string(), valeurs);
+        Tableau&& retour = Fonction::invoquer(scope, noeud->children.front()->string(), valeurs);
         
         return retour.empty() ? Variable() : (retour.size() == 1 ? retour[0] : Variable(retour));
     }
 
     // variable
     if(noeud->template is_type< variable >()) {
-        return fonction.get_scope().lire(noeud->string());
+        return scope.lire(noeud->string());
     }   
 
     // valeur
@@ -40,10 +40,10 @@ Variable evaluer(std::unique_ptr<Noeud>& noeud, Fonction& fonction)
 
     // operation unaire
     if(noeud->children.size() == 1)
-        return stretch::operer(noeud->type, evaluer(noeud->children[0], fonction), Variable());
+        return stretch::operer(noeud->type, evaluer(noeud->children[0], scope), Variable());
 
     // operation binaire
-    return stretch::operer(noeud->type, evaluer(noeud->children[0], fonction), evaluer(noeud->children[1], fonction));
+    return stretch::operer(noeud->type, evaluer(noeud->children[0], scope), evaluer(noeud->children[1], scope));
 }
 
 } // namespace stretch

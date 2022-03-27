@@ -70,6 +70,10 @@ struct point : pe::one< '.' > {};
 struct guillemets : pe::one< '"' > {};
 struct apostrophe : pe::one< '\'' > {};
 
+/// Operateurs de forme
+struct taille : pe::istring< 't', 'a', 'i', 'l', 'l', 'e' > {};
+struct nature : pe::istring< 'n', 'a', 't', 'u', 'r', 'e' > {};
+
 /// Operateurs arithmétiques
 struct reste : pe::istring< 'r', 'e', 's', 't', 'e' > {};
 

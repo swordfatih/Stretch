@@ -1,45 +1,8 @@
-a <- 5 * (-1)
-b <- 5 * -a
-c <- b egal a
-d <- non c
+liste <- [2, 3, 8, 2, 3]
+somme <- 0
 
-f <- 0
-tant que non c
-    f <- f + 1
-
-    si f egal 100
-        c <- vrai
-    fin
+pour chaque nombre dans liste faire
+    somme <- somme + nombre
 fin
 
-repeter 5 fois dans i
-    e <- "ca repete"
-    si i egal 1
-        arreter
-    fin
-fin
-
-si faux
-    e <- "ca marche"
-fin
-
-z <- "abcdefghijklmnopqrstuvwxyz"
-repeter 26 fois dans h
-    c <- z#h
-fin
-
-a <- [1,25.56,"salut",[5,3,2]]#4 + ["cc"]
-
-pour chaque i dans a faire 
-    
-fin
-
-fonction factorielle <- i
-    si i plus petit que 2
-        sortir avec 1
-    fin
-    
-    sortir avec factorielle(i - 1) * i
-fin
-
-c <- factorielle(10)
+a <- somme 

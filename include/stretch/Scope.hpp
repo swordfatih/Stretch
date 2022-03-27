@@ -2,11 +2,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include <map>
-#include <iostream>
 
 #include <tao/pegtl/contrib/parse_tree.hpp>
 
 #include "stretch/Variable.hpp"
+#include "stretch/Exceptions.hpp"
 
 /////////////////////////////////////////////////
 using Noeud = tao::pegtl::parse_tree::node;
@@ -15,20 +15,23 @@ using Noeud = tao::pegtl::parse_tree::node;
 namespace stretch {
 
 /////////////////////////////////////////////////
+class Fonction;
+
+/////////////////////////////////////////////////
 /// @brief Scope d'un bloc
 /////////////////////////////////////////////////
 class Scope {
 public:
     /////////////////////////////////////////////////
-    Scope(std::unique_ptr<Noeud>& root) : m_root(root) 
+    Scope(Scope* scope = nullptr) : m_parent(scope) 
     {
         
     }
 
     /////////////////////////////////////////////////
-    std::unique_ptr<Noeud>& get_root()
+    Scope* get_parent()
     {
-        return m_root;
+        return m_parent;
     }
 
     /////////////////////////////////////////////////
@@ -47,13 +50,24 @@ public:
     /////////////////////////////////////////////////
     Variable lire(const std::string& nom) 
     {
-        return m_variables.count(nom) == 0 ? Variable() : m_variables.at(nom);
+        if(m_variables.count(nom) != 0)
+            return m_variables[nom];
+
+        /* 
+         * Si la variable n'est pas dans le scope courant, on essaye de la chercher dans le scope parent
+         * Si la variable n'est pas dans le scope parent, on lève une exception
+        
+        else if(m_parent)
+            return m_parent->lire(nom); 
+        */
+
+        throw exception::VariableInconnue(nom);
     }
 
 private:
     /////////////////////////////////////////////////
-    std::unique_ptr<Noeud>& m_root;
-    std::map<std::string, Variable> m_variables;
+    Scope* m_parent;                                ///< Scope parente
+    std::map<std::string, Variable> m_variables;    ///< Variables locales
 };
 
 } // namespace stretch

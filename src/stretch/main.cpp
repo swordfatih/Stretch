@@ -26,10 +26,9 @@ int main(int argc, char *argv[])
 
     try
     {
-        auto main = stretch::Fonction(root);
-        stretch::Fonction::enregistrer("main", main);
-
-        stretch::executer(root, main);
+        stretch::Fonction::enregistrer("main", stretch::Fonction(root));
+        stretch::Scope scope;
+        stretch::executer(root, scope);
     }
     catch(const stretch::exception::QuitterException& e) 
     {            

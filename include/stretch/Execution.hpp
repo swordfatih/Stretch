@@ -4,20 +4,19 @@
 #include <stdexcept>
 
 #include "stretch/Evaluation.hpp"
-#include "stretch/Exceptions.hpp"
  
 /////////////////////////////////////////////////
 namespace stretch {
 
 /////////////////////////////////////////////////
-Tableau executer(std::unique_ptr<Noeud>& noeud, Fonction& fonction) 
+Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope) 
 {
     /////////////////////////////////////////////////
     if(noeud->is_root() || noeud->template is_type< bloc >())    
     {
         for(auto& c: noeud->children) 
         {
-            auto&& resultat = executer(c, fonction);
+            auto&& resultat = executer(c, scope);
             
             if(!resultat.empty())
                 return std::move(resultat);
@@ -26,29 +25,29 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Fonction& fonction)
     /////////////////////////////////////////////////
     else if(noeud->template is_type< assignation >()) // a <- 5 + 5 + 5
     {
-        fonction.get_scope().assigner(noeud->children.front(), evaluer(noeud->children.back(), fonction));
+        scope.assigner(noeud->children.front(), evaluer(noeud->children.back(), scope));
     } 
     /////////////////////////////////////////////////
     else if(noeud->template is_type< condition >()) // si 5 == 5 alors bloc fin
     {
         for(auto i = 0; i < noeud->children.size() - 1; i += 2) {
-            Variable&& resultat = evaluer(noeud->children[i], fonction);
+            Variable&& resultat = evaluer(noeud->children[i], scope);
         
             if(resultat.get_nature() != Nature::Booleen) 
                 throw std::runtime_error("La condition ne retourne pas un booléen.");
 
             if(std::get<bool>(resultat.get_valeur()) == true) {
-                return executer(noeud->children[i + 1], fonction);
+                return executer(noeud->children[i + 1], scope);
             }
         }
         
         if(noeud->children.size() % 2 != 0) // vérifier l'existence d'un sinon final
-            return executer(noeud->children.back(), fonction);
+            return executer(noeud->children.back(), scope);
     } 
     /////////////////////////////////////////////////
     else if(noeud->template is_type< repeter >())
     {
-        Variable compteur = evaluer(noeud->children.front(), fonction);
+        Variable compteur = evaluer(noeud->children.front(), scope);
 
         if(compteur.get_nature() != Nature::Reel) 
             throw std::runtime_error("Le compteur de la boucle n'est pas un entier.");
@@ -61,14 +60,14 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Fonction& fonction)
             auto& ranger = noeud->children[1];
 
             if(ranger->template is_type< variable >()) 
-                fonction.get_scope().assigner(ranger, Variable(i));
+                scope.assigner(ranger, Variable(i));
 
             /* if(noeud->children.back()->children->template is_type< mot::arreter >()) {
                 std::cout << "[DEBUG] La boucle est terminée." << std::endl;
                 break;
             } */
 
-            Tableau&& retour = executer(noeud->children.back(), fonction);
+            Tableau&& retour = executer(noeud->children.back(), scope);
 
             if(!retour.empty()) // déléguer la valeur de retour à la fonction au dessus s'il y en
                 return retour;
@@ -78,7 +77,7 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Fonction& fonction)
     else if(noeud->template is_type< tant_que >())
     {
         // on récupère la condition elle-même puis on l'évalue, elle renvoie une Variable à laquelle on va récupérer le type utilisé dans le variant, ici c'est un booléen.
-        bool resultat = std::get<bool>(evaluer(noeud->children.front(), fonction).get_valeur());
+        bool resultat = std::get<bool>(evaluer(noeud->children.front(), scope).get_valeur());
 
         while(resultat) 
         {
@@ -88,19 +87,19 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Fonction& fonction)
             } */
 
             //on execute ce qu'il y a à l'intérieur 
-            Tableau&& retour = executer(noeud->children.back(), fonction);
+            Tableau&& retour = executer(noeud->children.back(), scope);
 
             if(!retour.empty()) // déléguer la valeur de retour à la fonction au dessus s'il y en
                 return retour;
 
-            resultat = std::get<bool>(evaluer(noeud->children.front(), fonction).get_valeur());
+            resultat = std::get<bool>(evaluer(noeud->children.front(), scope).get_valeur());
         }
     }
     /////////////////////////////////////////////////
     else if(noeud->template is_type< pour_chaque >())
     {
         auto& element = noeud->children.front();
-        Variable tableau = evaluer(noeud->children[1], fonction);
+        Variable tableau = evaluer(noeud->children[1], scope);
 
         if(tableau.get_nature() != Nature::Tableau) 
             throw std::runtime_error("Un tableau est requis pour la boucle pour chaque.");
@@ -111,14 +110,14 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Fonction& fonction)
         Tableau tab = std::get<Tableau>(tableau.get_valeur());
         for(auto& v: tab) 
         {
-            fonction.get_scope().assigner(element, v);
+            scope.assigner(element, v);
 
             /* if(noeud->children.back()->children->template is_type< mot::arreter >()) {
                 std::cout << "[DEBUG] La boucle est terminée." << std::endl;
                 break;
             } */ 
                 
-            executer(noeud->children.back(), fonction);
+            executer(noeud->children.back(), scope);
         }
     }
     /////////////////////////////////////////////////
@@ -152,7 +151,7 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Fonction& fonction)
         Tableau valeurs;
         
         for(auto& valeur: noeud->children)
-            valeurs.push_back(evaluer(valeur, fonction));
+            valeurs.push_back(evaluer(valeur, scope));
 
         return std::move(valeurs);
     }

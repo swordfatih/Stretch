@@ -24,16 +24,16 @@ public:
     Fonction(std::unique_ptr<Noeud>& root, std::vector<std::string> parametres = {});
 
     /////////////////////////////////////////////////
-    Scope& get_scope();
+    std::unique_ptr<Noeud>& get_root();
 
     /////////////////////////////////////////////////
-    static void enregistrer(const std::string& nom, Fonction fonction);
+    static Fonction& enregistrer(const std::string& nom, Fonction fonction);
 
     /////////////////////////////////////////////////
     static Fonction& recuperer(const std::string& nom);
 
     /////////////////////////////////////////////////
-    static Tableau invoquer(std::string nom, Tableau& valeurs);
+    static Tableau invoquer(Scope& parent, std::string nom, Tableau& valeurs);
 
     /////////////////////////////////////////////////
     /// @brief Affichage
@@ -51,7 +51,7 @@ public:
 private:
     /////////////////////////////////////////////////
     std::vector<std::string> m_parametres;  ///< paramètres de la fonction
-    Scope m_scope;                          ///< scope de la fonction
+    std::unique_ptr<Noeud>& m_root;         ///< noeud racine de la fonction
 };
 
 } // stretch
