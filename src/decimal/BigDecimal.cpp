@@ -855,10 +855,10 @@ std::string BigDecimal::round (const std::string &lhs, int scale) {
   return ret;
 }
 
-std::string BigDecimal::ln(const std::string &lhs, int scale)
+/*std::string BigDecimal::ln(const std::string &lhs, int scale)
 {
-	
-}
+
+}*/
 
 std::string BigDecimal::log2 (const std::string &lhs, int scale)
 {
