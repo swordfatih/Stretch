@@ -28,7 +28,8 @@ struct identifieur : pe::sor< alias, variable > {};
 struct entier : pe::list< pe::plus< pe::digit >, mot::apostrophe > {};
 struct reel : pe::seq< entier, pe::opt< mot::point, entier > > {}; ///< ie. 4'500.5 
 struct booleen : pe::sor < mot::vrai, mot::faux > {}; ///< ie. vrai
-struct chaine : pe::star< pe::not_at< mot::guillemets >, pe::sor< pe::alnum, pe::space > > {};
+
+struct chaine : pe::star< pe::not_at< mot::guillemets >, pe::any > {};
 struct texte : pe::seq< mot::guillemets, chaine, mot::guillemets > {}; ///< ie. "hello"
 
 // struct affectation : pe::seq< variable, fleche_gauche, operation > {};
@@ -59,8 +60,7 @@ struct indexation : pe::sor< mot::indice > {};
 struct ou : pe::sor < mot::ou > {};
 struct et : pe::sor < mot::et > {};
 
-struct appel;
-struct operation_appel : pe::seq< separateur, valeur, separateur, pe::opt < appel, separateur > > {};
+struct operation_appel : pe::seq< separateur, valeur, separateur, pe::opt < struct appel, separateur > > {};
 struct operation_unaire : pe::seq< pe::opt< separateur, pe::sor< negation, addition, soustraction, taille, nature > >, operation_appel > {};
 struct operation_indice : pe::list< operation_unaire, indexation > {};
 struct operation_produit : pe::list< operation_indice, pe::sor< multiplication, division, reste > > {};
@@ -139,7 +139,6 @@ struct assignation : pe::seq< pe::list< identifieur, mot::virgule >, separateur,
 /// Conditions
 ///////////////////////////////////////////////// 
 struct bloc;
-
 struct condition : pe::seq< mot::si, operation, pe::opt< mot::alors, separateur >, bloc, 
                         pe::star< mot::sinon, separateur, mot::si, operation, pe::opt< mot::alors, separateur >, bloc >,
                         pe::opt< mot::sinon, separateur, bloc >,
@@ -165,9 +164,15 @@ struct definition : pe::seq< mot::fonction, separateur, variable, separateur, pa
 struct appel : pe::seq< mot::parenthese_ouvrante, separateur, pe::opt< operations >, separateur, mot::parenthese_fermante > {};
 
 /////////////////////////////////////////////////
+/// Instructions standards
+/////////////////////////////////////////////////
+struct sortie : pe::seq< mot::afficher, separateur, operations > {};
+struct entree : pe::seq< mot::lire, separateur, mot::dans, separateur, identifieur > {};
+
+/////////////////////////////////////////////////
 /// Blocs d'instructions
 /////////////////////////////////////////////////
-struct instruction : pe::sor< retour, mot::quitter, mot::arreter, definition, condition, boucle, assignation > {};
+struct instruction : pe::sor< retour, mot::quitter, entree, sortie, mot::arreter, mot::continuer, definition, condition, boucle, assignation > {};
 struct bloc : pe::star< instruction, separateur > {};
 
 /////////////////////////////////////////////////
@@ -214,6 +219,7 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         repeter,
         pour_chaque,
         mot::arreter,
+        mot::continuer,
 
         // fonctions
         definition,
@@ -225,7 +231,9 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         assignation,
         condition, 
         bloc,
-        mot::quitter
+        mot::quitter,
+        entree,
+        sortie
     >,
     rearrange_operation::on<
         operation,

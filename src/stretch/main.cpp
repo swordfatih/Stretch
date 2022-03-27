@@ -6,6 +6,8 @@
 
 #include "stretch/Execution.hpp"
 
+#include <iostream>
+
 /////////////////////////////////////////////////
 namespace pe = tao::pegtl;
 
@@ -30,7 +32,7 @@ int main(int argc, char *argv[])
         stretch::Scope scope;
         stretch::executer(root, scope);
     }
-    catch(const stretch::exception::QuitterException& e) 
+    catch(const stretch::exception::Quitter& e) 
     {            
         std::cerr << e.what() << std::endl;                 
         return 0;

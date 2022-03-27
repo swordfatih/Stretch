@@ -11,7 +11,7 @@ class StretchException : public std::exception
 {
 public:
     /////////////////////////////////////////////////
-    explicit StretchException(std::string message) : m_message(message) 
+    explicit StretchException(std::string message = {}) : m_message(message) 
     {
 
     }
@@ -27,19 +27,35 @@ protected:
 };
 
 /////////////////////////////////////////////////
-class QuitterException : public StretchException 
+class Quitter : public StretchException 
 {
 public:
     /////////////////////////////////////////////////
-    explicit QuitterException(std::string message) : StretchException(message) {}
+    explicit Quitter(std::string message = {}) : StretchException(message) {}
 };
 
 /////////////////////////////////////////////////
-class BoucleException : public StretchException 
+class Boucle : public StretchException 
 {
 public:
     /////////////////////////////////////////////////
-    explicit BoucleException(std::string message) : StretchException(message) {}
+    enum class Type {
+        Arreter,
+        Continuer
+    };
+
+    /////////////////////////////////////////////////
+    explicit Boucle(Type type, std::string message = {}) : m_type(type), StretchException(message) {}
+
+    /////////////////////////////////////////////////
+    Type get_type() const 
+    {
+        return m_type;
+    }
+
+private:
+    /////////////////////////////////////////////////
+    Type m_type;
 };
 
 /////////////////////////////////////////////////
@@ -47,7 +63,7 @@ class VariableInconnue : public StretchException
 {
 public:
     /////////////////////////////////////////////////
-    explicit VariableInconnue(std::string message) : StretchException(message) {}
+    explicit VariableInconnue(std::string message = {}) : StretchException(message) {}
 };
 
 } // namespace stretch

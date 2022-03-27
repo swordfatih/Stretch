@@ -45,6 +45,24 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope)
             return executer(noeud->children.back(), scope);
     } 
     /////////////////////////////////////////////////
+    else if(noeud->template is_type< entree >())
+    {
+        std::string in;
+        std::getline(std::cin, in);
+
+        scope.assigner(noeud->children.front()->string(), Variable::parse(in));
+    }
+    /////////////////////////////////////////////////
+    else if(noeud->template is_type< sortie >())
+    {
+        for(int i = 0; i < noeud->children.size(); i++) {
+            if(i != 0)
+                std::cout << " ";
+
+            std::cout << evaluer(noeud->children[i], scope).to_string();
+        }
+    }
+    /////////////////////////////////////////////////
     else if(noeud->template is_type< repeter >())
     {
         Variable compteur = evaluer(noeud->children.front(), scope);
@@ -62,12 +80,19 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope)
             if(ranger->template is_type< variable >()) 
                 scope.assigner(ranger, Variable(i));
 
-            /* if(noeud->children.back()->children->template is_type< mot::arreter >()) {
-                std::cout << "[DEBUG] La boucle est terminée." << std::endl;
-                break;
-            } */
-
-            Tableau&& retour = executer(noeud->children.back(), scope);
+            Tableau retour; 
+            
+            try 
+            {
+                retour = executer(noeud->children.back(), scope);
+            } 
+            catch(exception::Boucle& e) 
+            {
+                if(e.get_type() == exception::Boucle::Type::Arreter)
+                    break;
+                else if(e.get_type() == exception::Boucle::Type::Continuer)
+                    continue;
+            }
 
             if(!retour.empty()) // déléguer la valeur de retour à la fonction au dessus s'il y en
                 return retour;
@@ -77,19 +102,29 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope)
     else if(noeud->template is_type< tant_que >())
     {
         // on récupère la condition elle-même puis on l'évalue, elle renvoie une Variable à laquelle on va récupérer le type utilisé dans le variant, ici c'est un booléen.
-        bool resultat = std::get<bool>(evaluer(noeud->children.front(), scope).get_valeur());
+        Variable condition = evaluer(noeud->children.front(), scope).get_valeur();
+        
+        if(condition.get_nature() != Nature::Booleen) 
+            throw std::runtime_error("La condition de la boucle n'est pas un booléen.");
+
+        bool resultat = std::get<bool>(condition.get_valeur());
 
         while(resultat) 
         {
-            /* if(noeud->children.back()->children->template is_type< mot::arreter >()) {
-                 std::cout << "[DEBUG] La boucle est terminée." << std::endl;
-                break;
-            } */
-
-            //on execute ce qu'il y a à l'intérieur 
-            Tableau&& retour = executer(noeud->children.back(), scope);
-
-            if(!retour.empty()) // déléguer la valeur de retour à la fonction au dessus s'il y en
+            Tableau retour;
+            
+            try {
+                retour = executer(noeud->children.back(), scope);
+            } 
+            catch(exception::Boucle& e) 
+            {
+                if(e.get_type() == exception::Boucle::Type::Arreter)
+                    break;
+                else if(e.get_type() == exception::Boucle::Type::Continuer)
+                    continue;
+            }
+            
+            if(!retour.empty()) 
                 return retour;
 
             resultat = std::get<bool>(evaluer(noeud->children.front(), scope).get_valeur());
@@ -112,23 +147,32 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope)
         {
             scope.assigner(element, v);
 
-            /* if(noeud->children.back()->children->template is_type< mot::arreter >()) {
-                std::cout << "[DEBUG] La boucle est terminée." << std::endl;
-                break;
-            } */ 
-                
-            executer(noeud->children.back(), scope);
+            Tableau retour;
+
+            try {
+                retour = executer(noeud->children.back(), scope);
+            } 
+            catch(exception::Boucle& e) 
+            {
+                if(e.get_type() == exception::Boucle::Type::Arreter)
+                    break;
+                else if(e.get_type() == exception::Boucle::Type::Continuer)
+                    continue;
+            }    
+
+            if(!retour.empty()) 
+                return retour; 
         }
     }
     /////////////////////////////////////////////////
     else if(noeud->template is_type< mot::arreter >())
     {
-        /* if(!noeud->parent->template is_type< repeter >() || !noeud->parent->template is_type< tant_que >()
-        || !noeud->parent->template is_type< pour_chaque >()) {
-            throw std::runtime_error("Vous n'êtes pas dans une boucle !");  
-        } */
-
-        std::cout << "[DEBUG] La boucle est terminée mais chelou pcq normalement la bonne vérif se fait dans les else if des boucles" << std::endl;
+        throw exception::Boucle(exception::Boucle::Type::Arreter);
+    }
+    /////////////////////////////////////////////////
+    else if(noeud->template is_type< mot::continuer >())
+    {
+        throw exception::Boucle(exception::Boucle::Type::Continuer);
     }
     /////////////////////////////////////////////////
     else if(noeud->template is_type< definition >())
@@ -158,7 +202,7 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope)
     /////////////////////////////////////////////////
     else if(noeud->template is_type< mot::quitter >()) 
     {
-        throw exception::QuitterException("Arrêt du programme");
+        throw exception::Quitter("Arrêt du programme");
     }
 
     return {};

@@ -35,7 +35,6 @@ public:
     void assigner(const std::string& nom, Variable valeur) 
     {
         m_variables[nom] = valeur;
-        std::cerr << "[DEBUG] Affectation de " << m_variables[nom].to_string() << " (" << Variable::type_tos(m_variables[nom].get_nature()) << ") dans la variable " << nom << std::endl;   
     }
 
     /////////////////////////////////////////////////

@@ -50,7 +50,6 @@ struct sortir : pe::istring< 's', 'o', 'r', 't', 'i', 'r' > {};
 struct retourner : pe::istring< 'r', 'e', 't', 'o', 'u', 'r', 'n', 'e', 'r' > {};
 struct avec : pe::istring< 'a', 'v', 'e', 'c' > {};
 struct quitter : pe::istring< 'q', 'u', 'i', 't', 't', 'e', 'r' > {};
-struct afficher : pe::istring< 'a', 'f', 'f', 'i', 'c', 'h', 'e','r' > {};
 
 /// Valeurs
 struct vrai : pe::istring< 'v', 'r', 'a', 'i' > {};
@@ -69,6 +68,7 @@ struct virgule : pe::one< ',' > {};
 struct point : pe::one< '.' > {};
 struct guillemets : pe::one< '"' > {};
 struct apostrophe : pe::one< '\'' > {};
+struct echapper : pe::one< '\\' > {};
 
 /// Operateurs de forme
 struct taille : pe::istring< 't', 'a', 'i', 'l', 'l', 'e' > {};
@@ -97,5 +97,9 @@ struct est : pe::istring< 'e', 's', 't' > {};
 struct different : pe::istring< 'd', 'i', 'f', 'f', 'e', 'r', 'e', 'n', 't' > {};
 struct nest : pe::istring< 'n', '\'', 'e', 's', 't' > {};
 struct pas : pe::istring< 'p', 'a', 's' > {};
+
+// Instructions
+struct afficher : pe::istring< 'a', 'f', 'f', 'i', 'c', 'h', 'e', 'r' > {};
+struct lire : pe::istring< 'l', 'i', 'r', 'e' > {};
 
 } // namespace stretch::mot

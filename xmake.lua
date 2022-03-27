@@ -1,7 +1,8 @@
 add_repositories("xrepo_guillaume https://github.com/GuillaumeMZ/personal-xrepo.git")
+add_repositories("xrepo_fatih https://github.com/swordfatih/xmake-repo.git main")
+
 add_requires("pegtl-nocmake", "catch2")
 
-add_requires("pegtl-nocmake")
 target("stretch")
 	set_languages("c++17")
 	set_kind("binary")

@@ -1,8 +1,10 @@
-liste <- [2, 3, 8, 2, 3]
-somme <- 0
+a <- "a <- Salut
 
-pour chaque nombre dans liste faire
-    somme <- somme + nombre
-fin
-
-a <- somme 
+tant que a different 0
+    afficher 
+    a <- a - 1
+    afficher a
+    si a egal 0
+        afficher
+    fin
+fin"

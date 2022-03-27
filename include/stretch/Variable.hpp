@@ -38,6 +38,7 @@ class Variable;
 /// représenter les différents types de valeurs
 /////////////////////////////////////////////////
 using Tableau = std::vector< Variable >;
+
 using VariantValeur = std::variant< std::string, bool, BigDecimal, Tableau >;
 
 /////////////////////////////////////////////////
