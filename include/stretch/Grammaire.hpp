@@ -31,13 +31,7 @@ struct booleen : pe::sor < mot::vrai, mot::faux > {}; ///< ie. vrai
 struct priorite : pe::seq< mot::parenthese_ouvrante, struct operation, mot::parenthese_fermante > {};
 
 // littéraux
-// struct echapper_x : pe::seq< pe::one< 'x' >, pe::rep< 2, pe::xdigit > > {};
-// struct echapper_u : pe::seq< pe::one< 'u' >, pe::rep< 4, pe::xdigit > > {};
-// struct echapper_U : pe::seq< pe::one< 'U' >, pe::rep< 8, pe::xdigit > > {};
-struct echapper_c : pe::one< '"', '\\' > {}; // , 'n', 'r', 't' > {};
-
-struct echappements : pe::sor< /*echapper_x, echapper_u, echapper_U,*/ echapper_c > {};
-struct caractere : pe::if_then_else< mot::echappement, echappements, mot::unicode > {};
+struct caractere : pe::if_then_else< mot::echappeur, pe::opt< mot::echapper >, mot::unicode > {};
 struct chaine : pe::star< pe::not_at< mot::guillemets >, pe::sor< caractere, pe::eol > > {};
 struct texte : pe::seq< mot::guillemets, chaine, mot::guillemets > {}; ///< ie. "hello"
 

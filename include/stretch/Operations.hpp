@@ -575,28 +575,28 @@ static std::map<
             {
                 std::make_pair(Nature::Tableau, Nature::Nul),
                 [](const Variable f, const Variable s) {
-                    return Variable(std::get<Tableau>(f.get_valeur()).size());
+                    return Variable(BigDecimal(std::to_string(std::get<Tableau>(f.get_valeur()).size())));
                 }
             },
             /////////////////////////////////////////////////
             {
                 std::make_pair(Nature::Chaine, Nature::Nul),
                 [](const Variable f, const Variable s) {
-                    return Variable(f.to_string().size());
+                    return Variable(BigDecimal(std::to_string(f.to_string().size())));
                 }
             },
             /////////////////////////////////////////////////
             {
                 std::make_pair(Nature::Reel, Nature::Nul),
                 [](const Variable f, const Variable s) {
-                    return Variable(f.to_string().size());
+                    return Variable(BigDecimal(std::to_string(f.to_string().size())));
                 }
             },
             /////////////////////////////////////////////////
             {
                 std::make_pair(Nature::Booleen, Nature::Nul),
                 [](const Variable f, const Variable s) {
-                    return Variable(f.to_string().size());
+                    return Variable(BigDecimal(std::to_string(f.to_string().size())));
                 }
             }
         }

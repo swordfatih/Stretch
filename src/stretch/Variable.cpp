@@ -33,10 +33,15 @@ Variable::Variable(std::string valeur) : Variable(VariantValeur(std::string{std:
 /////////////////////////////////////////////////
 Variable::Variable(std::unique_ptr<Noeud>& noeud) : m_type(sto_nature(noeud->type)) 
 {
-    if(m_type != Nature::Tableau) {
-        m_valeur = sto_valeur(m_type, noeud->string());
+    if(m_type != Nature::Tableau) 
+    {
+        std::string&& valeur = noeud->string();
+        remplacer(valeur, "\\\"", "\"");
+        
+        m_valeur = sto_valeur(m_type, valeur);
     }
-    else {
+    else 
+    {
         Tableau tableau;
 
         for(auto& fils : noeud->children)
@@ -179,6 +184,17 @@ Variable Variable::parse(std::string valeur)
     }
 
     return Variable(std::move(valeur));
+}
+
+/////////////////////////////////////////////////
+void Variable::remplacer(std::string& source, const std::string& from, const std::string& to) 
+{
+    size_t start_pos = 0;
+
+    while((start_pos = source.find(from, start_pos)) != std::string::npos) {
+        source.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    }
 }
 
 /////////////////////////////////////////////////

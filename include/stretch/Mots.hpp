@@ -69,7 +69,10 @@ struct virgule : pe::one< ',' > {};
 struct point : pe::one< '.' > {};
 struct guillemets : pe::one< '"' > {};
 struct apostrophe : pe::one< '\'' > {};
-struct echappement : pe::one< '\\' > {};
+
+/// Echappement
+struct echappeur : pe::one< '\\' > {};
+struct echapper : pe::one< '"' > {};
 
 /// Operateurs de forme
 struct taille : pe::istring< 't', 'a', 'i', 'l', 'l', 'e' > {};

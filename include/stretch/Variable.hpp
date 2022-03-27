@@ -106,6 +106,9 @@ public:
     bool est(Nature type) const;
 
 private:
+    /////////////////////////////////////////////////
+    static void remplacer(std::string& source, const std::string& from, const std::string& to);
+
     /////////////////////////////////////////////////   
     static std::vector<std::string> split_tableau(const std::string& s, const std::regex& tableau_regex); 
 

@@ -18,6 +18,7 @@ namespace stretch {
 /////////////////////////////////////////////////
 struct rearrange_operations : pe::parse_tree::apply< rearrange_operations > 
 {
+    /////////////////////////////////////////////////
     template< typename Node, typename... States >
     static void transform( std::unique_ptr< Node >& noeud, States&&... st )
     {
@@ -70,19 +71,6 @@ struct rearrange_operations : pe::parse_tree::apply< rearrange_operations >
             noeud = std::move( operateur );
             transform( noeud->children.front(), st... );
         }
-    }
-};
-
-/////////////////////////////////////////////////
-/// @brief Structure pour réarranger les noeuds 
-/// des séquences d'échappements
-/////////////////////////////////////////////////
-struct rearrange_echappements : pe::parse_tree::apply< rearrange_echappements > 
-{
-    template< typename Node, typename... States >
-    static void transform( std::unique_ptr< Node >& noeud, States&&... st )
-    {
-        
     }
 };
 
@@ -154,13 +142,7 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         operation_produit,
         operation_unaire,
         operation_appel
-    >, 
-    rearrange_echappements::on< 
-        /*echapper_x,
-        echapper_u,
-        echapper_U,*/
-        echapper_c
-    > 
+    >
 >;
 
 } // namespace stretch
