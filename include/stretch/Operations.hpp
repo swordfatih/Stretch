@@ -1,3 +1,6 @@
+#ifndef OPERATIONS_HPP
+#define OPERATIONS_HPP
+
 /////////////////////////////////////////////////
 // Headers
 /////////////////////////////////////////////////
@@ -647,7 +650,7 @@ static std::map<
 };
 
 /////////////////////////////////////////////////
-const Variable operer(const std::string_view& operateur, const Variable first, const Variable second) 
+inline const Variable operer(const std::string_view& operateur, const Variable first, const Variable second) 
 {
     if(operations.find(operateur) == operations.end()) {
         throw std::runtime_error("L'opération " + static_cast<std::string>(operateur) + " n'existe pas");
@@ -663,3 +666,5 @@ const Variable operer(const std::string_view& operateur, const Variable first, c
 }
 
 } // namespace stretch
+
+#endif // OPERATIONS_HPP

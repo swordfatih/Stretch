@@ -1,3 +1,6 @@
+#ifndef ARBRE_HPP
+#define ARBRE_HPP
+
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
@@ -147,3 +150,5 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
 >;
 
 } // namespace stretch
+
+#endif // ARBRE_HPP

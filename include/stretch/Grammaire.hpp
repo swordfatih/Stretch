@@ -1,3 +1,6 @@
+#ifndef GRAMMAIRE_HPP
+#define GRAMMAIRE_HPP
+
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
@@ -133,3 +136,4 @@ struct grammaire : fichier {};
 
 } // namespace stretch
 
+#endif // GRAMMAIRE_HPP

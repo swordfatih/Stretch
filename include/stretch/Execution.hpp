@@ -1,3 +1,6 @@
+#ifndef EXECUTION_HPP
+#define EXECUTION_HPP
+
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
@@ -9,7 +12,7 @@
 namespace stretch {
 
 /////////////////////////////////////////////////
-Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope) 
+Tableau executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope) 
 {
     /////////////////////////////////////////////////
     if(noeud->is_root() || noeud->template is_type< bloc< mot::fin > >() || noeud->template is_type< bloc< mot::fin, mot::sinon > >())    
@@ -219,3 +222,5 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope)
 }
 
 } // namespace stretch
+
+#endif // EXECUTION_HPP

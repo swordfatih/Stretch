@@ -1,3 +1,6 @@
+#ifndef EVALUATION_HPP
+#define EVALUATION_HPP
+
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
@@ -7,13 +10,14 @@
 #include "stretch/Fonction.hpp"
 #include "stretch/Operations.hpp"
 
+/////////////////////////////////////////////////
 namespace pe = tao::pegtl;
 
+/////////////////////////////////////////////////
 namespace stretch {
 
 /////////////////////////////////////////////////
-template <typename Noeud>
-Variable evaluer(std::unique_ptr<Noeud>& noeud, Scope& scope) 
+inline Variable evaluer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope) 
 {
     // appel de fonction
     if(noeud->template is_type< appel >()) {
@@ -57,3 +61,5 @@ Variable evaluer(std::unique_ptr<Noeud>& noeud, Scope& scope)
 }
 
 } // namespace stretch
+
+#endif // EVALUATION_HPP

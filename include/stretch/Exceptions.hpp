@@ -1,3 +1,6 @@
+#ifndef EXCEPTIONS_HPP
+#define EXCEPTIONS_HPP
+
 /////////////////////////////////////////////////
 // Headers
 /////////////////////////////////////////////////
@@ -59,11 +62,22 @@ private:
 };
 
 /////////////////////////////////////////////////
-class VariableInconnue : public StretchException 
+class Variable : public StretchException 
 {
 public:
     /////////////////////////////////////////////////
-    explicit VariableInconnue(std::string message = {}) : StretchException(message) {}
+    enum class Type {
+        Inconnue
+    };
+
+    /////////////////////////////////////////////////
+    explicit Variable(Type type, std::string message = {}) : m_type(type), StretchException(message) {}
+
+private:
+    /////////////////////////////////////////////////
+    Type m_type;
 };
 
 } // namespace stretch
+
+#endif // EXCEPTIONS_HPP

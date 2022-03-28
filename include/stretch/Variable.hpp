@@ -1,4 +1,5 @@
-#pragma once 
+#ifndef VARIABLE_HPP
+#define VARIABLE_HPP
 
 /////////////////////////////////////////////////
 /// Headers
@@ -14,7 +15,11 @@
 #include "stretch/Arbre.hpp"
 
 /////////////////////////////////////////////////
-using Noeud = tao::pegtl::parse_tree::node;
+namespace pe = tao::pegtl;
+
+namespace tao::pegtl {
+    using Noeud = parse_tree::node;
+}
 
 /////////////////////////////////////////////////
 namespace stretch {
@@ -95,7 +100,7 @@ public:
     Variable(std::string valeur);
 
     // Constructeur à partir d'un noeud
-    Variable(std::unique_ptr<Noeud>& noeud);
+    Variable(std::unique_ptr<pe::Noeud>& noeud);
 
     Nature get_nature() const;
     VariantValeur get_valeur() const;
@@ -118,3 +123,5 @@ private:
 };
 
 } // namespace stretch
+
+#endif // VARIABLE_HPP

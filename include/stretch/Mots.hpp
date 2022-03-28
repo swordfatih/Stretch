@@ -1,3 +1,6 @@
+#ifndef MOTS_HPP
+#define MOTS_HPP
+
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
@@ -107,3 +110,5 @@ struct afficher : pe::istring< 'a', 'f', 'f', 'i', 'c', 'h', 'e', 'r' > {};
 struct lire : pe::istring< 'l', 'i', 'r', 'e' > {};
 
 } // namespace stretch::mot
+
+#endif // MOTS_HPP
