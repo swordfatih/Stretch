@@ -64,6 +64,10 @@ struct crochet_fermant : pe::one< ']' > {};
 struct parenthese_ouvrante : pe::one< '(' > {};
 struct parenthese_fermante : pe::one< ')' > {};
 
+// Accolades
+struct accolade_ouvrante : pe::one< '{' > {};
+struct accolade_fermante : pe::one< '}' > {};
+
 /// Ponctuation
 struct virgule : pe::one< ',' > {};
 struct point : pe::one< '.' > {};

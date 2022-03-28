@@ -7,6 +7,7 @@
 #include <string>
 #include <memory>
 #include <regex>
+#include <unordered_map>
 
 #include <tao/pegtl/demangle.hpp>
 
@@ -27,7 +28,8 @@ enum class Nature {
     Chaine,
     Booleen,
     Reel,
-    Tableau
+    Tableau,
+    Objet
 };
 
 /////////////////////////////////////////////////
@@ -39,7 +41,9 @@ class Variable;
 /////////////////////////////////////////////////
 using Tableau = std::vector< Variable >;
 
-using VariantValeur = std::variant< std::string, bool, BigDecimal, Tableau >;
+using Objet = std::unordered_map<std::string, Variable>;
+
+using VariantValeur = std::variant< std::string, bool, BigDecimal, Tableau, Objet>;
 
 /////////////////////////////////////////////////
 /// @brief Classe représentant une variable
@@ -110,7 +114,7 @@ private:
     static void remplacer(std::string& source, const std::string& from, const std::string& to);
 
     /////////////////////////////////////////////////   
-    static std::vector<std::string> split_tableau(const std::string& s, const std::regex& tableau_regex); 
+    static std::vector<std::string> split_structure(const std::string& s, const std::regex& regex); 
 
     Nature m_type;          ///< Le type de la variable
     VariantValeur m_valeur; ///< La valeur de la variable

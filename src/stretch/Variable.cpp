@@ -33,15 +33,7 @@ Variable::Variable(std::string valeur) : Variable(VariantValeur(std::string{std:
 /////////////////////////////////////////////////
 Variable::Variable(std::unique_ptr<Noeud>& noeud) : m_type(sto_nature(noeud->type)) 
 {
-    if(m_type != Nature::Tableau) 
-    {
-        std::string&& valeur = noeud->string();
-        remplacer(valeur, "\\\"", "\"");
-        remplacer(valeur, "\\n", "\n");
-        
-        m_valeur = sto_valeur(m_type, valeur);
-    }
-    else 
+    if(m_type == Nature::Tableau) 
     {
         Tableau tableau;
 
@@ -49,6 +41,28 @@ Variable::Variable(std::unique_ptr<Noeud>& noeud) : m_type(sto_nature(noeud->typ
             tableau.push_back(Variable(fils));
 
         m_valeur = std::move(tableau);
+    }
+    else if(m_type == Nature::Objet)
+    {
+      /*  Objet objet;
+
+        for(auto& fils : noeud->children)
+        {
+            auto cle = Variable(fils->children[0]);
+            auto valeur = Variable(fils->children[1]);
+
+            objet[cle] = std::move(valeur);
+        }
+
+        m_valeur = std::move(objet); */
+    }
+    else
+    {
+        std::string&& valeur = noeud->string();
+        remplacer(valeur, "\\\"", "\"");
+        remplacer(valeur, "\\n", "\n");
+        
+        m_valeur = sto_valeur(m_type, valeur);
     }
 }
 
@@ -90,6 +104,28 @@ std::string Variable::to_string() const
 
         return chaine.str();
     }
+    else if(m_type == Nature::Objet) {
+        auto& objet = std::get<Objet>(m_valeur);
+
+        /**
+         * r <- 52.36
+         * a <- {
+         *   b <- "c",
+         *   d <- r
+         *   e <- [1, 2, 3]
+         * }
+         */
+
+        std::stringstream chaine;
+        chaine << "{";
+
+        for(auto& pair : objet) {
+            chaine << pair.first << "<- " << pair.second.to_string() << ", " << std::endl;
+        }
+
+        chaine << "}";
+        return chaine.str();
+    }
     
     return "nul";
 }
@@ -111,6 +147,8 @@ Nature Variable::sto_nature(std::string_view type)
         return Nature::Reel;
     else if (type == pe::demangle< stretch::tableau >())
         return Nature::Tableau;
+    else if (type == pe::demangle< stretch::objet >())
+        return Nature::Objet;
 
     return Nature::Nul;
 }
@@ -126,7 +164,8 @@ std::string Variable::type_tos(Nature type)
         return "reel";
     else if(type == Nature::Tableau)
         return "tableau";
-    
+    else if(type == Nature::Objet)
+        return "objet";
     return "nul";
 }
 
@@ -141,7 +180,7 @@ VariantValeur Variable::sto_valeur(Nature type, std::string valeur)
     } 
     else if(type == Nature::Reel) 
         return BigDecimal(std::move(valeur));
-    /*else if(type == Nature::Tableau)
+    else if(type == Nature::Tableau)
     {
         valeur.erase(valeur.begin());
         valeur.erase(valeur.end());
@@ -156,7 +195,7 @@ VariantValeur Variable::sto_valeur(Nature type, std::string valeur)
             tableau.push_back(parse(element));
 
         return tableau;
-    } A gérer plus tard : parsing en ayant un tableau comme une chaine de caractères*/
+    } //A gérer plus tard : parsing en ayant un tableau comme une chaine de caractères
     
     return {};
 }
@@ -169,6 +208,10 @@ Variable Variable::parse(std::string valeur)
 
     std::regex number_regex("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)");
     std::regex tableau_regex("^\\[.*(,.*)*\\]$");
+    /*std::regex objet_cle("([\\wéàç]+)");
+    std::regex objet_valeur("(\"[^\"]*\"|[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)|vrai|faux)"); */
+    std::regex objet_regex("(\"[^\"]*\"|[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)|vrai|faux|([\\wéàç]+))");
+
     std::smatch match;
 
     if(lower == "vrai" || lower == "faux")
@@ -178,10 +221,20 @@ Variable Variable::parse(std::string valeur)
     else if(std::regex_match(valeur, match, tableau_regex)) {
         std::vector<Variable> variables;
 
-        for(auto& v : split_tableau(valeur, tableau_regex))
+        for(auto& v : split_structure(valeur, tableau_regex))
             variables.push_back(parse(v));
 
         return Variable(variables);
+    }
+    else if (std::regex_match(valeur, match, objet_regex)) {
+        std::map<std::string, Variable> variables;
+
+        std::vector<std::string> objet_string = split_structure(valeur, objet_regex);
+        for(int i = 0; i < objet_string.size(); i += 2) {
+            variables[objet_string[i]] = parse(objet_string[i + 1]);
+        }
+
+        return Variable(variables); 
     }
 
     return Variable(std::move(valeur));
@@ -199,7 +252,7 @@ void Variable::remplacer(std::string& source, const std::string& from, const std
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> Variable::split_tableau(const std::string& s, const std::regex& tableau_regex) 
+std::vector<std::string> Variable::split_structure(const std::string& s, const std::regex& tableau_regex) 
 {
     std::vector<std::string> elems;
 

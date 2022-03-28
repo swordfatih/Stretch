@@ -35,8 +35,18 @@ Variable evaluer(std::unique_ptr<Noeud>& noeud, Scope& scope)
     }   
 
     // valeur
-    if(noeud->children.empty() || noeud->template is_type< tableau >()) 
+    if(noeud->children.empty()) 
         return Variable(noeud);
+
+    // tableau
+    if(noeud->template is_type< tableau >()) {
+        Tableau tableau;
+
+        for(auto& fils : noeud->children)
+            tableau.push_back(evaluer(fils, scope));
+
+        return Variable(std::move(tableau));
+    }
 
     // operation unaire
     if(noeud->children.size() == 1)

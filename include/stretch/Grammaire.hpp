@@ -37,9 +37,11 @@ struct texte : pe::seq< mot::guillemets, chaine, mot::guillemets > {}; ///< ie. 
 
 // listes
 // struct affectation : pe::seq< variable, fleche_gauche, operation >  {};
-// struct objet : pe::seq< crochet_ouvrant, pe::list< pe::sor< affectation, objet >, virgule >, crochet_fermant > {};
+
 // struct acces : pe::seq< identifieur, de, objet > {};
 struct tableau : pe::seq< mot::crochet_ouvrant, struct operations, mot::crochet_fermant > {};
+struct objet : pe::seq< mot::accolade_ouvrante, pe::list< pe::seq<identifieur, separateur, mot::fleche, operation>, mot::virgule >, mot::accolade_fermante > {};
+
 
 // valeur
 struct valeur : pe::sor< priorite, booleen, identifieur, tableau, reel, texte > {};
@@ -105,7 +107,7 @@ struct boucle : pe::sor< repeter, pour_chaque, tant_que > {};
 /////////////////////////////////////////////////
 struct retour : pe::seq< pe::sor< mot::sortir, mot::retourner >, pe::opt< separateur, mot::avec, separateur, operations > > {};
 
-struct parametres : pe::opt< mot::fleche, separateur, pe::list< pe::seq< variable, separateur >, mot::virgule > > {};
+struct parametres : pe::opt< mot::fleche, pe::list< pe::seq< separateur, variable >, mot::virgule > > {};
 struct definition : pe::seq< mot::fonction, separateur, variable, separateur, parametres, separateur, bloc< mot::fin > > {};
 
 struct appel : pe::seq< mot::parenthese_ouvrante, separateur, pe::opt< operations >, separateur, mot::parenthese_fermante > {};

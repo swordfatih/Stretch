@@ -571,6 +571,12 @@ static std::map<
     {
         pe::demangle<stretch::taille>(), 
         {
+            {
+                std::make_pair(Nature::Objet, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(BigDecimal(std::to_string(std::get<Objet>(f.get_valeur()).size())));
+                }
+            },
             /////////////////////////////////////////////////
             {
                 std::make_pair(Nature::Tableau, Nature::Nul),
@@ -631,6 +637,13 @@ static std::map<
             /////////////////////////////////////////////////
             {
                 std::make_pair(Nature::Booleen, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(Variable::type_tos(f.get_nature()));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Objet, Nature::Nul),
                 [](const Variable f, const Variable s) {
                     return Variable(Variable::type_tos(f.get_nature()));
                 }
