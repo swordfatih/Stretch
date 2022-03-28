@@ -1,5 +1,4 @@
-nombre <- aleatoire(0, 100, faux)
-entree <- 0
+nombre, entree <- aleatoire(0, 100, faux), 0
 
 tant que vrai | entree different nombre
     afficher "ecrivez votre nombre\n"

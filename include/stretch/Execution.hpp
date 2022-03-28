@@ -25,7 +25,18 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope)
     /////////////////////////////////////////////////
     else if(noeud->template is_type< assignation >()) // a <- 5 + 5 + 5
     {
-        scope.assigner(noeud->children.front(), evaluer(noeud->children.back(), scope));
+        if(noeud->children.size() % 2 != 0)
+            throw std::runtime_error("Il faut le même nombre de variable et de valeurs dans une assignation.");
+
+        size_t mid = noeud->children.size() / 2;
+
+        for(size_t i = 0; i < mid; ++i) 
+        {
+            if(!(noeud->children[i]->template is_type< variable >()))
+                throw std::runtime_error(noeud->children[i]->string() + " n'est pas une variable, vérifiez qu'il y a le même nombre de variables et de valeurs dans l'assignation.");
+
+            scope.assigner(noeud->children[i], evaluer(noeud->children[mid + i], scope));
+        }
     } 
     /////////////////////////////////////////////////
     else if(noeud->template is_type< condition >()) // si 5 == 5 alors bloc fin
@@ -36,9 +47,8 @@ Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope)
             if(resultat.get_nature() != Nature::Booleen) 
                 throw std::runtime_error("La condition ne retourne pas un booléen.");
 
-            if(std::get<bool>(resultat.get_valeur()) == true) {
+            if(std::get<bool>(resultat.get_valeur()) == true)
                 return executer(noeud->children[i + 1], scope);
-            }
         }
         
         if(noeud->children.size() % 2 != 0) // vérifier l'existence d'un sinon final

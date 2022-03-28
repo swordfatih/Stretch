@@ -79,7 +79,7 @@ struct operations : pe::list< operation, mot::virgule > {};
 /////////////////////////////////////////////////
 /// Assignation
 /////////////////////////////////////////////////
-struct assignation : pe::seq< pe::list< identifieur, mot::virgule >, separateur, mot::fleche, separateur, operations > {}; // a, b, c <- 2, 5, 10
+struct assignation : pe::seq< pe::list< pe::seq< separateur, identifieur >, mot::virgule >, separateur, mot::fleche, separateur, operations > {}; // a, b, c <- 2, 5, 10
 
 /////////////////////////////////////////////////
 /// Conditions
@@ -97,7 +97,7 @@ struct condition : pe::seq< mot::si, operation, pe::opt< mot::alors >, separateu
 struct ranger : pe::opt< mot::dans, separateur, identifieur, separateur > {}; // ranger la valeur actuelle dans une variable
 struct repeter : pe::seq< mot::repeter, operation, mot::fois, separateur, ranger, bloc< mot::fin > > {};
 struct tant_que : pe::seq< mot::tant, separateur, mot::que, operation, pe::opt< mot::faire, separateur >, bloc< mot::fin > > {};
-struct pour_chaque : pe::seq< mot::pour, separateur, mot::chaque, separateur, operation, separateur, mot::dans, separateur, operation, separateur, pe::opt< mot::faire, separateur >, bloc< mot::fin > > {};
+struct pour_chaque : pe::seq< mot::pour, separateur, mot::chaque, separateur, identifieur, separateur, mot::dans, separateur, operation, separateur, pe::opt< mot::faire, separateur >, bloc< mot::fin > > {};
 struct boucle : pe::sor< repeter, pour_chaque, tant_que > {};
 
 /////////////////////////////////////////////////
