@@ -1,16 +1,4 @@
-nombre, entree <- aleatoire(0, 100, faux), 0
+nombre_points <- 100000
+nombre_points_inclus <- 0  | le nombre de points situés dans le cercle
 
-tant que vrai | entree different nombre
-    afficher "ecrivez votre nombre\n"
-    lire dans entree
 
-    si nombre plus grand que entree 
-        afficher "plus grand\n"
-    sinon si nombre plus petit que entree
-        afficher "plus petit\n"
-    sinon
-        arreter
-    fin
-fin
-
-afficher "Félicitations, vous avez trouvé le nombre à deviner !\n"

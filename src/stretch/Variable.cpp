@@ -33,23 +33,11 @@ Variable::Variable(std::string valeur) : Variable(VariantValeur(std::string{std:
 /////////////////////////////////////////////////
 Variable::Variable(std::unique_ptr<Noeud>& noeud) : m_type(sto_nature(noeud->type)) 
 {
-    if(m_type != Nature::Tableau) 
-    {
-        std::string&& valeur = noeud->string();
-        remplacer(valeur, "\\\"", "\"");
-        remplacer(valeur, "\\n", "\n");
-        
-        m_valeur = sto_valeur(m_type, valeur);
-    }
-    else 
-    {
-        Tableau tableau;
-
-        for(auto& fils : noeud->children)
-            tableau.push_back(Variable(fils));
-
-        m_valeur = std::move(tableau);
-    }
+    std::string&& valeur = noeud->string();
+    remplacer(valeur, "\\\"", "\"");
+    remplacer(valeur, "\\n", "\n");
+    
+    m_valeur = sto_valeur(m_type, valeur);
 }
 
 /////////////////////////////////////////////////
@@ -141,7 +129,9 @@ VariantValeur Variable::sto_valeur(Nature type, std::string valeur)
     } 
     else if(type == Nature::Reel) 
         return BigDecimal(std::move(valeur));
-    /*else if(type == Nature::Tableau)
+
+    /*
+    else if(type == Nature::Tableau)
     {
         valeur.erase(valeur.begin());
         valeur.erase(valeur.end());
@@ -156,7 +146,8 @@ VariantValeur Variable::sto_valeur(Nature type, std::string valeur)
             tableau.push_back(parse(element));
 
         return tableau;
-    } A gérer plus tard : parsing en ayant un tableau comme une chaine de caractères*/
+    } // A gérer plus tard : parsing en ayant un tableau comme une chaine de caractères
+    */
     
     return {};
 }
@@ -175,6 +166,8 @@ Variable Variable::parse(std::string valeur)
         return Variable(Nature::Booleen, lower);
     else if(std::regex_match(valeur, match, number_regex)) 
         return Variable(BigDecimal(std::move(valeur)));
+
+    /*
     else if(std::regex_match(valeur, match, tableau_regex)) {
         std::vector<Variable> variables;
 
@@ -183,6 +176,7 @@ Variable Variable::parse(std::string valeur)
 
         return Variable(variables);
     }
+    */
 
     return Variable(std::move(valeur));
 }

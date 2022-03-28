@@ -177,7 +177,7 @@ static int parse_number(const std::string &s, int &lsign, int &lint, int &ldot, 
     {
         lsign = 1;
     }
-
+ 
     // retourne le nombre de chiffre après le point
     return lscale; 
 }
@@ -835,14 +835,14 @@ std::string BigDecimal::pow(const std::string &lhs, const std::string &rhs, int 
     }
 
     int lsign, lint, ldot, lfrac, lscale;
-    if (parse_number(lhs, lsign, lint, ldot, lfrac, lscale) != 0)
+    if (parse_number(lhs, lsign, lint, ldot, lfrac, lscale) < 0)
     {
         std::cerr << "\"" << lhs.c_str() << "\" Is Not A Number" << std::endl;
         return ZERO;
     }
 
     int rsign, rint, rdot, rfrac, rscale;
-    if (parse_number(rhs, rsign, rint, rdot, rfrac, rscale) != 0)
+    if (parse_number(rhs, rsign, rint, rdot, rfrac, rscale) < 0)
     {
         std::cerr << "\"" << rhs.c_str() << "\" Is Not A Number" << std::endl;
         return ZERO;
