@@ -12,7 +12,7 @@ namespace stretch {
 Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope) 
 {
     /////////////////////////////////////////////////
-    if(noeud->is_root() || noeud->template is_type< bloc >())    
+    if(noeud->is_root() || noeud->template is_type< bloc< mot::fin > >() || noeud->template is_type< bloc< mot::fin, mot::sinon > >())    
     {
         for(auto& c: noeud->children) 
         {

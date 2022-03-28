@@ -127,7 +127,8 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         // instructions
         assignation,
         condition, 
-        bloc,
+        bloc< mot::fin, mot::sinon >,
+        bloc< mot::fin >,
         mot::quitter,
         entree,
         sortie

@@ -21,6 +21,10 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    if(pe::analyze< stretch::grammaire >(1)) {
+        return 1;
+    }
+
     std::string filename{argv[1]};
     pe::file_input in(filename); 
 
