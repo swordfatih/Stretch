@@ -1,9 +1,19 @@
-#include <iostream>
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/parse_tree_to_dot.hpp>
-#include "stretch/Evaluation.hpp"
+#include <tao/pegtl/contrib/analyze.hpp>
 
+#include "stretch/Execution.hpp"
+#include "stretch/Standard.hpp"
+
+#include <iostream>
+
+/////////////////////////////////////////////////
 namespace pe = tao::pegtl;
 
+/////////////////////////////////////////////////
 int main(int argc, char *argv[])
 {
     if(argc != 2) {
@@ -11,20 +21,29 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    if(pe::analyze< stretch::grammaire >(1)) {
+        return 1;
+    }
+
     std::string filename{argv[1]};
     pe::file_input in(filename); 
 
-    auto root = pe::parse_tree::parse<stretch::grammaire, stretch::selector>(in);
+    auto root = pe::parse_tree::parse< stretch::grammaire, stretch::selector >(in);
 
     pe::parse_tree::print_dot(std::cout, *root);
-    stretch::executer(root);
 
-    // std::cout << stretch::Variable("salutt") << std::endl;
-    // std::cout << stretch::Variable(45) << std::endl;
-    // std::cout << stretch::Variable(75000.8) << std::endl;
-    // std::cout << stretch::Variable(stretch::Nature::Reel, "45487551215455555555.55555555555555555555555") << std::endl;
-    // std::cout << stretch::Variable(root->children[0]->children[1]->children[0]) << std::endl;
-    // std::cout << (stretch::Variable::parse("23442.98").get_nature() == stretch::Nature::Reel) << std::endl;
-
+    try
+    {
+        stretch::standard::charger();
+        stretch::Fonction::enregistrer("main", stretch::Fonction(root));
+        stretch::Scope scope;
+        stretch::executer(root, scope);
+    }
+    catch(const stretch::exception::Quitter& e) 
+    {            
+        std::cerr << e.what() << std::endl;                 
+        return 0;
+    }
+    
     return 0;
 }

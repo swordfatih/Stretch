@@ -1,0 +1,69 @@
+/////////////////////////////////////////////////
+// Headers
+/////////////////////////////////////////////////
+#include <exception>
+
+/////////////////////////////////////////////////
+namespace stretch::exception {
+
+/////////////////////////////////////////////////
+class StretchException : public std::exception
+{
+public:
+    /////////////////////////////////////////////////
+    explicit StretchException(std::string message = {}) : m_message(message) 
+    {
+
+    }
+
+    /////////////////////////////////////////////////
+    char const* what() const noexcept override 
+    { 
+        return m_message.c_str(); 
+    }
+
+protected:
+    std::string m_message;
+};
+
+/////////////////////////////////////////////////
+class Quitter : public StretchException 
+{
+public:
+    /////////////////////////////////////////////////
+    explicit Quitter(std::string message = {}) : StretchException(message) {}
+};
+
+/////////////////////////////////////////////////
+class Boucle : public StretchException 
+{
+public:
+    /////////////////////////////////////////////////
+    enum class Type {
+        Arreter,
+        Continuer
+    };
+
+    /////////////////////////////////////////////////
+    explicit Boucle(Type type, std::string message = {}) : m_type(type), StretchException(message) {}
+
+    /////////////////////////////////////////////////
+    Type get_type() const 
+    {
+        return m_type;
+    }
+
+private:
+    /////////////////////////////////////////////////
+    Type m_type;
+};
+
+/////////////////////////////////////////////////
+class VariableInconnue : public StretchException 
+{
+public:
+    /////////////////////////////////////////////////
+    explicit VariableInconnue(std::string message = {}) : StretchException(message) {}
+};
+
+} // namespace stretch

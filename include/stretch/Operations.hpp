@@ -1,15 +1,15 @@
-#include <tao/pegtl/demangle.hpp>
-
+/////////////////////////////////////////////////
+// Headers
+/////////////////////////////////////////////////
 #include <functional>
 #include <map>
 #include <regex>
 #include <cstring>
+#include <cmath>
 
-#include "stretch/Variable.hpp"
-
-namespace pe = tao::pegtl;
-
-namespace stretch::arithmetique {
+/////////////////////////////////////////////////
+namespace stretch
+{
 
 /////////////////////////////////////////////////
 static std::map<    
@@ -25,7 +25,7 @@ static std::map<
     // Addition
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::plus>(), 
+        pe::demangle<stretch::addition>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -66,6 +66,17 @@ static std::map<
                 [](const Variable f, const Variable s) {
                     return f;
                 }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Tableau, Nature::Tableau),
+                [](const Variable f, const Variable s) {
+                    auto t = std::get<Tableau>(f.get_valeur());
+                    auto q = std::get<Tableau>(s.get_valeur());
+                    t.insert(t.end(), q.begin(), q.end());
+                    
+                    return Variable(t);
+                }
             }
         }
     },
@@ -74,7 +85,7 @@ static std::map<
     // Soustraction
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::moins>(), 
+        pe::demangle<stretch::soustraction>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -120,15 +131,30 @@ static std::map<
                 [](const Variable f, const Variable s) {
                     return Variable(std::get<BigDecimal>(f.get_valeur()) * -1);
                 }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Tableau, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    auto t_f = std::get<Tableau>(f.get_valeur());
+                    auto t_s = std::get<BigDecimal>(s.get_valeur());
+                    
+                    if(t_s.toInt() > t_f.size()) {
+                        throw std::runtime_error("Ce que vous souhaitez retirer du tableau dépasse sa taille");
+                    }
+
+                    return Variable(std::vector(t_f.begin(), t_f.end() - t_s.toInt()));
+                }
             }
+
         }
-    },
+    }, 
 
     /////////////////////////////////////////////////
     // Multiplication
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::facteur>(), 
+        pe::demangle<stretch::multiplication>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -172,7 +198,7 @@ static std::map<
     // Division
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::fraction>(), 
+        pe::demangle<stretch::division>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -190,7 +216,7 @@ static std::map<
                     if(t.est(Nature::Reel))
                         return Variable(std::get<BigDecimal>(f.get_valeur()) / std::get<BigDecimal>(t.get_valeur()));
                     
-                    throw std::runtime_error("Vous ne pouvez pas diviser un réel par une chaine qui ne contient pas de réel");
+                    throw std::runtime_error("Vous ne pouvez pas diviser un réel par une chaîne qui ne contient pas de réel");
                 }
             }
         }
@@ -200,7 +226,7 @@ static std::map<
     // Reste
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::modulo>(), 
+        pe::demangle<stretch::reste>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -218,7 +244,7 @@ static std::map<
                     if(t.est(Nature::Reel))
                         return Variable(std::get<BigDecimal>(f.get_valeur()) % std::get<BigDecimal>(t.get_valeur()));
                     
-                    throw std::runtime_error("Vous ne pouvez pas diviser un réel par une chaine qui ne contient pas de réel");
+                    throw std::runtime_error("Vous ne pouvez pas diviser un réel par une chaîne qui ne contient pas de réel");
                 }
             }
         }
@@ -228,7 +254,7 @@ static std::map<
     // Egalité
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::egal>(), 
+        pe::demangle<stretch::egalite>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -267,7 +293,7 @@ static std::map<
                     if(t.est(Nature::Booleen))
                         return Variable(std::get<bool>(t.get_valeur()) == std::get<bool>(s.get_valeur()));
                     
-                    return Variable(false);
+                    return Variable(VariantValeur(false));
                 }
             },
             /////////////////////////////////////////////////
@@ -279,7 +305,7 @@ static std::map<
                     if(t.est(Nature::Booleen))
                         return Variable(std::get<bool>(f.get_valeur()) == std::get<bool>(t.get_valeur()));
                     
-                    return Variable(false);
+                    return Variable(VariantValeur(false));
                 }
             },
             /////////////////////////////////////////////////
@@ -293,14 +319,14 @@ static std::map<
             {
                 std::make_pair(Nature::Chaine, Nature::Nul),
                 [](const Variable f, const Variable s) {                
-                    return Variable(false);
+                    return Variable(VariantValeur(false));
                 }
             },
             /////////////////////////////////////////////////
             {
                 std::make_pair(Nature::Nul, Nature::Chaine),
                 [](const Variable f, const Variable s) {                
-                    return Variable(false);
+                    return Variable(VariantValeur(false));
                 } 
             }
         } 
@@ -310,7 +336,7 @@ static std::map<
     // Différence
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::different>(), 
+        pe::demangle<stretch::inegalite>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -421,10 +447,10 @@ static std::map<
     }, 
 
     /////////////////////////////////////////////////
-    // Plus petit que
+    // Inferieur
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::plus_petit_que>(), 
+        pe::demangle<stretch::inferieur>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -444,10 +470,10 @@ static std::map<
     }, 
 
     /////////////////////////////////////////////////
-    // Plus grand que
+    // Supérieur
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::plus_grand_que>(), 
+        pe::demangle<stretch::superieur>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -470,7 +496,7 @@ static std::map<
     // Non
     /////////////////////////////////////////////////
     {
-        pe::demangle<stretch::non>(), 
+        pe::demangle<stretch::negation>(), 
         {
             /////////////////////////////////////////////////
             {
@@ -480,21 +506,160 @@ static std::map<
                 }
             }
         }
+    },
+
+    /////////////////////////////////////////////////
+    // Indice
+    /////////////////////////////////////////////////
+    {
+        pe::demangle<stretch::indexation>(), 
+        {
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Chaine, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    auto indice = std::get<BigDecimal>(s.get_valeur());
+                    auto chaine = std::get<std::string>(f.get_valeur());
+
+                    if(indice > 0 && indice.toInt() <= chaine.size()) 
+                        return Variable(std::string{chaine[indice.toInt() - 1]});
+
+                    throw std::runtime_error("L'indice donné dépasse les bornes de la chaîne");
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Reel, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    auto indice = std::get<BigDecimal>(s.get_valeur());
+                    auto reel = std::get<BigDecimal>(f.get_valeur());
+
+                    if(indice < 0) {
+                        int entier = std::abs((indice + 1).toInt());
+
+                        if(entier >= reel.getDecPart().size())
+                            throw std::runtime_error("L'indice " + std::to_string(entier) + " donné dépasse les bornes de la partie décimale de taille " + std::to_string(reel.getDecPart().size()));
+
+                        return Variable(BigDecimal(reel.getDecPart()[entier] - '0')); 
+                    }
+                        
+                    if(indice > 0 && indice.toInt() >= reel.getIntPart().size())
+                        throw std::runtime_error("L'indice " + indice.toString() + " donné dépasse les bornes de la partie réelle de taille " + std::to_string(reel.getIntPart().size()));
+
+                    return Variable(BigDecimal(reel.getIntPart()[reel.getIntPart().size() - indice.toInt()] - '0')); 
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Tableau, Nature::Reel),
+                [](const Variable f, const Variable s) {
+                    auto indice = std::get<BigDecimal>(s.get_valeur());
+                    auto tableau = std::get<Tableau>(f.get_valeur());
+
+                    if(indice > 0 && indice.toInt() <= tableau.size()) 
+                        return Variable(tableau[indice.toInt() - 1]);
+
+                    throw std::runtime_error("L'indice donné dépasse les bornes du tableau");
+                }
+            }
+        }
+    },
+
+    /////////////////////////////////////////////////
+    // Taille
+    /////////////////////////////////////////////////
+    {
+        pe::demangle<stretch::taille>(), 
+        {
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Tableau, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(BigDecimal(std::to_string(std::get<Tableau>(f.get_valeur()).size())));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Chaine, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(BigDecimal(std::to_string(f.to_string().size())));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Reel, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(BigDecimal(std::to_string(f.to_string().size())));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Booleen, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(BigDecimal(std::to_string(f.to_string().size())));
+                }
+            }
+        }
+    },
+    /////////////////////////////////////////////////
+    // Nature
+    /////////////////////////////////////////////////
+    {
+        pe::demangle<stretch::nature>(), 
+        {
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Tableau, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(Variable::type_tos(f.get_nature()));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Chaine, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(Variable::type_tos(f.get_nature()));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Reel, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(Variable::type_tos(f.get_nature()));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Booleen, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(Variable::type_tos(f.get_nature()));
+                }
+            },
+            /////////////////////////////////////////////////
+            {
+                std::make_pair(Nature::Nul, Nature::Nul),
+                [](const Variable f, const Variable s) {
+                    return Variable(Variable::type_tos(f.get_nature()));
+                }
+            }
+        }
     }
 };
 
-const Variable operation(const std::string_view& operateur, const Variable first, const Variable second) {
+/////////////////////////////////////////////////
+const Variable operer(const std::string_view& operateur, const Variable first, const Variable second) 
+{
     if(operations.find(operateur) == operations.end()) {
-        std::cout << "L'opération " << operateur << " n'existe pas" << std::endl;
+        throw std::runtime_error("L'opération " + static_cast<std::string>(operateur) + " n'existe pas");
         return Variable();
     } 
 
     if(operations[operateur].find(std::make_pair(first.get_nature(), second.get_nature())) == operations[operateur].end()) {
-        std::cout << "L'opération " << operateur << " n'est pas supporté pour les types " << Variable::type_tos(first.get_nature()) << " et " << Variable::type_tos(second.get_nature()) << std::endl;
+        throw std::runtime_error("L'opération " + static_cast<std::string>(operateur) + " n'est pas supporté pour les types " + Variable::type_tos(first.get_nature()) + " et " + Variable::type_tos(second.get_nature()));
         return Variable();
     }
 
     return operations[operateur][std::make_pair(first.get_nature(), second.get_nature())](first, second);
 }
 
-} // namespace stretch::arithmetique
+} // namespace stretch

@@ -1,3 +1,5 @@
+#pragma once 
+
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
@@ -5,15 +7,16 @@
 #include <string>
 #include <memory>
 #include <regex>
-#include <iostream>
 
 #include <tao/pegtl/demangle.hpp>
 
 #include "decimal/BigDecimal.h"
-#include "stretch/Grammaire.hpp"
+#include "stretch/Arbre.hpp"
 
-namespace pe = tao::pegtl;
+/////////////////////////////////////////////////
+using Noeud = tao::pegtl::parse_tree::node;
 
+/////////////////////////////////////////////////
 namespace stretch {
 
 /////////////////////////////////////////////////
@@ -23,14 +26,20 @@ enum class Nature {
     Nul = -1,
     Chaine,
     Booleen,
-    Reel
+    Reel,
+    Tableau
 };
+
+/////////////////////////////////////////////////
+class Variable;
 
 /////////////////////////////////////////////////
 /// @brief Les types utilisés en mémoire pour
 /// représenter les différents types de valeurs
 /////////////////////////////////////////////////
-using VariantValeur = std::variant< std::string, bool, BigDecimal >;
+using Tableau = std::vector< Variable >;
+
+using VariantValeur = std::variant< std::string, bool, BigDecimal, Tableau >;
 
 /////////////////////////////////////////////////
 /// @brief Classe représentant une variable
@@ -86,8 +95,7 @@ public:
     Variable(std::string valeur);
 
     // Constructeur à partir d'un noeud
-    template <typename T>
-    Variable(std::unique_ptr<T>& noeud) : Variable(sto_nature(noeud->type), sto_valeur(sto_nature(noeud->type), noeud->string())) {}
+    Variable(std::unique_ptr<Noeud>& noeud);
 
     Nature get_nature() const;
     VariantValeur get_valeur() const;
@@ -98,8 +106,15 @@ public:
     bool est(Nature type) const;
 
 private:
+    /////////////////////////////////////////////////
+    static void remplacer(std::string& source, const std::string& from, const std::string& to);
+
+    /////////////////////////////////////////////////   
+    static std::vector<std::string> split_tableau(const std::string& s, const std::regex& tableau_regex); 
+
     Nature m_type;          ///< Le type de la variable
     VariantValeur m_valeur; ///< La valeur de la variable
+
 };
 
 } // namespace stretch
