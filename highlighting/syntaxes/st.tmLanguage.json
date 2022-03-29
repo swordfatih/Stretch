@@ -47,7 +47,7 @@
 		"operateurs": {
 			"patterns": [{
 				"name": "keyword.operator.st",
-				"match": "\\b(egal|non|different|de|est|pas|plus|grand|petit|que|ou|et|#|<-)\\b"
+				"match": "\\b(egal|non|different|de|est|pas|plus|grand|petit|que|ou|et|#|<-|taille|nature)\\b"
 			}]
 		},
 		"constants": {
@@ -63,7 +63,7 @@
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.st",
-				"match": "\\b(tant|que|si|repeter|fois|dans|fin|quitter|retourner|faire|alors)\\b"
+				"match": "\\b(tant[\\t\\n\\r\\s]+que|sortir[\\t\\n\\r\\s]+avec|retourner[\\t\\n\\r\\s]+avec|pour[\\t\\n\\r\\s]+chaque|si|sinon|repeter|fois|dans|fin|quitter|sortir|continuer|arreter|faire|alors|retourner|afficher|lire)\\b"
 			}, 
 			{
 				"name": "storage.type.st",
