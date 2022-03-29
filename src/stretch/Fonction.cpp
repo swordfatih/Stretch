@@ -7,24 +7,30 @@
 namespace stretch {
 
 /////////////////////////////////////////////////
-Tableau executer(std::unique_ptr<Noeud>& noeud, Scope& scope);
+Tableau executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope);
 
 /////////////////////////////////////////////////
-Fonction::Fonction(std::unique_ptr<Noeud>& root, std::vector<std::string> parametres, const std::function<Tableau(const Tableau&)>& interne) : m_root(root), m_parametres(std::move(parametres)), m_interne(interne) 
+Fonction::Fonction(std::unique_ptr<pe::Noeud>& root, std::vector<std::string> parametres, const std::function<Tableau(const Tableau&)>& interne) : m_root(root), m_parametres(std::move(parametres)), m_interne(interne) 
 {
     
 }
 
 /////////////////////////////////////////////////
-std::unique_ptr<Noeud>& Fonction::get_root()
+std::unique_ptr<pe::Noeud>& Fonction::get_root()
 {
     return m_root;
 }
 
 /////////////////////////////////////////////////
+std::vector<std::string>& Fonction::get_parametres()
+{
+    return m_parametres;
+}
+
+/////////////////////////////////////////////////
 Fonction& Fonction::enregistrer(const std::string& nom, Fonction fonction) 
 {
-    if(definitions.count(nom) != 0)
+    if(existe(nom))
         throw std::runtime_error("La fonction " + nom + " est déjà enregistrée.");
 
     definitions.insert(std::make_pair(nom, std::move(fonction)));
@@ -33,12 +39,18 @@ Fonction& Fonction::enregistrer(const std::string& nom, Fonction fonction)
 }
 
 /////////////////////////////////////////////////
+bool Fonction::existe(const std::string& nom) 
+{
+    return definitions.count(nom) != 0;
+}
+
+/////////////////////////////////////////////////
 Fonction& Fonction::recuperer(const std::string& nom) 
 {
-    if(definitions.count(nom) == 0)
-        throw std::runtime_error("La fonction " + nom + " n'est pas enregistrée");
+    if(existe(nom))
+        return definitions.at(nom);
 
-    return definitions.at(nom);
+    throw std::runtime_error("La fonction " + nom + " n'est pas enregistree");
 }
 
 /////////////////////////////////////////////////

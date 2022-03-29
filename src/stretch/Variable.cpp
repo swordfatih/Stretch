@@ -31,11 +31,19 @@ Variable::Variable(std::string valeur) : Variable(VariantValeur(std::string{std:
 }
 
 /////////////////////////////////////////////////
-Variable::Variable(std::unique_ptr<Noeud>& noeud) : m_type(sto_nature(noeud->type)) 
+Variable::Variable(std::unique_ptr<pe::Noeud>& noeud) : m_type(sto_nature(noeud->type)) 
 {
-    std::string&& valeur = noeud->string();
-    remplacer(valeur, "\\\"", "\"");
-    remplacer(valeur, "\\n", "\n");
+    std::string valeur = noeud->string();
+
+    if(m_type == Nature::Chaine)
+    {
+        remplacer(valeur, "\\\"", "\"");
+        remplacer(valeur, "\\n", "\n");
+    }
+    else if(m_type == Nature::Reel)
+    {
+        remplacer(valeur, "'", "");
+    }
     
     m_valeur = sto_valeur(m_type, valeur);
 }

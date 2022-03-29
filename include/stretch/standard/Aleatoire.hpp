@@ -1,3 +1,6 @@
+#ifndef ALEATOIRE_HPP
+#define ALEATOIRE_HPP
+
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
@@ -35,4 +38,4 @@ Tableau aleatoire(const Tableau& valeurs)
 
 } // namespace stretch::standard::fonction
 
-
+#endif // ALEATOIRE_HPP

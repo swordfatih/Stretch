@@ -1,7 +1,7 @@
 add_repositories("xrepo_guillaume https://github.com/GuillaumeMZ/personal-xrepo.git")
 add_repositories("xrepo_fatih https://github.com/swordfatih/xmake-repo.git main")
 
-add_requires("pegtl-nocmake", "catch2")
+add_requires("pegtl-nocmake", "catch2", "fmt-nocmake")
 
 target("stretch")
 	set_languages("c++17")
@@ -9,7 +9,7 @@ target("stretch")
 	add_includedirs("include/")
 	add_files("src/stretch/*.cpp")
 	add_files("src/decimal/*.cpp")
-	add_packages("pegtl-nocmake")
+	add_packages("pegtl-nocmake", "fmt-nocmake")
 	add_rules("mode.debug")
 
 target("test")

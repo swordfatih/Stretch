@@ -1,3 +1,6 @@
+#ifndef STANDARD_HPP
+#define STANDARD_HPP
+
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
@@ -9,7 +12,7 @@
 namespace stretch::standard {
 
 /////////////////////////////////////////////////
-static std::unique_ptr< Noeud > null_node = nullptr;
+static std::unique_ptr< pe::Noeud > null_node = nullptr;
 
 /////////////////////////////////////////////////
 void charger() 
@@ -19,4 +22,5 @@ void charger()
 
 } // namespace stretch::standard
 
+#endif // STANDARD_HPP
 

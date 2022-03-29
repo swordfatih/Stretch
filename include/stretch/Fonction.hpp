@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FONCTION_HPP
+#define FONCTION_HPP
 
 /////////////////////////////////////////////////
 /// Headers
@@ -25,13 +26,19 @@ public:
     /// @param parametres Parametres de la fonction, s'il y en a
     /// @param interne Fonction interne, s'il y en a une
     /////////////////////////////////////////////////
-    Fonction(std::unique_ptr<Noeud>& root, std::vector<std::string> parametres = {}, const std::function<Tableau(const Tableau&)>& interne = {});
+    Fonction(std::unique_ptr<pe::Noeud>& root, std::vector<std::string> parametres = {}, const std::function<Tableau(const Tableau&)>& interne = {});
 
     /////////////////////////////////////////////////
-    std::unique_ptr<Noeud>& get_root();
+    std::unique_ptr<pe::Noeud>& get_root();
+
+    /////////////////////////////////////////////////
+    std::vector<std::string>& get_parametres();
 
     /////////////////////////////////////////////////
     static Fonction& enregistrer(const std::string& nom, Fonction fonction);
+
+    /////////////////////////////////////////////////
+    static bool existe(const std::string& nom);
 
     /////////////////////////////////////////////////
     static Fonction& recuperer(const std::string& nom);
@@ -55,8 +62,10 @@ public:
 private:
     /////////////////////////////////////////////////
     std::vector<std::string> m_parametres;              ///< paramètres de la fonction
-    std::unique_ptr<Noeud>& m_root;                     ///< noeud racine de la fonction
+    std::unique_ptr<pe::Noeud>& m_root;                     ///< noeud racine de la fonction
     std::function<Tableau(const Tableau&)> m_interne;   ///< fonction interne
 };
 
 } // stretch
+
+#endif // FONCTION_HPP
