@@ -23,6 +23,8 @@ template<> inline constexpr auto error_message< pe::sor< mot::fin > > = "Il faut
 template<> inline constexpr auto error_message< pe::sor< mot::fin, mot::sinon > > = "Il faut 'fin' pour terminer la condition";
 template<> inline constexpr auto error_message< pe::sor< pe::eof > > = "Le fichier n'a pas de fin ?!";
 
+template<> inline constexpr auto error_message< instruction > = "Ce n'est pas une instruction valide";
+
 /////////////////////////////////////////////////
 struct error
 {
