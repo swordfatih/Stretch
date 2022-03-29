@@ -3,7 +3,7 @@
     "displayName": "Stretch Highlighting",
     "description": "Syntax highlighting for Stretch",
     "icon": "images/icon.png",
-    "version": "0.0.1",
+    "version": "0.0.9",
     "publisher": "stretch",
     "author": {
         "name": "swordfatih"
