@@ -32,7 +32,13 @@ public:
     std::unique_ptr<pe::Noeud>& get_root();
 
     /////////////////////////////////////////////////
+    std::vector<std::string>& get_parametres();
+
+    /////////////////////////////////////////////////
     static Fonction& enregistrer(const std::string& nom, Fonction fonction);
+
+    /////////////////////////////////////////////////
+    static bool existe(const std::string& nom);
 
     /////////////////////////////////////////////////
     static Fonction& recuperer(const std::string& nom);

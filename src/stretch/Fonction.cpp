@@ -22,9 +22,15 @@ std::unique_ptr<pe::Noeud>& Fonction::get_root()
 }
 
 /////////////////////////////////////////////////
+std::vector<std::string>& Fonction::get_parametres()
+{
+    return m_parametres;
+}
+
+/////////////////////////////////////////////////
 Fonction& Fonction::enregistrer(const std::string& nom, Fonction fonction) 
 {
-    if(definitions.count(nom) != 0)
+    if(existe(nom))
         throw std::runtime_error("La fonction " + nom + " est déjà enregistrée.");
 
     definitions.insert(std::make_pair(nom, std::move(fonction)));
@@ -33,12 +39,18 @@ Fonction& Fonction::enregistrer(const std::string& nom, Fonction fonction)
 }
 
 /////////////////////////////////////////////////
+bool Fonction::existe(const std::string& nom) 
+{
+    return definitions.count(nom) != 0;
+}
+
+/////////////////////////////////////////////////
 Fonction& Fonction::recuperer(const std::string& nom) 
 {
-    if(definitions.count(nom) == 0)
-        throw std::runtime_error("La fonction " + nom + " n'est pas enregistrée");
+    if(existe(nom))
+        return definitions.at(nom);
 
-    return definitions.at(nom);
+    throw std::runtime_error("La fonction " + nom + " n'est pas enregistree");
 }
 
 /////////////////////////////////////////////////

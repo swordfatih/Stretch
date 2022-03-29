@@ -31,9 +31,15 @@ void Scope::assigner(std::unique_ptr<pe::Noeud>& variable, Variable valeur)
 }
 
 /////////////////////////////////////////////////
-Variable Scope::lire(const std::string& nom) 
+bool Scope::existe(const std::string& nom) 
 {
-    if(m_variables.count(nom) != 0)
+    return m_variables.count(nom) != 0;
+}
+
+/////////////////////////////////////////////////
+Variable& Scope::lire(const std::string& nom) 
+{
+    if(existe(nom))
         return m_variables[nom];
 
     /* 
@@ -44,7 +50,7 @@ Variable Scope::lire(const std::string& nom)
         return m_parent->lire(nom); 
     */
 
-    throw exception::Variable(exception::Variable::Type::Inconnue, nom);
+    throw std::runtime_error("La variable '" + nom + "' est inconnue.");
 }
 
 } // namespace stretch

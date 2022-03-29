@@ -36,11 +36,10 @@ int main(int argc, char *argv[])
     {
         stretch::standard::charger();
         
-        auto& bloc = root->children.front();
-        stretch::Fonction::enregistrer("main", stretch::Fonction(bloc));
+        stretch::Fonction::enregistrer("main", stretch::Fonction(root));
         
         stretch::Scope scope;
-        executer(bloc, scope);
+        executer(root, scope);
     }
     catch(const stretch::exception::Quitter& e) 
     {            

@@ -21,20 +21,28 @@ inline Variable evaluer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
 {
     // appel de fonction
     if(noeud->template is_type< appel >()) {
-        if(!noeud->children.front()->template is_type< variable >())
-            throw std::runtime_error("Le nom de la fonction n'est pas un identificateur valide.");
-
         Tableau valeurs;
         for(size_t i = 1; i < noeud->children.size(); ++i)
             valeurs.push_back(evaluer(noeud->children[i], scope));
 
-        Tableau&& retour = Fonction::invoquer(scope, noeud->children.front()->string(), valeurs);
+        std::string nom = noeud->children.front()->string();
+        if(!Fonction::existe(nom))
+            throw exception::Runtime(noeud->children.front()->begin(), "La fonction n'existe pas.", nom);
+
+        Fonction& fonction = Fonction::recuperer(nom);
+        if(valeurs.size() != fonction.get_parametres().size() || valeurs.empty() && !fonction.get_parametres().empty()) 
+            throw exception::Runtime(noeud->begin(), "La fonction n'a pas le bon nombre de paramètres.", noeud->string());
+
+        Tableau&& retour = Fonction::invoquer(scope, nom, valeurs);
         
         return retour.empty() ? Variable() : (retour.size() == 1 ? retour[0] : Variable(std::move(retour)));
     }
 
     // variable
     if(noeud->template is_type< variable >()) {
+        if(!scope.existe(noeud->string()))
+            throw exception::Runtime(noeud->begin(), "La variable est inconnue.", noeud->string());
+
         return scope.lire(noeud->string());
     }   
 

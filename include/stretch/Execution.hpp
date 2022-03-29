@@ -12,7 +12,24 @@
 namespace stretch {
 
 /////////////////////////////////////////////////
-Tableau executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope) 
+Tableau executer_internal(std::unique_ptr<pe::Noeud>& noeud, Scope& scope);
+
+/////////////////////////////////////////////////
+Tableau executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
+{
+    try 
+    {
+        return executer_internal(noeud, scope);
+    } 
+    catch(exception::Runtime& e) 
+    {
+        std::cerr << e.what() << std::endl;
+        return {};
+    } 
+}
+
+/////////////////////////////////////////////////
+Tableau executer_internal(std::unique_ptr<pe::Noeud>& noeud, Scope& scope) 
 {
     /////////////////////////////////////////////////
     if(noeud->is_root() || noeud->template is_type< bloc< mot::fin > >() || noeud->template is_type< bloc< mot::fin, mot::sinon > >())    
@@ -29,15 +46,15 @@ Tableau executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
     else if(noeud->template is_type< assignation >()) // a <- 5 + 5 + 5
     {
         if(noeud->children.size() % 2 != 0)
-            throw std::runtime_error("Il faut le même nombre de variable et de valeurs dans une assignation.");
+            throw stretch::exception::Runtime(noeud->begin(), "Il faut le meme nombre de variable et de valeurs dans une assignation.", noeud->string());
 
         size_t mid = noeud->children.size() / 2;
 
         for(size_t i = 0; i < mid; ++i) 
         {
             if(!(noeud->children[i]->template is_type< variable >()))
-                throw std::runtime_error(noeud->children[i]->string() + " n'est pas une variable, vérifiez qu'il y a le même nombre de variables et de valeurs dans l'assignation.");
-
+                throw stretch::exception::Runtime(noeud->children[i]->begin(), "Ce n'est pas une variable, verifiez qu'il y a le meme nombre de variables a gauche et de valeurs a droite.", noeud->children[i]->string());
+            
             scope.assigner(noeud->children[i], evaluer(noeud->children[mid + i], scope));
         }
     } 
@@ -48,7 +65,7 @@ Tableau executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
             Variable&& resultat = evaluer(noeud->children[i], scope);
         
             if(resultat.get_nature() != Nature::Booleen) 
-                throw std::runtime_error("La condition ne retourne pas un booléen.");
+                throw stretch::exception::Runtime(noeud->children[i]->begin(), "La condition n'est pas un booléen.", noeud->children[i]->string());
 
             if(std::get<bool>(resultat.get_valeur()) == true)
                 return executer(noeud->children[i + 1], scope);
@@ -81,7 +98,7 @@ Tableau executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
         Variable compteur = evaluer(noeud->children.front(), scope);
 
         if(compteur.get_nature() != Nature::Reel) 
-            throw std::runtime_error("Le compteur de la boucle n'est pas un entier.");
+            throw stretch::exception::Runtime(noeud->children.front()->begin(), "Le compteur de la boucle n'est pas un entier.", noeud->children.front()->string());
 
         BigDecimal n = std::get<BigDecimal>(compteur.get_valeur());
         n.round(1);
@@ -118,7 +135,7 @@ Tableau executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
         Variable condition = evaluer(noeud->children.front(), scope).get_valeur();
         
         if(condition.get_nature() != Nature::Booleen) 
-            throw std::runtime_error("La condition de la boucle n'est pas un booléen.");
+            throw stretch::exception::Runtime(noeud->children.front()->begin(), "La condition de la boucle n'est pas un booléen.", noeud->children.front()->string());
 
         bool resultat = std::get<bool>(condition.get_valeur());
 
@@ -150,10 +167,7 @@ Tableau executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
         Variable tableau = evaluer(noeud->children[1], scope);
 
         if(tableau.get_nature() != Nature::Tableau) 
-            throw std::runtime_error("Un tableau est requis pour la boucle pour chaque.");
-
-        if(!(element->template is_type< variable >()))
-            throw std::runtime_error(element->string() + " n'est pas un nom de variable valide.");
+            throw stretch::exception::Runtime(noeud->children[1]->begin(), "La variable n'est pas un tableau.", noeud->children[1]->string());
 
         Tableau tab = std::get<Tableau>(tableau.get_valeur());
         for(auto& v: tab) 
@@ -180,16 +194,19 @@ Tableau executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
     /////////////////////////////////////////////////
     else if(noeud->template is_type< mot::arreter >())
     {
-        throw exception::Boucle(exception::Boucle::Type::Arreter);
+        throw exception::Boucle(exception::Boucle::Type::Arreter, noeud->begin());
     }
     /////////////////////////////////////////////////
     else if(noeud->template is_type< mot::continuer >())
     {
-        throw exception::Boucle(exception::Boucle::Type::Continuer);
+        throw exception::Boucle(exception::Boucle::Type::Continuer, noeud->begin());
     }
     /////////////////////////////////////////////////
     else if(noeud->template is_type< definition >())
     {
+        if(Fonction::existe(noeud->children.front()->string()))
+            throw stretch::exception::Runtime(noeud->children.front()->begin(), "La fonction existe deja.", noeud->children.front()->string());
+
         std::vector<std::string> params;
 
         // puis on récupère tous les noms de parametres (tous les fils de stretch::parametres) jusqu'à atteindre le fond 
@@ -215,7 +232,7 @@ Tableau executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
     /////////////////////////////////////////////////
     else if(noeud->template is_type< mot::quitter >()) 
     {
-        throw exception::Quitter("Arrêt du programme");
+        throw exception::Quitter(noeud->begin(), "Arrêt du programme");
     }
 
     return {};

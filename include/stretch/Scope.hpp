@@ -35,7 +35,10 @@ public:
     void assigner(std::unique_ptr<pe::Noeud>& variable, Variable valeur);
 
     /////////////////////////////////////////////////
-    Variable lire(const std::string& nom);
+    bool existe(const std::string& nom);
+
+    /////////////////////////////////////////////////
+    Variable& lire(const std::string& nom);
 
 private:
     /////////////////////////////////////////////////
