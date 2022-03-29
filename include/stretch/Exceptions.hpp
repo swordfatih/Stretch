@@ -4,8 +4,10 @@
 /////////////////////////////////////////////////
 // Headers
 /////////////////////////////////////////////////
-#include <tao/pegtl.hpp>
 #include <exception>
+#include <tao/pegtl.hpp>
+
+#include <fmt/color.h>
 
 /////////////////////////////////////////////////
 namespace stretch::exception {
@@ -17,43 +19,59 @@ public:
     /////////////////////////////////////////////////
     explicit StretchException(const pe::position& position, const std::string& message = {}, const std::string& sujet = {}) : m_position(position), m_message(message), m_sujet(sujet)
     {
-        m_output = format(position, message, sujet);
+        
     }
 
     /////////////////////////////////////////////////
-    static std::string format(const pe::position& position, const std::string& message, const std::string& sujet)
+    void print()
     {
-        std::stringstream ss;
+        std::string output = fmt::format(fg(fmt::color::crimson) | fmt::emphasis::bold, "[erreur d'execution]\n");
+        output += fmt::format("fichier: ");
+        output += fmt::format(fg(fmt::color::pink), "{}\n", m_position.source);
+        output += fmt::format("    ligne: ");
+        output += fmt::format(fg(fmt::color::pink), "{}", m_position.line);
+        output += fmt::format(", colonne: ");
+        output += fmt::format(fg(fmt::color::pink), "{}\n", m_position.column);
+        
+        if(!m_message.empty()) 
+        {
+            output += fmt::format("message: ");
+            output += fmt::format(fg(fmt::color::pink) | fmt::emphasis::bold, "{}\n", m_message);
+        } 
 
-        ss << "\033[31;1m" << "[erreur d'execution]" << "\033[0m" << "\n";
-        ss << "fichier: " << "\033[35m" << position.source << "\033[0m" << "\n";
-        ss << tab << "ligne: " << "\033[35m" << std::to_string(position.line) << "\033[0m" << ", colonne: " << "\033[35m" << std::to_string(position.column) << "\033[0m" << "\n";
-        if(!message.empty()) ss << "message: " << "\033[35;1m" << message << "\033[0m" << "\n";
-        if(!sujet.empty()) ss << "sujet: " << "\033[35;1m" << sujet << "\033[0m" << "\n";
+        if(!m_sujet.empty()) 
+        {
+            output += fmt::format("sujet: ");
+            output += fmt::format(fg(fmt::color::pink) | fmt::emphasis::bold, "{}\n", m_sujet);
+        }
 
-        return ss.str();
+        fmt::print(stderr, "{}", output);
     }
 
     /////////////////////////////////////////////////
-    static std::string format(const pe::parse_error& e, const std::string_view& ligne)
+    static void print(const pe::parse_error& e, const std::string_view& ligne)
     {
-        std::stringstream ss;
         auto position = e.positions().front();
 
-        ss << "\033[31;1m" << "[erreur de syntaxe]" << "\033[0m" << "\n";
-        ss << "fichier: " << "\033[35m" << position.source << "\033[0m" << "\n";
-        ss << tab << "ligne: " << "\033[35m" << std::to_string(position.line) << "\033[0m" << ", colonne: " << "\033[35m" << std::to_string(position.column) << "\033[0m" << "\n";
-        ss << "message: " << "\033[35;1m" << e.message() << "\033[0m" << "\n";
-        ss << ligne << "\n";
-        ss << "\033[31;1m" << std::string(position.column, '-') << std::string(e.positions().size(), '^') << "\033[0m" << "\n";
+        std::string output = fmt::format(fg(fmt::color::crimson) | fmt::emphasis::bold, "[erreur de syntaxe]\n");
+        output += fmt::format("fichier: ");
+        output += fmt::format(fg(fmt::color::pink), "{}\n", position.source);
+        output += fmt::format("    ligne: ");
+        output += fmt::format(fg(fmt::color::pink), "{}", position.line);
+        output += fmt::format(", colonne: ");
+        output += fmt::format(fg(fmt::color::pink), "{}\n", position.column);  
+        output += fmt::format("message: ");
+        output += fmt::format(fg(fmt::color::pink) | fmt::emphasis::bold, "{}\n", e.message());
+        output += fmt::format("{}\n", ligne);
+        output += fmt::format(fg(fmt::color::crimson) | fmt::emphasis::bold, "{}{}\n", std::string(position.column, '-'), "^");
 
-        return ss.str();
+        fmt::print(stderr, "{}", output);
     }
 
     /////////////////////////////////////////////////
     char const* what() const noexcept override 
     { 
-        return m_output.data();
+        return m_message.c_str();
     }
 
 protected:

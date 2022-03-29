@@ -23,7 +23,7 @@ Tableau executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
     } 
     catch(exception::Runtime& e) 
     {
-        std::cerr << e.what() << std::endl;
+        e.print();
         return {};
     } 
 }
@@ -85,14 +85,17 @@ Tableau executer_internal(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
     /////////////////////////////////////////////////
     else if(noeud->template is_type< sortie >())
     {
-        for(int i = 0; i < noeud->children.size(); i++) {
-            if(i != 0)
-                std::cout << " ";
+        std::string output = {};
 
-            std::cout << evaluer(noeud->children[i], scope).to_string();
+        for(size_t i = 0; i < noeud->children.size(); i++) 
+        {
+            if(i != 0)
+                output += fmt::format(" ");
+
+            output += fmt::format("{}", evaluer(noeud->children[i], scope).to_string());
         }
 
-        std::cout << std::flush;
+        fmt::print("{}\n", output);
     }
     /////////////////////////////////////////////////
     else if(noeud->template is_type< repeter >())

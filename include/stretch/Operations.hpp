@@ -649,22 +649,6 @@ static std::map<
     }
 };
 
-/////////////////////////////////////////////////
-inline const Variable operer(const std::string_view& operateur, const Variable first, const Variable second) 
-{
-    if(operations.find(operateur) == operations.end()) {
-        throw std::runtime_error("L'opération " + static_cast<std::string>(operateur) + " n'existe pas");
-        return Variable();
-    } 
-
-    if(operations[operateur].find(std::make_pair(first.get_nature(), second.get_nature())) == operations[operateur].end()) {
-        throw std::runtime_error("L'opération " + static_cast<std::string>(operateur) + " n'est pas supporté pour les types " + Variable::type_tos(first.get_nature()) + " et " + Variable::type_tos(second.get_nature()));
-        return Variable();
-    }
-
-    return operations[operateur][std::make_pair(first.get_nature(), second.get_nature())](first, second);
-}
-
 } // namespace stretch::arithmetique
 
 #endif // OPERATIONS_HPP

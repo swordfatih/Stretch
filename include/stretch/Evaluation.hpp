@@ -60,12 +60,26 @@ inline Variable evaluer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
         return Variable(std::move(tableau));
     }
 
-    // operation unaire
-    if(noeud->children.size() == 1)
-        return stretch::arithmetique::operer(noeud->type, evaluer(noeud->children[0], scope), Variable());
+    // operation
+    std::string_view operation = noeud->type;
+    Variable first = evaluer(noeud->children.front(), scope);
+    Variable second = noeud->children.size() == 1 ? Variable() : evaluer(noeud->children.back(), scope);
 
-    // operation binaire
-    return stretch::arithmetique::operer(noeud->type, evaluer(noeud->children[0], scope), evaluer(noeud->children[1], scope));
+    // l'opération n'existe pas
+    if(arithmetique::operations.count(operation) == 0) 
+    {
+        throw stretch::exception::Runtime(noeud->begin(), "L'opération n'existe pas", noeud->string());
+        return Variable();
+    } 
+
+    // l'opération n'est pas supportée pour les types
+    if(arithmetique::operations[operation].count(std::make_pair(first.get_nature(), second.get_nature())) == 0) 
+    {
+        throw stretch::exception::Runtime(noeud->begin(), "L'opération n'est pas supporté pour ces types (" + Variable::type_tos(first.get_nature()) + " et " + Variable::type_tos(second.get_nature()) + ")", noeud->string());
+        return Variable();
+    }
+
+    return arithmetique::operations[operation][std::make_pair(first.get_nature(), second.get_nature())](first, second);
 }
 
 } // namespace stretch

@@ -82,7 +82,7 @@ struct operations : pe::list< operation, mot::virgule > {};
 /////////////////////////////////////////////////
 /// Assignation
 /////////////////////////////////////////////////
-struct assignation : pe::seq< pe::list< pe::seq< separateur, identifieur >, mot::virgule >, separateur, mot::fleche, separateur, operations > {}; // a, b, c <- 2, 5, 10
+struct assignation : pe::seq< pe::list< pe::seq< separateur, identifieur >, mot::virgule >, separateur, mot::fleche, separateur, pe::must< operations > > {}; // a, b, c <- 2, 5, 10
 
 /////////////////////////////////////////////////
 /// Conditions
@@ -90,25 +90,26 @@ struct assignation : pe::seq< pe::list< pe::seq< separateur, identifieur >, mot:
 template< typename... End>
 struct bloc;
 
-struct condition : pe::seq< mot::si, operation, pe::opt< mot::alors >, separateur, bloc< mot::fin, pe::at< mot::sinon > >, 
-                    pe::star< mot::sinon, separateur, mot::si, operation, pe::opt< mot::alors >, separateur, bloc< mot::fin, pe::at< mot::sinon > > >,
+struct condition : pe::seq< mot::si, pe::must< operation >, pe::opt< mot::alors >, separateur, bloc< mot::fin, pe::at< mot::sinon > >, 
+                    pe::star< mot::sinon, separateur, mot::si, pe::must< operation >, pe::opt< mot::alors >, separateur, bloc< mot::fin, pe::at< mot::sinon > > >,
                     pe::opt< mot::sinon, separateur, bloc< mot::fin > > > {};
 
 /////////////////////////////////////////////////
 /// Boucles
 /////////////////////////////////////////////////
 struct ranger : pe::opt_must< pe::seq< separateur, mot::dans, separateur >, identifieur > {}; // ranger la valeur actuelle dans une variable
-struct repeter : pe::seq< mot::repeter, operation, mot::fois, ranger, separateur, bloc< mot::fin > > {};
-struct tant_que : pe::seq< mot::tant, separateur, mot::que, operation, pe::opt< mot::faire, separateur >, bloc< mot::fin > > {};
-struct pour_chaque : pe::seq< mot::pour, separateur, mot::chaque, separateur, pe::must< identifieur >, separateur, mot::dans, separateur, operation, separateur, pe::opt< mot::faire, separateur >, bloc< mot::fin > > {};
+struct repeter : pe::seq< mot::repeter, pe::must< operation >, pe::must< mot::fois >, ranger, separateur, bloc< mot::fin > > {};
+struct tant_que : pe::seq< mot::tant, separateur, pe::must< mot::que >, pe::must< operation >, pe::opt< mot::faire, separateur >, bloc< mot::fin > > {};
+struct pour_chaque : pe::seq< mot::pour, separateur, pe::must< mot::chaque >, separateur, pe::must< identifieur >, separateur, pe::must< mot::dans >, separateur, pe::must< operation >, separateur, pe::opt< mot::faire, separateur >, bloc< mot::fin > > {};
 struct boucle : pe::sor< repeter, pour_chaque, tant_que > {};
 
 /////////////////////////////////////////////////
 /// Fonctions
 /////////////////////////////////////////////////
-struct retour : pe::seq< pe::sor< mot::sortir, mot::retourner >, pe::opt< separateur, mot::avec, separateur, operations > > {};
+struct retour : pe::seq< pe::sor< mot::sortir, mot::retourner >, pe::opt_must< pe::seq< separateur, mot::avec, separateur >, operations > > {};
 
-struct parametres : pe::opt< mot::fleche, pe::list< pe::seq< separateur, pe::must< identifieur > >, mot::virgule > > {};
+struct identifieurs : pe::list< pe::seq< separateur, identifieur >, mot::virgule > {};
+struct parametres : pe::opt_must< mot::fleche, identifieurs > {};
 struct definition : pe::seq< mot::fonction, separateur, pe::must< identifieur >, separateur, parametres, separateur, bloc< mot::fin > > {};
 
 struct appel : pe::seq< mot::parenthese_ouvrante, separateur, pe::opt< operations >, separateur, mot::parenthese_fermante > {};
@@ -117,7 +118,7 @@ struct appel : pe::seq< mot::parenthese_ouvrante, separateur, pe::opt< operation
 /// Instructions standards
 /////////////////////////////////////////////////
 struct sortie : pe::seq< mot::afficher, separateur, operations > {};
-struct entree : pe::seq< mot::lire, separateur, mot::dans, separateur, pe::must< identifieur > > {};
+struct entree : pe::seq< mot::lire, separateur, pe::must< mot::dans >, separateur, pe::must< identifieur > > {};
 
 /////////////////////////////////////////////////
 /// Blocs d'instructions
