@@ -90,9 +90,9 @@ struct assignation : pe::seq< pe::list< pe::seq< separateur, identifieur >, mot:
 template< typename... End>
 struct bloc;
 
-struct condition : pe::seq< mot::si, operation, pe::opt< mot::alors >, separateur, bloc< mot::fin, mot::sinon >, 
-                    pe::star< separateur, mot::si, operation, pe::opt< mot::alors >, separateur, bloc< mot::fin, mot::sinon > >,
-                    pe::opt< separateur, bloc< mot::fin > > > {};
+struct condition : pe::seq< mot::si, operation, pe::opt< mot::alors >, separateur, bloc< mot::fin, pe::at< mot::sinon > >, 
+                    pe::star< mot::sinon, separateur, mot::si, operation, pe::opt< mot::alors >, separateur, bloc< mot::fin, pe::at< mot::sinon > > >,
+                    pe::opt< mot::sinon, separateur, bloc< mot::fin > > > {};
 
 /////////////////////////////////////////////////
 /// Boucles

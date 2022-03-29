@@ -4,6 +4,6 @@
 si faux
 
 
-fin
 
 a <- 5
+fin

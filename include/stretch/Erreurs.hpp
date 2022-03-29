@@ -20,7 +20,7 @@ template<> inline constexpr auto error_message< operation > = "Il faut mettre un
 template<> inline constexpr auto error_message< identifieur > = "Il faut mettre un nom de variable ici (verifie que le nom n'est pas un mot reserve)";
 
 template<> inline constexpr auto error_message< pe::sor< mot::fin > > = "Il faut mettre 'fin' pour terminer le bloc";
-template<> inline constexpr auto error_message< pe::sor< mot::fin, mot::sinon > > = "Il faut 'fin' pour terminer la condition";
+template<> inline constexpr auto error_message< pe::sor< mot::fin, pe::at< mot::sinon > > > = "Il faut 'fin' pour terminer la condition";
 template<> inline constexpr auto error_message< pe::sor< pe::eof > > = "Le fichier n'a pas de fin ?!";
 
 template<> inline constexpr auto error_message< instruction > = "Ce n'est pas une instruction valide";
