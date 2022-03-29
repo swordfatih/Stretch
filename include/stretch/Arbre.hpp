@@ -90,7 +90,6 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         booleen,
         chaine,
         variable,
-        alias,
         tableau,
 
         // operation unaire

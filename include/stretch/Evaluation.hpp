@@ -27,11 +27,11 @@ inline Variable evaluer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
 
         std::string nom = noeud->children.front()->string();
         if(!Fonction::existe(nom))
-            throw exception::Runtime(noeud->children.front()->begin(), "La fonction n'existe pas.", nom);
+            throw exception::Runtime(noeud->children.front()->begin(), "La fonction n'existe pas (verifie que t'as bien mis le bon nom, les majuscules comptent)", nom);
 
         Fonction& fonction = Fonction::recuperer(nom);
         if(valeurs.size() != fonction.get_parametres().size() || valeurs.empty() && !fonction.get_parametres().empty()) 
-            throw exception::Runtime(noeud->begin(), "La fonction n'a pas le bon nombre de paramètres.", noeud->string());
+            throw exception::Runtime(noeud->begin(), "La fonction n'a pas le bon nombre de parametres", noeud->string());
 
         Tableau&& retour = Fonction::invoquer(scope, nom, valeurs);
         
@@ -41,7 +41,7 @@ inline Variable evaluer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
     // variable
     if(noeud->template is_type< variable >()) {
         if(!scope.existe(noeud->string()))
-            throw exception::Runtime(noeud->begin(), "La variable est inconnue.", noeud->string());
+            throw exception::Runtime(noeud->begin(), "La variable est inconnue (verifie que t'as bien mis le bon nom ou que t'y as acces depuis ce bloc)", noeud->string());
 
         return scope.lire(noeud->string());
     }   
@@ -62,10 +62,10 @@ inline Variable evaluer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
 
     // operation unaire
     if(noeud->children.size() == 1)
-        return stretch::operer(noeud->type, evaluer(noeud->children[0], scope), Variable());
+        return stretch::arithmetique::operer(noeud->type, evaluer(noeud->children[0], scope), Variable());
 
     // operation binaire
-    return stretch::operer(noeud->type, evaluer(noeud->children[0], scope), evaluer(noeud->children[1], scope));
+    return stretch::arithmetique::operer(noeud->type, evaluer(noeud->children[0], scope), evaluer(noeud->children[1], scope));
 }
 
 } // namespace stretch

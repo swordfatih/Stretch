@@ -109,6 +109,12 @@ struct pas : pe::istring< 'p', 'a', 's' > {};
 struct afficher : pe::istring< 'a', 'f', 'f', 'i', 'c', 'h', 'e', 'r' > {};
 struct lire : pe::istring< 'l', 'i', 'r', 'e' > {};
 
+// Mot clés
+struct cles : pe::sor< symbole::plus, symbole::moins, symbole::division, symbole::fois, symbole::modulo, commentaire, fin, tant, 
+    que, repeter, fois, dans, pour, chaque, faire, arreter, continuer, si, sinon, alors, fleche, fonction, sortir, retourner, avec, quitter,
+    vrai, faux, crochet_ouvrant, crochet_fermant, parenthese_ouvrante, parenthese_fermante, virgule, point, guillemets, apostrophe, echappeur,
+    taille, nature, reste, et, ou, non, indice, de, plus, petit, grand, egal, est, different, nest, pas, afficher, lire > {};
+
 } // namespace stretch::mot
 
 #endif // MOTS_HPP

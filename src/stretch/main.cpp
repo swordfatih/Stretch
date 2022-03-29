@@ -7,6 +7,7 @@
 
 #include "stretch/Execution.hpp"
 #include "stretch/Standard.hpp"
+#include "stretch/Erreurs.hpp"
 
 #include <iostream>
 
@@ -28,12 +29,11 @@ int main(int argc, char *argv[])
     std::string filename{argv[1]};
     pe::file_input in(filename); 
 
-    auto root = pe::parse_tree::parse< stretch::grammaire, stretch::selector >(in);
-
-    pe::parse_tree::print_dot(std::cout, *root);
-
     try
     {
+        auto root = pe::parse_tree::parse< stretch::grammaire, stretch::selector, pe::nothing, stretch::control >( in );
+        pe::parse_tree::print_dot(std::cout, *root);
+        
         stretch::standard::charger();
         
         stretch::Fonction::enregistrer("main", stretch::Fonction(root));
@@ -41,10 +41,14 @@ int main(int argc, char *argv[])
         stretch::Scope scope;
         executer(root, scope);
     }
+    catch(const pe::parse_error& e)
+    {
+        std::cout << stretch::exception::StretchException::format(e, in.line_at(e.positions().front())) << std::endl;
+    }
     catch(const stretch::exception::Quitter& e) 
     {            
         std::cerr << e.what() << std::endl;                 
-        return 0;
+        return 1;
     }
     
     return 0;

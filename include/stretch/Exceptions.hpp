@@ -4,7 +4,7 @@
 /////////////////////////////////////////////////
 // Headers
 /////////////////////////////////////////////////
-#include <tao/pegtl/position.hpp>
+#include <tao/pegtl.hpp>
 #include <exception>
 
 /////////////////////////////////////////////////
@@ -15,18 +15,39 @@ class StretchException : public std::exception
 {
 public:
     /////////////////////////////////////////////////
-    explicit StretchException(const pe::position& position, std::string message = {}, std::string sujet = {}) : m_position(position), m_message(message), m_sujet(sujet) 
+    explicit StretchException(const pe::position& position, const std::string& message = {}, const std::string& sujet = {}) : m_position(position), m_message(message), m_sujet(sujet)
     {
-        m_output = "[exception]\n";
-        m_output += "   - fichier: " + m_position.source + "\n";
-        m_output += "   - ligne: " + std::to_string(m_position.line) + "\n";
-        m_output += "   - colonne: " + std::to_string(m_position.column) + "\n";
-        
-        if(!m_sujet.empty())
-            m_output += "   - sujet: " + m_sujet + "\n";
+        m_output = format(position, message, sujet);
+    }
 
-        if(!m_message.empty())
-            m_output += "   - message: " + m_message + "\n";
+    /////////////////////////////////////////////////
+    static std::string format(const pe::position& position, const std::string& message, const std::string& sujet)
+    {
+        std::stringstream ss;
+
+        ss << "\033[31;1m" << "[erreur d'execution]" << "\033[0m" << "\n";
+        ss << "fichier: " << "\033[35m" << position.source << "\033[0m" << "\n";
+        ss << tab << "ligne: " << "\033[35m" << std::to_string(position.line) << "\033[0m" << ", colonne: " << "\033[35m" << std::to_string(position.column) << "\033[0m" << "\n";
+        if(!message.empty()) ss << "message: " << "\033[35;1m" << message << "\033[0m" << "\n";
+        if(!sujet.empty()) ss << "sujet: " << "\033[35;1m" << sujet << "\033[0m" << "\n";
+
+        return ss.str();
+    }
+
+    /////////////////////////////////////////////////
+    static std::string format(const pe::parse_error& e, const std::string_view& ligne)
+    {
+        std::stringstream ss;
+        auto position = e.positions().front();
+
+        ss << "\033[31;1m" << "[erreur de syntaxe]" << "\033[0m" << "\n";
+        ss << "fichier: " << "\033[35m" << position.source << "\033[0m" << "\n";
+        ss << tab << "ligne: " << "\033[35m" << std::to_string(position.line) << "\033[0m" << ", colonne: " << "\033[35m" << std::to_string(position.column) << "\033[0m" << "\n";
+        ss << "message: " << "\033[35;1m" << e.message() << "\033[0m" << "\n";
+        ss << ligne << "\n";
+        ss << "\033[31;1m" << std::string(position.column, '-') << std::string(e.positions().size(), '^') << "\033[0m" << "\n";
+
+        return ss.str();
     }
 
     /////////////////////////////////////////////////
@@ -36,10 +57,15 @@ public:
     }
 
 protected:
+    /////////////////////////////////////////////////
     pe::position m_position;
     std::string m_message;
     std::string m_sujet;
     std::string m_output;
+
+private:
+    /////////////////////////////////////////////////
+    inline static const std::string tab = std::string(4, ' ');
 };
 
 /////////////////////////////////////////////////

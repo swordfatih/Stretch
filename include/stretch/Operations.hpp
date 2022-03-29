@@ -11,7 +11,7 @@
 #include <cmath>
 
 /////////////////////////////////////////////////
-namespace stretch
+namespace stretch::arithmetique
 {
 
 /////////////////////////////////////////////////
@@ -665,6 +665,6 @@ inline const Variable operer(const std::string_view& operateur, const Variable f
     return operations[operateur][std::make_pair(first.get_nature(), second.get_nature())](first, second);
 }
 
-} // namespace stretch
+} // namespace stretch::arithmetique
 
 #endif // OPERATIONS_HPP
