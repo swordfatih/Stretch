@@ -35,7 +35,7 @@ public:
     std::vector<std::string>& get_parametres();
 
     /////////////////////////////////////////////////
-    static Fonction& enregistrer(const std::string& nom, Fonction fonction);
+    static void enregistrer(const std::string& nom, Fonction fonction);
 
     /////////////////////////////////////////////////
     static bool existe(const std::string& nom);
@@ -44,7 +44,7 @@ public:
     static Fonction& recuperer(const std::string& nom);
 
     /////////////////////////////////////////////////
-    static Tableau invoquer(Scope& parent, const std::string& nom, const Tableau& valeurs);
+    static void invoquer(Scope& parent, const std::string& nom, const Tableau& valeurs);
 
     /////////////////////////////////////////////////
     /// @brief Affichage
@@ -62,7 +62,7 @@ public:
 private:
     /////////////////////////////////////////////////
     std::vector<std::string> m_parametres;              ///< paramètres de la fonction
-    std::unique_ptr<pe::Noeud>& m_root;                     ///< noeud racine de la fonction
+    std::unique_ptr<pe::Noeud>& m_root;                 ///< noeud racine de la fonction
     std::function<Tableau(const Tableau&)> m_interne;   ///< fonction interne
 };
 

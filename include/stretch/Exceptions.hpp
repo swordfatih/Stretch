@@ -13,17 +13,17 @@
 namespace stretch::exception {
 
 /////////////////////////////////////////////////
-class StretchException : public std::exception
+class Runtime
 {
 public:
     /////////////////////////////////////////////////
-    explicit StretchException(const pe::position& position, const std::string& message = {}, const std::string& sujet = {}) : m_position(position), m_message(message), m_sujet(sujet)
+    Runtime(const pe::position& position, const std::string& message = {}, const std::string& sujet = {}) : m_position(position), m_message(message), m_sujet(sujet)
     {
         
     }
 
     /////////////////////////////////////////////////
-    void print()
+    void print() const
     {
         std::string output = fmt::format(fg(fmt::color::crimson) | fmt::emphasis::bold, "[erreur d'execution]\n");
         output += fmt::format("fichier: ");
@@ -68,32 +68,26 @@ public:
         fmt::print(stderr, "{}", output);
     }
 
-    /////////////////////////////////////////////////
-    char const* what() const noexcept override 
-    { 
-        return m_message.c_str();
-    }
-
-protected:
+private:
     /////////////////////////////////////////////////
     pe::position m_position;
     std::string m_message;
     std::string m_sujet;
     std::string m_output;
-
-private:
-    /////////////////////////////////////////////////
-    inline static const std::string tab = std::string(4, ' ');
 };
 
 /////////////////////////////////////////////////
-class Quitter : public StretchException 
+class Quitter 
 {
-    using StretchException::StretchException;
+    /////////////////////////////////////////////////
+    Boucle()
+    {
+
+    }
 };
 
 /////////////////////////////////////////////////
-class Boucle : public StretchException 
+class Boucle
 {
 public:
     /////////////////////////////////////////////////
@@ -103,7 +97,10 @@ public:
     };
 
     /////////////////////////////////////////////////
-    explicit Boucle(Type type, pe::position position, std::string message = {}) : m_type(type), StretchException(position, message) {}
+    Boucle(Type type) : m_type(type)
+    {
+
+    }
 
     /////////////////////////////////////////////////
     Type get_type() const 
@@ -117,9 +114,24 @@ private:
 };
 
 /////////////////////////////////////////////////
-class Runtime : public StretchException
+class Retour
 {
-    using StretchException::StretchException;
+public:
+    /////////////////////////////////////////////////
+    Retour(const Tableau& retour) : m_retour(retour)
+    {
+
+    }
+
+    /////////////////////////////////////////////////
+    Tableau& get_retour() 
+    {
+        return m_retour;
+    }
+
+private:
+    /////////////////////////////////////////////////
+    Tableau m_retour;
 };
 
 } // namespace stretch

@@ -89,18 +89,20 @@ struct assignation : pe::seq< pe::list< pe::seq< separateur, identifieur >, mot:
 ///////////////////////////////////////////////// 
 template< typename... End>
 struct bloc;
+struct bloc_generique;
+struct bloc_condition;
 
-struct condition : pe::seq< mot::si, pe::must< operation >, pe::opt< mot::alors >, separateur, bloc< mot::fin, pe::at< mot::sinon > >, 
-                    pe::star< mot::sinon, separateur, mot::si, pe::must< operation >, pe::opt< mot::alors >, separateur, bloc< mot::fin, pe::at< mot::sinon > > >,
-                    pe::opt< mot::sinon, separateur, bloc< mot::fin > > > {};
+struct condition : pe::seq< mot::si, pe::must< operation >, pe::opt< mot::alors >, separateur, bloc_condition, 
+                    pe::star< mot::sinon, separateur, mot::si, pe::must< operation >, pe::opt< mot::alors >, separateur, bloc_condition >,
+                    pe::opt< mot::sinon, separateur, bloc_generique > > {};
 
 /////////////////////////////////////////////////
 /// Boucles
 /////////////////////////////////////////////////
 struct ranger : pe::opt_must< pe::seq< separateur, mot::dans, separateur >, identifieur > {}; // ranger la valeur actuelle dans une variable
-struct repeter : pe::seq< mot::repeter, pe::must< operation >, pe::must< mot::fois >, ranger, separateur, bloc< mot::fin > > {};
-struct tant_que : pe::seq< mot::tant, separateur, pe::must< mot::que >, pe::must< operation >, pe::opt< mot::faire, separateur >, bloc< mot::fin > > {};
-struct pour_chaque : pe::seq< mot::pour, separateur, pe::must< mot::chaque >, separateur, pe::must< identifieur >, separateur, pe::must< mot::dans >, separateur, pe::must< operation >, separateur, pe::opt< mot::faire, separateur >, bloc< mot::fin > > {};
+struct repeter : pe::seq< mot::repeter, pe::must< operation >, pe::must< mot::fois >, ranger, separateur, bloc_generique > {};
+struct tant_que : pe::seq< mot::tant, separateur, pe::must< mot::que >, pe::must< operation >, pe::opt< mot::faire, separateur >, bloc_generique > {};
+struct pour_chaque : pe::seq< mot::pour, separateur, pe::must< mot::chaque >, separateur, pe::must< identifieur >, separateur, pe::must< mot::dans >, separateur, pe::must< operation >, separateur, pe::opt< mot::faire, separateur >, bloc_generique > {};
 struct boucle : pe::sor< repeter, pour_chaque, tant_que > {};
 
 /////////////////////////////////////////////////
@@ -110,9 +112,10 @@ struct retour : pe::seq< pe::sor< mot::sortir, mot::retourner >, pe::opt_must< p
 
 struct identifieurs : pe::list< pe::seq< separateur, identifieur >, mot::virgule > {};
 struct parametres : pe::opt_must< mot::fleche, identifieurs > {};
-struct definition : pe::seq< mot::fonction, separateur, pe::must< identifieur >, separateur, parametres, separateur, bloc< mot::fin > > {};
+struct definition : pe::seq< mot::fonction, separateur, pe::must< identifieur >, separateur, parametres, separateur, bloc_generique > {};
 
-struct appel : pe::seq< mot::parenthese_ouvrante, separateur, pe::opt< operations >, separateur, mot::parenthese_fermante > {};
+struct appel : pe::seq< mot::parenthese_ouvrante, separateur, pe::opt< operations >, separateur, pe::must< mot::parenthese_fermante > > {};
+struct appel_fonction : pe::seq< identifieur, separateur, appel > {};
 
 /////////////////////////////////////////////////
 /// Instructions standards
@@ -123,15 +126,18 @@ struct entree : pe::seq< mot::lire, separateur, pe::must< mot::dans >, separateu
 /////////////////////////////////////////////////
 /// Blocs d'instructions
 /////////////////////////////////////////////////
-struct instruction : pe::sor< mot::arreter, retour, mot::quitter, entree, sortie, mot::continuer, definition, condition, boucle, assignation > {};
+struct instruction : pe::sor< mot::arreter, retour, mot::quitter, entree, sortie, mot::continuer, definition, condition, boucle, assignation, appel_fonction > {};
 
-template< typename... End >
+template< typename... End > 
 struct bloc : pe::seq< pe::star< pe::not_at< pe::sor< End... > >, pe::if_must< pe::at< pe::minus< pe::any, separateur > >, instruction >, separateur >, pe::must< pe::sor< End... > > > {};
+struct bloc_condition : bloc< mot::fin, pe::at< mot::sinon > > {};
+struct bloc_generique : bloc< mot::fin > {};
 
 /////////////////////////////////////////////////
 /// Grammaire
 /////////////////////////////////////////////////
-struct fichier : pe::seq< pe::bof, separateur, bloc< pe::eof > > {};
+struct bloc_fichier : bloc< pe::eof > {};
+struct fichier : pe::seq< pe::bof, separateur, bloc_fichier > {};
 struct grammaire : fichier {};
 
 } // namespace stretch

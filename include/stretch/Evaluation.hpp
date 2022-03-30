@@ -17,31 +17,51 @@ namespace pe = tao::pegtl;
 namespace stretch {
 
 /////////////////////////////////////////////////
+Variable evaluer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope);
+
+/////////////////////////////////////////////////
+inline Variable evaluer_fonction(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
+{
+    Tableau valeurs;
+
+    for(size_t i = 1; i < noeud->children.size(); ++i)
+        valeurs.push_back(evaluer(noeud->children[i], scope));
+
+    std::string nom = noeud->children.front()->string();
+    if(!Fonction::existe(nom))
+        throw exception::Runtime(noeud->children.front()->begin(), "La fonction n'existe pas (vérifie que t'as bien mis le bon nom, les majuscules comptent)", nom);
+
+    Fonction& fonction = Fonction::recuperer(nom);
+    if(valeurs.size() != fonction.get_parametres().size() || valeurs.empty() && !fonction.get_parametres().empty()) 
+        throw exception::Runtime(noeud->begin(), "La fonction n'a pas le bon nombre de paramètres", noeud->string());
+
+    try 
+    {
+        Fonction::invoquer(scope, nom, valeurs);
+    }
+    catch(exception::Retour& e) // S'il y a une valeur de retour
+    {
+        Tableau& retour = e.get_retour();
+        return retour.size() == 1 ? retour[0] : Variable(retour);
+    }
+    
+    return Variable();
+}
+
+/////////////////////////////////////////////////
 inline Variable evaluer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope) 
 {
     // appel de fonction
-    if(noeud->template is_type< appel >()) {
-        Tableau valeurs;
-        for(size_t i = 1; i < noeud->children.size(); ++i)
-            valeurs.push_back(evaluer(noeud->children[i], scope));
-
-        std::string nom = noeud->children.front()->string();
-        if(!Fonction::existe(nom))
-            throw exception::Runtime(noeud->children.front()->begin(), "La fonction n'existe pas (verifie que t'as bien mis le bon nom, les majuscules comptent)", nom);
-
-        Fonction& fonction = Fonction::recuperer(nom);
-        if(valeurs.size() != fonction.get_parametres().size() || valeurs.empty() && !fonction.get_parametres().empty()) 
-            throw exception::Runtime(noeud->begin(), "La fonction n'a pas le bon nombre de parametres", noeud->string());
-
-        Tableau&& retour = Fonction::invoquer(scope, nom, valeurs);
-        
-        return retour.empty() ? Variable() : (retour.size() == 1 ? retour[0] : Variable(std::move(retour)));
+    if(noeud->template is_type< appel >()) 
+    {
+        return evaluer_fonction(noeud, scope);
     }
 
     // variable
-    if(noeud->template is_type< variable >()) {
+    if(noeud->template is_type< variable >()) 
+    {
         if(!scope.existe(noeud->string()))
-            throw exception::Runtime(noeud->begin(), "La variable est inconnue (verifie que t'as bien mis le bon nom ou que t'y as acces depuis ce bloc)", noeud->string());
+            throw exception::Runtime(noeud->begin(), "La variable est inconnue (vérifie que t'as bien mis le bon nom et que t'y as acces depuis ce bloc)", noeud->string());
 
         return scope.lire(noeud->string());
     }   
