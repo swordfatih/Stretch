@@ -27,17 +27,13 @@ inline Variable evaluer_fonction(std::unique_ptr<pe::Noeud>& noeud, Scope& scope
     for(size_t i = 1; i < noeud->children.size(); ++i)
         valeurs.push_back(evaluer(noeud->children[i], scope));
 
-    std::string nom = noeud->children.front()->string();
-    if(!Fonction::existe(nom))
-        throw exception::Runtime(noeud->children.front()->begin(), "La fonction n'existe pas (vérifie que t'as bien mis le bon nom, les majuscules comptent)", nom);
-
-    Fonction& fonction = Fonction::recuperer(nom);
-    if(valeurs.size() != fonction.get_parametres().size() || valeurs.empty() && !fonction.get_parametres().empty()) 
-        throw exception::Runtime(noeud->begin(), "La fonction n'a pas le bon nombre de paramètres", noeud->string());
-
     try 
     {
-        Fonction::invoquer(scope, nom, valeurs);
+        Fonction::invoquer(scope, noeud->children.front()->string(), valeurs);
+    }
+    catch(const std::runtime_error& e)
+    {
+        throw stretch::exception::Runtime(noeud->begin(), e.what(), noeud->string());
     }
     catch(exception::Retour& e) // S'il y a une valeur de retour
     {

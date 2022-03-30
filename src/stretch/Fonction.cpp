@@ -31,7 +31,7 @@ std::vector<std::string>& Fonction::get_parametres()
 void Fonction::enregistrer(const std::string& nom, Fonction fonction) 
 {
     if(existe(nom))
-        throw std::runtime_error("La fonction " + nom + " est déjà enregistrée.");
+        throw std::runtime_error("Le nom de la fonction existe deja, essaye un autre nom.");
 
     definitions.insert(std::make_pair(nom, std::move(fonction)));
 }
@@ -48,7 +48,7 @@ Fonction& Fonction::recuperer(const std::string& nom)
     if(existe(nom))
         return definitions.at(nom);
 
-    throw std::runtime_error("La fonction " + nom + " n'est pas enregistree");
+    throw std::runtime_error("La fonction n'existe pas (vérifie que t'as bien mis le bon nom, les majuscules comptent)");
 }
 
 /////////////////////////////////////////////////

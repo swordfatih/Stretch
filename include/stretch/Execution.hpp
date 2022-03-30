@@ -195,9 +195,6 @@ void executer_internal(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
     /////////////////////////////////////////////////
     else if(noeud->template is_type< definition >())
     {
-        if(Fonction::existe(noeud->children.front()->string()))
-            throw stretch::exception::Runtime(noeud->children.front()->begin(), "Le nom de la fonction existe deja, essaye un autre nom", noeud->children.front()->string());
-
         std::vector<std::string> params;
 
         // puis on récupère tous les noms de parametres (tous les fils de stretch::parametres) jusqu'à atteindre le fond 
@@ -207,8 +204,14 @@ void executer_internal(std::unique_ptr<pe::Noeud>& noeud, Scope& scope)
                 params.push_back(noeud->children[1]->children[i]->string());
         }
 
-        // noeud->children.front() = nom de la fonction
-        Fonction::enregistrer(noeud->children.front()->string(), Fonction(noeud->children.back(), params));
+        try
+        {
+            Fonction::enregistrer(noeud->children.front()->string(), Fonction(noeud->children.back(), params));
+        }
+        catch(const std::runtime_error& e)
+        {
+            throw stretch::exception::Runtime(noeud->children.front()->begin(), e.what(), noeud->children.front()->string());
+        }
     }
     /////////////////////////////////////////////////
     else if(noeud->template is_type< appel >())

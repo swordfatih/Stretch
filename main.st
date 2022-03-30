@@ -1,11 +1,18 @@
 
-a <- 5
+a <- tailler("   salut   ")
+afficher a
+
+b <- separer("salut" + "cc", ",")
 
 fonction nombre_magique <- nombre
     entree <- 0
 
     afficher "Ecrivez votre nombre"
+
     lire dans entree
+    tant que nature de entree egal "chaine"
+        lire dans entree
+    fin
 
     si nombre plus grand que entree 
         afficher "📈 Plus grand"
