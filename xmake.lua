@@ -9,6 +9,7 @@ target("stretch")
 	add_includedirs("include/")
 	add_files("src/stretch/*.cpp")
 	add_files("src/decimal/*.cpp")
+	add_files("src/main.cpp")
 	add_packages("pegtl-nocmake", "fmt-nocmake")
 	add_rules("mode.debug")
 
