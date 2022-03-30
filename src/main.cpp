@@ -9,6 +9,7 @@
 #include "stretch/Execution.hpp"
 #include "stretch/Standard.hpp"
 #include "stretch/Erreurs.hpp"
+#include "stretch/Output.hpp"
 
 /////////////////////////////////////////////////
 #include <algorithm> // pour les arguments
@@ -45,25 +46,36 @@ bool option_exists(char** begin, char** end, const std::string& option)
 int main(int argc, char *argv[])
 {
     /////////////////////////////////////////////////
+    /// Desactiver les couleurs
+    /////////////////////////////////////////////////
+    if(option_exists(argv, argv + argc, "-c")) 
+    {
+        stretch::output::disable_color = true;
+    }
+
+    /////////////////////////////////////////////////
     /// Affichage des options
     /////////////////////////////////////////////////
     if(option_exists(argv, argv + argc, "-h") || argc == 1) 
     {
-        fmt::print("Usage: ");
-        fmt::print(fg(fmt::color::peach_puff) | fmt::emphasis::bold, "{}", argv[0]);
-        fmt::print(fg(fmt::color::powder_blue), " -f <fichier> [options]\n");
-        fmt::print(fg(fmt::color::pale_green) | fmt::emphasis::bold, " -f <fichier>");
-        fmt::print(": fichier a executer\n");
-        fmt::print(fg(fmt::color::pale_green) | fmt::emphasis::bold, " -h");
-        fmt::print(": affiche cette aide\n");
-        fmt::print(fg(fmt::color::pale_green) | fmt::emphasis::bold, " -v");
-        fmt::print(": affiche la version\n");
-        fmt::print(fg(fmt::color::pale_green) | fmt::emphasis::bold, " -t");
-        fmt::print(": affiche l'arbre de la syntaxe abstraite\n");
-        fmt::print(fg(fmt::color::pale_green) | fmt::emphasis::bold, " -s");
-        fmt::print(": desactive les fonctions standards\n");
-        fmt::print(fg(fmt::color::pale_green) | fmt::emphasis::bold, " -g");
-        fmt::print(": desactive l'analyse de la grammaire\n");
+        std::string output = fmt::format("Usage: ");
+        output += stretch::output::format(fg(fmt::color::powder_blue), "<stretch> -f <fichier> [options]\n");
+        output += stretch::output::format(fg(fmt::color::pale_green) | fmt::emphasis::bold, " -f <fichier>");
+        output += fmt::format(": fichier a executer\n"); 
+        output += stretch::output::format(fg(fmt::color::pale_green) | fmt::emphasis::bold, " -h");
+        output += fmt::format(": affiche cette aide\n");
+        output += stretch::output::format(fg(fmt::color::pale_green) | fmt::emphasis::bold, " -v");
+        output += fmt::format(": affiche la version\n");
+        output += stretch::output::format(fg(fmt::color::pale_green) | fmt::emphasis::bold, " -t");
+        output += fmt::format(": affiche l'arbre de la syntaxe abstraite\n");
+        output += stretch::output::format(fg(fmt::color::pale_green) | fmt::emphasis::bold, " -s");
+        output += fmt::format(": desactive les fonctions standards\n");
+        output += stretch::output::format(fg(fmt::color::pale_green) | fmt::emphasis::bold, " -g");
+        output += fmt::format(": desactive l'analyse de la grammaire\n");
+        output += stretch::output::format(fg(fmt::color::pale_green) | fmt::emphasis::bold, " -c");
+        output += fmt::format(": desactiver les couleurs\n"); 
+
+        fmt::print("{}\n", output);
 
         return 0;
     }
@@ -71,16 +83,17 @@ int main(int argc, char *argv[])
     /////////////////////////////////////////////////
     /// Affichage de la version
     /////////////////////////////////////////////////
-    if(option_exists(argv, argv + argc, "-v") || argc == 1) 
+    if(option_exists(argv, argv + argc, "-v")) 
     {
-        fmt::print(fg(fmt::color::honey_dew), "Stretch. Version: 0.0.1");
+        fmt::print("{}\n", stretch::output::format(fg(fmt::color::honey_dew), "Stretch. Version: 0.0.1"));
         return 0;
     }
 
     /////////////////////////////////////////////////
     /// Précondition, analyse de la grammaire
     /////////////////////////////////////////////////
-    if(!option_exists(argv, argv + argc, "-g") && pe::analyze< stretch::grammaire >(1)) {
+    if(!option_exists(argv, argv + argc, "-g") && pe::analyze< stretch::grammaire >(1)) 
+    {
         fmt::print(stderr, "La grammaire n'est pas valide");
         return 1;
     }

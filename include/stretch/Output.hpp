@@ -1,0 +1,24 @@
+#ifndef OUTPUT_HPP
+#define OUTPUT_HPP
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include <fmt/color.h>
+
+/////////////////////////////////////////////////
+namespace stretch::output {
+
+/////////////////////////////////////////////////
+inline bool disable_color = false;
+
+/////////////////////////////////////////////////
+template <typename... Args>
+std::string format(const fmt::text_style& ts, const Args&... args) 
+{
+    return fmt::format(disable_color ? fmt::text_style() : ts, args...);
+}
+
+} // namespace output
+
+#endif // OUTPUT_HPP

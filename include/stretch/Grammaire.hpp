@@ -73,8 +73,8 @@ struct operation_produit : pe::list< operation_indice, pe::sor< multiplication, 
 struct operation_somme : pe::list< operation_produit, pe::sor< addition, soustraction > > {};
 struct operation_ordre : pe::list< operation_somme, pe::seq< pe::sor< inferieur, superieur > /*, pe::opt< separateur, ou, separateur, egalite > */ > > {};
 struct operation_egalite : pe::list< operation_ordre, pe::sor< egalite, inegalite > > {};
-struct operation_et : pe::list< operation_egalite, pe::sor< mot::et > > {}; 
-struct operation_ou : pe::list< operation_et, pe::sor< mot::ou > > {};
+struct operation_et : pe::list< operation_egalite, pe::sor< et > > {}; 
+struct operation_ou : pe::list< operation_et, pe::sor< ou > > {};
 
 struct operation : operation_ou {};
 struct operations : pe::list< operation, mot::virgule > {};

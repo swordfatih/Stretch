@@ -18,6 +18,11 @@ static std::mt19937 generator(device());
 /////////////////////////////////////////////////
 Tableau aleatoire(const Tableau& valeurs) 
 {
+    if(valeurs[0].get_nature() != Nature::Reel || valeurs[1].get_nature() != Nature::Reel || valeurs[2].get_nature() != Nature::Booleen) 
+    {
+        throw std::runtime_error("Les paramètres doivent être un réel, un réel et un booléen.");
+    }
+
     BigDecimal from = std::get< BigDecimal >(valeurs[0].get_valeur());
     BigDecimal to = std::get< BigDecimal >(valeurs[1].get_valeur());
     BigDecimal resultat;
@@ -33,7 +38,7 @@ Tableau aleatoire(const Tableau& valeurs)
         resultat = distribution(generator);
     }
     
-    return { { std::move(resultat) } };
+    return { { resultat } };
 }
 
 } // namespace stretch::standard::fonction

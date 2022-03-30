@@ -7,7 +7,7 @@
 #include <exception>
 #include <tao/pegtl.hpp>
 
-#include <fmt/color.h>
+#include "stretch/Output.hpp"
 
 /////////////////////////////////////////////////
 namespace stretch::exception {
@@ -25,24 +25,24 @@ public:
     /////////////////////////////////////////////////
     void print() const
     {
-        std::string output = fmt::format(fg(fmt::color::crimson) | fmt::emphasis::bold, "[erreur d'execution]\n");
+        std::string output = output::format(fg(fmt::color::crimson) | fmt::emphasis::bold, "[erreur d'execution]\n");
         output += fmt::format("fichier: ");
-        output += fmt::format(fg(fmt::color::pink), "{}\n", m_position.source);
+        output += output::format(fg(fmt::color::pink), "{}\n", m_position.source);
         output += fmt::format("    ligne: ");
-        output += fmt::format(fg(fmt::color::pink), "{}", m_position.line);
+        output += output::format(fg(fmt::color::pink), "{}", m_position.line);
         output += fmt::format(", colonne: ");
-        output += fmt::format(fg(fmt::color::pink), "{}\n", m_position.column);
+        output += output::format(fg(fmt::color::pink), "{}\n", m_position.column);
         
         if(!m_message.empty()) 
         {
             output += fmt::format("message: ");
-            output += fmt::format(fg(fmt::color::pink) | fmt::emphasis::bold, "{}\n", m_message);
+            output += output::format(fg(fmt::color::pink) | fmt::emphasis::bold, "{}\n", m_message);
         } 
 
         if(!m_sujet.empty()) 
         {
             output += fmt::format("sujet: ");
-            output += fmt::format(fg(fmt::color::pink) | fmt::emphasis::bold, "{}\n", m_sujet);
+            output += output::format(fg(fmt::color::pink) | fmt::emphasis::bold, "{}\n", m_sujet);
         }
 
         fmt::print(stderr, "{}", output);
@@ -53,17 +53,17 @@ public:
     {
         auto position = e.positions().front();
 
-        std::string output = fmt::format(fg(fmt::color::crimson) | fmt::emphasis::bold, "[erreur de syntaxe]\n");
+        std::string output = output::format(fg(fmt::color::crimson) | fmt::emphasis::bold, "[erreur de syntaxe]\n");
         output += fmt::format("fichier: ");
-        output += fmt::format(fg(fmt::color::pink), "{}\n", position.source);
+        output += output::format(fg(fmt::color::pink), "{}\n", position.source);
         output += fmt::format("    ligne: ");
-        output += fmt::format(fg(fmt::color::pink), "{}", position.line);
+        output += output::format(fg(fmt::color::pink), "{}", position.line);
         output += fmt::format(", colonne: ");
-        output += fmt::format(fg(fmt::color::pink), "{}\n", position.column);  
+        output += output::format(fg(fmt::color::pink), "{}\n", position.column);  
         output += fmt::format("message: ");
-        output += fmt::format(fg(fmt::color::pink) | fmt::emphasis::bold, "{}\n", e.message());
+        output += output::format(fg(fmt::color::pink) | fmt::emphasis::bold, "{}\n", e.message());
         output += fmt::format("{}\n", ligne);
-        output += fmt::format(fg(fmt::color::crimson) | fmt::emphasis::bold, "{}{}\n", std::string(position.column, '-'), "^");
+        output += output::format(fg(fmt::color::crimson) | fmt::emphasis::bold, "{}{}\n", std::string(position.column, '-'), "^");
 
         fmt::print(stderr, "{}", output);
     }
@@ -79,11 +79,7 @@ private:
 /////////////////////////////////////////////////
 class Quitter 
 {
-    /////////////////////////////////////////////////
-    Boucle()
-    {
 
-    }
 };
 
 /////////////////////////////////////////////////

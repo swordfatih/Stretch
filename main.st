@@ -1,25 +1,19 @@
+nombre_points <- 10'000
+nombre_points_inclus <- 0  
 
-a <- 5
-
-fonction nombre_magique <- nombre
-    entree <- 0
-
-    afficher "Ecrivez votre nombre"
-    lire dans entree
-
-    si nombre plus grand que entree 
-        afficher "📈 Plus grand"
-    sinon si nombre plus petit que entree
-        afficher "📉 Plus petit" 
-    sinon
-        sortir
-    fin
-
-    a <- nombre_magique(nombre)
+fonction distance_origine <- x, y  
+    sortir avec racine(puissance(x, 2) + puissance(y, 2), 2)  
 fin
 
-nombre <- aleatoire(0, 100, faux)
+repeter nombre_points fois dans i
+    point <- [aleatoire(0, 1, vrai), aleatoire(0, 1, vrai)]
+    distance <- distance_origine(point#1, point#2)
 
-nombre_magique(nombre)
+    si distance plus petit que 1 ou distance egal 1 alors
+        nombre_points_inclus <- nombre_points_inclus + 1  
+    fin
+fin
 
-afficher "Félicitations, vous avez trouvé le nombre à deviner !"
+pi_sur_quatre <- nombre_points_inclus / nombre_points
+pi <- 4 * pi_sur_quatre
+afficher pi
