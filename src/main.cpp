@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
         /////////////////////////////////////////////////
         catch(const pe::parse_error& e)
         {
-            stretch::exception::StretchException::print(e, in.line_at(e.positions().front()));
+            stretch::exception::Runtime::print(e, in.line_at(e.positions().front()));
             return 0;
         }
     }

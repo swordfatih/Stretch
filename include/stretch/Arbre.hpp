@@ -44,7 +44,7 @@ struct rearrange_operations : pe::parse_tree::apply< rearrange_operations >
             noeud->children.emplace_back( std::move( valeur ) );
         }
         // pour les appels de fonctions
-        else if( noeud->template is_type< operation_appel >() ) {
+        else if( noeud->template is_type< operation_appel >() || noeud->template is_type< appel_fonction >()) {
             noeud->remove_content();
             auto& fils = noeud->children;
 
@@ -129,8 +129,9 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         // instructions
         assignation,
         condition, 
-        bloc< mot::fin, mot::sinon >,
-        bloc< mot::fin >,
+        bloc_generique,
+        bloc_condition,
+        bloc_fichier,
         mot::quitter,
         entree,
         sortie
@@ -144,7 +145,8 @@ using selector = tao::pegtl::parse_tree::selector< Rule,
         operation_somme,
         operation_produit,
         operation_unaire,
-        operation_appel
+        operation_appel,
+        appel_fonction
     >
 >;
 

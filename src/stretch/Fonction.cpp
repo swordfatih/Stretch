@@ -7,7 +7,7 @@
 namespace stretch {
 
 /////////////////////////////////////////////////
-Tableau executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope);
+void executer(std::unique_ptr<pe::Noeud>& noeud, Scope& scope);
 
 /////////////////////////////////////////////////
 Fonction::Fonction(std::unique_ptr<pe::Noeud>& root, std::vector<std::string> parametres, const std::function<Tableau(const Tableau&)>& interne) : m_root(root), m_parametres(std::move(parametres)), m_interne(interne) 
@@ -28,14 +28,12 @@ std::vector<std::string>& Fonction::get_parametres()
 }
 
 /////////////////////////////////////////////////
-Fonction& Fonction::enregistrer(const std::string& nom, Fonction fonction) 
+void Fonction::enregistrer(const std::string& nom, Fonction fonction) 
 {
     if(existe(nom))
         throw std::runtime_error("La fonction " + nom + " est déjà enregistrée.");
 
     definitions.insert(std::make_pair(nom, std::move(fonction)));
-
-    return definitions.at(nom);
 }
 
 /////////////////////////////////////////////////
@@ -54,7 +52,7 @@ Fonction& Fonction::recuperer(const std::string& nom)
 }
 
 /////////////////////////////////////////////////
-Tableau Fonction::invoquer(Scope& parent, const std::string& nom, const Tableau& valeurs)
+void Fonction::invoquer(Scope& parent, const std::string& nom, const Tableau& valeurs)
 {
     Fonction& fonction = Fonction::recuperer(nom);
     Scope scope(&parent);
@@ -67,13 +65,20 @@ Tableau Fonction::invoquer(Scope& parent, const std::string& nom, const Tableau&
     // si la fonction a une fonction interne
     // c'est une fonction standard
     if(fonction.m_interne) 
-        return fonction.m_interne(valeurs);
+    {
+        Tableau retour = fonction.m_interne(valeurs);
+        
+        if(!retour.empty())
+            throw exception::Retour(retour);
+
+        return;    
+    }
 
     // itération sur tous les parametres envoyés dans l'arbre
     for(size_t i = 0; i < valeurs.size(); ++i)
         scope.assigner(fonction.m_parametres[i], valeurs[i]);
 
-    return executer(fonction.get_root(), scope); // root est un pointeur, on le déférence
+    executer(fonction.get_root(), scope); 
 }
 
 } // namespace stretch
